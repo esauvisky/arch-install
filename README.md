@@ -1,4 +1,6 @@
-# INSTALAÇÃO
+INSTALAÇÃO
+==========
+
 ## Parâmetros da Configuração
 - Boot via UEFI diretamente pela placa mãe (Wiki)[https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly]
 - Orientação completa para SSDs
@@ -17,7 +19,8 @@
 >       | /dev/sda1             | /dev/sda2              |
 >       +-----------------------+------------------------+
 
-##Passo-a-Passo
+## Passo-a-Passo
+
 - Fazer boot da imagem do Arch
 - Modificar layout do teclado
 
@@ -69,11 +72,13 @@
 
     - Editar o arquivo e arrumar as coisas
 
-        # nano /mnt/etc/fstab
+            # nano /mnt/etc/fstab
+
         - Trocar relatime por: 'noatime' em /boot e /dev/mapper/cryptoroot
         - Adicionar 'discard,' em /dev/mapper/cryptoroot
         - Adicionar uma entrada tmpfs para /tmp
-            tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0
+
+                tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0
 
 - Chroot pro sistema
         # arch-chroot /mnt
