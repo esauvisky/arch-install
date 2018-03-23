@@ -6,24 +6,28 @@
 - Encriptação total do sistema, menos /boot, via LUKS (Wiki)[https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system]
 - Layout final das partições (GPT):
 
->   +-----------------------+------------------------+
->   | Boot Partition        | LUKS Partition         |
->   | Filesystem: FAT32     | Filesystem: ext4       |
->   | Tamanho: 550MiB       | Tamanho: 100%          |
->   |                       |                        |
->   |                       | /dev/mapper/cryptroot  |
->   |                       |------------------------|
->   | Type: EF00            | Type: 8300             |
->   | /dev/sda1             | /dev/sda2              |
->   +-----------------------+------------------------+
+>       +-----------------------+------------------------+
+>       | Boot Partition        | LUKS Partition         |
+>       | Filesystem: FAT32     | Filesystem: ext4       |
+>       | Tamanho: 550MiB       | Tamanho: 100%          |
+>       |                       |                        |
+>       |                       | /dev/mapper/cryptroot  |
+>       |                       |------------------------|
+>       | Type: EF00            | Type: 8300             |
+>       | /dev/sda1             | /dev/sda2              |
+>       +-----------------------+------------------------+
 
 ##Passo-a-Passo
 - Fazer boot da imagem do Arch
 - Modificar layout do teclado
-    # loadkeys br-abnt2
+
+        # loadkeys br-abnt2
+
 - Testar internet
 - Atualizar horário
+
     # timedatectl set-ntp true
+
 - Particionar o SSD
         # cgdisk /dev/sda
         -- Partição #1 (/dev/sda1): Tamanho: 550MiB, Tipo: EF00, Nome: Boot Partition
