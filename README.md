@@ -81,14 +81,21 @@ INSTALAÇÃO
                 tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0
 
 - Chroot pro sistema
+
         # arch-chroot /mnt
+
 - Setar timezone e gerar /etc/adjtime
+
         # ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
         # hwclock --systohc
+
 - Setar localizações e locales
+
         # nano /etc/locale.gen
+
             - Descomentar en_US.UTF-8 UTF-8
             - Descomentar pt_BR.UTF-8 UTF-8
+
         # locale-gen
         - Criar locale.conf e adicionar variável LANG
             # nano /etc/locale.conf
