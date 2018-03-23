@@ -281,7 +281,9 @@ INSTALAÇÃO
 *aaanndd theere ve go!*
 
 - Configuração Básica Terminal e Pacotes
-    # pacman -S bash-completion
+
+        # pacman -S bash-completion
+
     - Configurar perfil do terminal
         - Tamanho: 100x30
         - Etc...
@@ -315,7 +317,7 @@ INSTALAÇÃO
     - Ir no .config e apagar o que tá sobrando relacionado aos acima
 
 - Instalar Google Chrome
-        $ aurget -S google-chrome-stable
+        `$ aurget -S google-chrome-stable`
     - Definir a senha do Default keyring em branco
 
 - Configurar Gnome-Shell (gnome-tweak-tool)
@@ -323,9 +325,11 @@ INSTALAÇÃO
     - Ação de fechar a tampa
     - Setar "Super-Right" como tecla de overlay (para evitar super de abrir o activities)
     - Integrar extensões com o Chrome
-        - Instalar a extensão https://goo.gl/89TkHr
+        - Instalar a extensão(https://goo.gl/89TkHr)
         - Instalar o conector nativo:
+
             $ pacs chrome-gnome-shell
+
     - Extensões
         * São instaladas em .local/share/gnome-shell/extensions
         * Se der problema com schemas, entrar na pasta plugin@autor/schemas/ e executar:
