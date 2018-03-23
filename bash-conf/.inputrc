@@ -1,0 +1,75 @@
+# Carregar o inputrc do sistema, que é ignorado se exisitir um pessoal
+$include /etc/inputrc
+
+############################# VARIÁVEIS READLINE #############################
+# Desligar bips e barulhos
+set bell-style none
+
+# Não exibir caracteres como ^C & etc. (somente fora de programas)
+set echo-control-characters off
+
+# Ignora maiúsculas e minúsculas quando autocompletando.
+set completion-ignore-case on
+
+# Se o tamanho do prefixo comum entre items de autocomplete for maior do que 10,
+# ocultar o prefixo na lista de autocomplete.
+set completion-prefix-display-length 10
+
+# Remove as páginas de autocompletação de aspecto igual a 'more' ou 'less'
+set page-completions off
+
+# Mostra as páginas de autocompletação para listas acima de 500 items
+set completion-query-items 500
+
+# Mostra a lista inteira de possíveis autocompletações com somente um <Tab>
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+
+# Ao resgatar o primeiro histórico, posiciona o cursor no mesmo lugar aonde
+# estava quando o último comando foi executado.
+set history-preserve-point on
+
+# Adiciona identificadores de arquivos (/ para diretorios, * para arquivos, etc)
+# nas listas de autocompletação
+set visible-stats on
+
+# Não adiciona barras no final de nomes de diretórios quando autocompletando
+# P.S.: se TAB está associado a menu-complete, é recomendado deixar esta
+# variável off, pois pode-se apertar / para autocompletar o diretório escolhido.
+set mark-directories on
+
+
+set mark-symlinked-directories on
+set prefer-visible-bell on
+
+
+############################## ATALHOS READLINE ##############################
+# Troca a ação padrão de TAB para menu-complete (ao invés de complete).
+# menu-complete é mais eficiente pois faz loop pelos autocompletes,
+# quando há uma lista de valores ambíguos.
+TAB: menu-complete
+
+# Faz a mesma coisa com Shift+TAB, só que faz o caminho inverso.
+# Comando encontrado na internet. Significa 'Shift+TAB: menu-complete-reverse'.
+"\e[Z": "\e-1\C-i"
+
+# Navega por argumentos, respeitando espaços dentro de aspas e tudo mais.
+"\C-g": shell-backward-word
+"\C-h": shell-forward-word
+"\C-w": shell-backward-kill-word
+"\C-d": shell-kill-word
+
+# Inicia programa dando 'disown' automaticamente (usar no lugar do Enter)
+"\ed": '& disown\015'
+
+# Não começa de primeira: exibe a lista antes, e depois faz o loop se apertar
+# TAB novamente. Desta forma permite dar uma "espiada" nos nomes dos arquivos
+# ou termos a completar antes de começar a preencher.
+set menu-complete-display-prefix on
+
+# Permite pesquisas no histórico.
+# Após digitar algum texto, ao usar as teclas para cima e para baixo
+# o histórico será pesquisado por comandos começando com tal texto.
+# Para sair do comando sem executá-lo, apertar CTRL+C.
+"\e[B": history-search-forward
+"\e[A": history-search-backward
