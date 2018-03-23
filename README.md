@@ -1,29 +1,29 @@
 # INSTALAÇÃO
 ## Parâmetros da Configuração
-- Boot via UEFI diretamente pela placa mãe [https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly]
+- Boot via UEFI diretamente pela placa mãe (Wiki)[https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly]
 - Orientação completa para SSDs
 - Somente duas partições, root e boot.
-- Encriptação total do sistema, menos /boot, via LUKS [https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system]
+- Encriptação total do sistema, menos /boot, via LUKS (Wiki)[https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system]
 - Layout final das partições (GPT):
 
-    +-----------------------+------------------------+
-    | Boot Partition        | LUKS Partition         |
-    | Filesystem: FAT32     | Filesystem: ext4       |
-    | Tamanho: 550MiB       | Tamanho: 100%          |
-    |                       |                        |
-    |                       | /dev/mapper/cryptroot  |
-    |                       |------------------------|
-    | Type: EF00            | Type: 8300             |
-    | /dev/sda1             | /dev/sda2              |
-    +-----------------------+------------------------+
+>   +-----------------------+------------------------+
+>   | Boot Partition        | LUKS Partition         |
+>   | Filesystem: FAT32     | Filesystem: ext4       |
+>   | Tamanho: 550MiB       | Tamanho: 100%          |
+>   |                       |                        |
+>   |                       | /dev/mapper/cryptroot  |
+>   |                       |------------------------|
+>   | Type: EF00            | Type: 8300             |
+>   | /dev/sda1             | /dev/sda2              |
+>   +-----------------------+------------------------+
 
-#Passo-a-Passo
+##Passo-a-Passo
 - Fazer boot da imagem do Arch
 - Modificar layout do teclado
-        # loadkeys br-abnt2
+    # loadkeys br-abnt2
 - Testar internet
 - Atualizar horário
-        # timedatectl set-ntp true
+    # timedatectl set-ntp true
 - Particionar o SSD
         # cgdisk /dev/sda
         -- Partição #1 (/dev/sda1): Tamanho: 550MiB, Tipo: EF00, Nome: Boot Partition
