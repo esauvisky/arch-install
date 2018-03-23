@@ -287,38 +287,49 @@ INSTALAÇÃO
     - Configurar perfil do terminal
         - Tamanho: 100x30
         - Etc...
+
     - Instalar aurget (usar o epiphany para baixar o pkgbuild e não precisar instalar o Firefox)
-        - Importar ~/.config/aurgetrc
-- Configurar userdirs ~/.config/user-dirs.dirs
-    XDG_DESKTOP_DIR="$HOME/Desktop/"
-    XDG_DOWNLOAD_DIR="$HOME/Desktop/Downloads"
-    XDG_TEMPLATES_DIR="$HOME/.local/share/nautilus/templates"
-    XDG_PUBLICSHARE_DIR="$HOME/Files/Public"
-    XDG_DOCUMENTS_DIR="$HOME/Documents"
-    XDG_MUSIC_DIR="$HOME/Media"
-    XDG_PICTURES_DIR="$HOME/Media"
-    XDG_VIDEOS_DIR="$HOME/Media"
+
+        - Importar `~/.config/aurgetrc`
+
+- Configurar userdirs `~/.config/user-dirs.dirs`
+
+        XDG_DESKTOP_DIR="$HOME/Desktop/"
+        XDG_DOWNLOAD_DIR="$HOME/Desktop/Downloads"
+        XDG_TEMPLATES_DIR="$HOME/.local/share/nautilus/templates"
+        XDG_PUBLICSHARE_DIR="$HOME/Files/Public"
+        XDG_DOCUMENTS_DIR="$HOME/Documents"
+        XDG_MUSIC_DIR="$HOME/Media"
+        XDG_PICTURES_DIR="$HOME/Media"
+        XDG_VIDEOS_DIR="$HOME/Media"
+
 - Configurar Gnome
+
     - Gnome: Region & Language:
         - Language: English
         - Formats: Brasil
         - Layout Teclado: Portuguese (Brazil)
+
     - Configurar opções uma-a-uma
+
     - Configurar atalhos um-a-um, remover todos os não-utilizados
         - Custom Shortcuts:
-            Launch Terminal: gnome-terminal | Super+T
-            Shorten URL: shortenurl -c | Super+W
-            Download URL to /tmp: uridownload | Super+R
-            Launch System Monitor: gnome-system-monitor | Ctrl+Alt+Delete
-            Take a Screenshot: emiliano-screenshot | Print
+
+                Launch Terminal: gnome-terminal | Super+T
+                Shorten URL: shortenurl -c | Super+W
+                Download URL to /tmp: uridownload | Super+R
+                Launch System Monitor: gnome-system-monitor | Ctrl+Alt+Delete
+                Take a Screenshot: emiliano-screenshot | Print
 
 - Remover coisas aleatórias não utilizadas que foram instaladas anyways
         $ pacr gnome-contacts gnome-maps folks gnome-todo gnome-calendar evolution evolution-data-server gnome-photos
     - Ir no .config e apagar o que tá sobrando relacionado aos acima
 
 - Instalar Google Chrome
-        `$ aurget -S google-chrome-stable`
-    - Definir a senha do Default keyring em branco
+
+        $ aurget -S google-chrome-stable
+
+    - Definir a senha do Default keyring em branco, senão você vai ter que digitar toda vez que abrir o Chrome.
 
 - Configurar Gnome-Shell (gnome-tweak-tool)
     - Ação do botão de desligar
@@ -328,7 +339,7 @@ INSTALAÇÃO
         - Instalar a extensão(https://goo.gl/89TkHr)
         - Instalar o conector nativo:
 
-            $ pacs chrome-gnome-shell
+                $ pacs chrome-gnome-shell
 
     - Extensões
         * São instaladas em .local/share/gnome-shell/extensions
