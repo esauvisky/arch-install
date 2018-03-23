@@ -1,42 +1,23 @@
-Este arquivo é versionado via git, não se esqueça de fazer commit das alterações toda vez que editar!
-
- 
-General Tips
-============
-- Como listar todas as bibliotecas necessárias por certo binário:
-    $ ldd binário
-- Como listar o pacote que contém a biblioteca:
-    $ pkgfile -s libportaudio.so.2
-- Copiar arquivos pelo rsync com verificação de crc & etc.
-    $ rsync -avhn --progress SOURCE DESTINO
-    - Verificar e remover -n para rodar
-    - Adicionar --del se quiser "sincronizar", ou seja, deletar arquivos em DESTINO que não estejam presentes em SOURCE
-    - Lembre-se que se SOURCE for um diretório com / no final, este é tratado como /*, portanto se quiser lidar com a pasta como se fosse um arquivo, não coloque / no final.
-
-
-INSTALAÇÃO
-==========
-
-Parâmetros da Configuração
---------------------------
+# INSTALAÇÃO
+## Parâmetros da Configuração
 - Boot via UEFI diretamente pela placa mãe [https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly]
 - Orientação completa para SSDs
 - Somente duas partições, root e boot.
 - Encriptação total do sistema, menos /boot, via LUKS [https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system]
-- Layout final das partições (GPT)
-		+-----------------------+------------------------+
-		| Boot Partition        | LUKS Partition         |
-		| Filesystem: FAT32     | Filesystem: ext4       |
-		| Tamanho: 550MiB       | Tamanho: 100%          |
-		|                       |                        |
-		|                       | /dev/mapper/cryptroot  |
-		|                       |------------------------|
-		| Type: EF00            | Type: 8300             |
-		| /dev/sda1             | /dev/sda2              |
-		+-----------------------+------------------------+
+- Layout final das partições (GPT):
 
-Passo-a-Passo
--------------
+>        +-----------------------+------------------------+
+>        | Boot Partition        | LUKS Partition         |
+>        | Filesystem: FAT32     | Filesystem: ext4       |
+>        | Tamanho: 550MiB       | Tamanho: 100%          |
+>        |                       |                        |
+>        |                       | /dev/mapper/cryptroot  |
+>        |                       |------------------------|
+>        | Type: EF00            | Type: 8300             |
+>        | /dev/sda1             | /dev/sda2              |
+>        +-----------------------+------------------------+
+
+#Passo-a-Passo
 - Fazer boot da imagem do Arch
 - Modificar layout do teclado
         # loadkeys br-abnt2
@@ -71,7 +52,7 @@ Passo-a-Passo
         - Trocar relatime por: 'noatime' em /boot e /dev/mapper/cryptoroot
         - Adicionar 'discard,' em /dev/mapper/cryptoroot
         - Adicionar uma entrada tmpfs para /tmp
-            tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0        
+            tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0
 - Chroot pro sistema
         # arch-chroot /mnt
 - Setar timezone e gerar /etc/adjtime
@@ -197,6 +178,7 @@ Post Install
         exec gnome-session
 - Trocar para tty1 e reiniciar o sistema
         # reboot
+
 **Se tudo der certo, o sistema será reiniciado e o gnome iniciará automaticamente após digitar a senha do HD!!!11UM**
 
 + TODO: backup header LUKS
@@ -212,17 +194,15 @@ CONFIGURAÇÕES
         - Etc...
     - Instalar aurget (usar o epiphany para baixar o pkgbuild e não precisar instalar o Firefox)
         - Importar ~/.config/aurgetrc
-
 - Configurar userdirs ~/.config/user-dirs.dirs
-   	XDG_DESKTOP_DIR="$HOME/Desktop/"
-	XDG_DOWNLOAD_DIR="$HOME/Desktop/Downloads"
-	XDG_TEMPLATES_DIR="$HOME/.local/share/nautilus/templates"
-	XDG_PUBLICSHARE_DIR="$HOME/Files/Public"
-	XDG_DOCUMENTS_DIR="$HOME/Documents"
-	XDG_MUSIC_DIR="$HOME/Media"
-	XDG_PICTURES_DIR="$HOME/Media"
-	XDG_VIDEOS_DIR="$HOME/Media"
-
+    XDG_DESKTOP_DIR="$HOME/Desktop/"
+    XDG_DOWNLOAD_DIR="$HOME/Desktop/Downloads"
+    XDG_TEMPLATES_DIR="$HOME/.local/share/nautilus/templates"
+    XDG_PUBLICSHARE_DIR="$HOME/Files/Public"
+    XDG_DOCUMENTS_DIR="$HOME/Documents"
+    XDG_MUSIC_DIR="$HOME/Media"
+    XDG_PICTURES_DIR="$HOME/Media"
+    XDG_VIDEOS_DIR="$HOME/Media"
 - Configurar Gnome
     - Gnome: Region & Language:
         - Language: English
@@ -273,14 +253,11 @@ CONFIGURAÇÕES
             - Pesquisar por: 'addToStatusArea'
             - Editar de acordo:
                 Main.panel.addToStatusArea('shellshape-indicator', _indicator, 1, 'left');
-
 - Adicionar tmpfs para algumas pastas em /etc/fstab
         - .cache/google-chrome
         - .cache/spotify
         - .aurget
-
 - Instalar e configurar Profile-sync-daemon[https://wiki.archlinux.org/index.php/Profile-sync-daemon]
-
 - Configurações do SMART para o HD
     - Ativa o daemon do SmartmonTools
         $ pacs smartmontools
@@ -293,7 +270,6 @@ CONFIGURAÇÕES
         $ systemctl enable smartd
     - Verifica o estado dos HDs
         # smartctl --all /dev/sda
-
 - Teclado
     - Instalar e configurar clipit
         - Items in history: MAX (1000)
@@ -305,7 +281,6 @@ CONFIGURAÇÕES
       Já que .Xmodmap não funciona no gnome pelo visto:
         Linha 18 (Editar): key <AE12> { [        equal,           plus,           bar,     dead_ogonek ] };
         Linha 19 (Adici.): key <AD09> { [            o,              O,   Greek_OMEGA,     Greek_OMEGA ] };
-
 - Instalar e configurar linux-ck (*para MuQSS + BFQ baby!*) [https://wiki.archlinux.org/index.php/Linux-ck]
     - Adicionar o repo do no /etc/pacman.conf:
         [repo-ck]
@@ -320,7 +295,6 @@ CONFIGURAÇÕES
         # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux MuQSS+BFQ" --loader /vmlinuz-linux-ck-haswell --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=/intel-ucode.img initrd=/initramfs-linux-ck-haswell.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
     - Reiniciar e verificar se MuQSS está rodando:
         # dmesg | grep -i muqss
-
 - Configurar sensores de temperatura
     $ pacs lm_sensors
     # sensors-detect
@@ -365,13 +339,11 @@ CONFIGURAÇÕES
         - GTK+: NumixSolarizedDark
         - Icons: Paper
         - Shell: SolArc-Dark
-
 - Pulseaudio
     - Configurações do usuário local
         $ gedit ~/.config/pulse/daemon.conf
             ## Utiliza volumes relativos. Soluciona vários probleminhas de volume e é bem melhor para resetar os volumes dos apps.
             flat-volumes = no
-
 - Banco do Brasil (warsaw):
     - Verificar configurações chrome://settings/content/flash
     - Ativar flag chrome://flags/#allow-insecure-localhost
@@ -383,16 +355,12 @@ CONFIGURAÇÕES
 - Adicionar links para meus softwares em ~/Documentos/Programação/Projetos
     $ cdp
     $ ./Atualizar_Projetos
-
-- Para montar partições do Windows *com* permissão de escrita, instalar ntfs-3g
-
 - Instalar serviços e clientes de impressão:
     $ pacs cups ghotscript gsfonts gutenprint
     $ systemctl enable org.cups.cupsd.socket
     $ systemctl start org.cups.cupsd.service
         - Navegar para localhost:631
         - Configurar impressora (logar como root)
-
 - Configuração Básica Samba (com usershares):
     # pacman -S samba gvfs-smb
     # cp /etc/samba/smb.conf.default /etc/samba/smb.conf
@@ -427,19 +395,11 @@ CONFIGURAÇÕES
 - Configurar iPhones e iPods via Nautilus:
     $ pacs gvfs-afc usbmuxd
 
-- Desativar controle de mouse com joysticks
-    $ pacr xf86-input-joystick
-
 - Instalar e configurar Wine/PlayOnLinux
     $ pacs playonlinux
     $ pacs wine-mono wine_gecko samba lib32-libxslt lib32-libxml2
     $ pacs lib32-alsa-lib lib32-alsa-plugins lib32-mpg123 lib32-libpulse
     - Usar no terminal TZ=America/New_York wine arquivo.exe se houver problema de TZ
-
-- Configurar GIT para usar o gnome-keyring
-    $ cd /usr/share/git/credential/gnome-keyring/
-    # make
-    $ git config --global credential.helper /usr/lib/git-core/git-credential-gnome-keyring
 
 - noip
     $ aurget -S noip
@@ -453,26 +413,41 @@ CONFIGURAÇÕES
             $ aurget -S virtualbox-ext-oracle
         - Depois adicionar o usuário no grupo vboxusers
             # sudo usermod -aG vboxusers esauvisky
-        - Depois instalar na máquina virtual o driver USB 3.0 (xHCD) da Intel
-            https://goo.gl/NqkZ1U
+        - Depois instalar na máquina virtual o driver USB 3.0 (xHCD) da Intel[https://goo.gl/NqkZ1U]
 
-##### DEPRECADO #####
+
+# Tips and Tricks
+- Para montar partições do Windows *com* permissão de escrita, instalar ntfs-3g
+- Como remover o popup "application is ready", e fazer a janela roubar o foco instalar (ou copiar do backup) a extensão Steal my Focus
+- Configurar GIT para usar o gnome-keyring:
+    $ git config --global credential.helper /usr/lib/git-core/git-credential-gnome-keyring
+- Desativar controle de mouse com joysticks
+    $ pacr xf86-input-joystick
+    - Como listar todas as bibliotecas necessárias por certo binário:
+        $ ldd binário
+    - Como listar o pacote que contém a biblioteca:
+        $ pkgfile -s libportaudio.so.2
+    - Copiar arquivos pelo rsync com verificação de crc & etc.
+        $ rsync -avhn --progress SOURCE DESTINO
+        - Verificar e remover -n para rodar
+        - Adicionar --del se quiser "sincronizar", ou seja, deletar arquivos em DESTINO que não estejam presentes em SOURCE
+        - Lembre-se que se SOURCE for um diretório com / no final, este é tratado como /*, portanto se quiser lidar com a pasta como se fosse um arquivo, não coloque / no final.
+
+
+# Deprecado
 - * Drivers placa de vídeo Topaz XT [Radeon R7 M260/M265]
     * O driver nativo da kernel 'amdgpu' está funcionando perfeitamente
     - Carrega o módulo radeon antes do KMS
         # gedit /etc/mkinitcpio.conf
             MODULES="radeon"
     - Adicionar radeon.dpm=1 à inicialização da Kernel??
-
 - Desabilitar touchpad se existe um mouse externo conectado
     # gedit /etc/udev/rules.d/01-touchpad.rules
         SUBSYSTEM=="input", KERNEL=="mouse[0-9]", ACTION=="add", PROGRAM="/usr/bin/find /var/run/gdm -name esauvisky -print -quit", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="$result/database", RUN+="/usr/bin/synclient TouchpadOff=1"
         SUBSYSTEM=="input", KERNEL=="mouse[0-9]", ACTION=="remove", PROGRAM="/usr/bin/find /var/run/gdm -name esauvisky -print -quit", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="$result/database", RUN+="/usr/bin/synclient TouchpadOff=0"
-
 - Editar atalhos de softwares (accels) *on-the-fly*
     $ dconf-editor
         org.gnome.desktop.interface can-change-accels true
-
 - Configurações do Mouse
     - Instalar solaar-git (para Logitech Unifiying Receivers)
     $ dconf-editor
@@ -498,7 +473,6 @@ CONFIGURAÇÕES
     - Remover applet do Solaar da auto-inicialização:
         $ sudo gedit /etc/xdg/autostart/solaar.desktop
             X-GNOME-Autostart-enabled=false
-
 - Configurar Power Options
     # gedit /etc/systemd/logind.conf
         HandlePowerKey=ignore
@@ -514,12 +488,10 @@ CONFIGURAÇÕES
         org.gnome.settings-daemon.plugins.power
     * Talvez valha a pena desativar org.gnome.settings-daemon.plugins.power (via active false) e utilizar somente systemd
     * Se ao fechar a tampa o monitor externo (e o interno) ficarem desativados, remover ~/.config/monitors.xml
-    
 - Pulseaudio
     - Remover autostart do pulseaudio no GDM
         # gedit /var/lib/gdm/.pulse/daemon.conf
             autospawn = no
             daemon-binary = /bin/true
         # chown gdm:gdm /var/lib/gdm/.pulse -R
-
 - Autostart: EmliDaemon
