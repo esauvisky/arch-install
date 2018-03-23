@@ -247,8 +247,7 @@ INSTALAÇÃO
 
 - Trocar para tty2, fazer login com o novo usuário e trocar de volta para tty1
 
-    - **Atenção: .bash_profile irá executar startx imediatamente assim que for feito login com o usuário não-root em tty2!**
-    - **Portanto, faça login antes de copiar o arquivo ou use outro tty**
+    - **Atenção: .bash_profile irá executar startx imediatamente assim que for feito login com o usuário não-root em tty2! Portanto, faça login antes de copiar o arquivo ou use outro tty**
 
 - Copiar os arquivos de configuração do bash para o usuário, apagar os em /root, criar links simbólicos e arrumar permissões
 
@@ -276,10 +275,9 @@ INSTALAÇÃO
 
 **Se tudo der certo, o sistema será reiniciado e o gnome iniciará automaticamente após digitar a senha do HD!!!11UM**
 
-+ TODO: backup header LUKS
+    + TODO: backup header LUKS
 
-CONFIGURAÇÕES
-=============
+# CONFIGURAÇÕES
 *aaanndd theere ve go!*
 
 - Configuração Básica Terminal e Pacotes
