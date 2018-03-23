@@ -26,37 +26,55 @@
 - Testar internet
 - Atualizar horário
 
-    # timedatectl set-ntp true
+        # timedatectl set-ntp true
 
 - Particionar o SSD
+
         # cgdisk /dev/sda
         -- Partição #1 (/dev/sda1): Tamanho: 550MiB, Tipo: EF00, Nome: Boot Partition
         -- Partição #2 (/dev/sda2): Tamanho: 450GiB, Tipo: 8300, Nome: LUKS Partition
+
 - Encriptar Partição #2 [https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Preparing_non-boot_partitions]
+
         # cryptsetup -y -v luksFormat --type luks2 /dev/sda2
+
 - Abrir Partição Encriptada (e ativar discards permanentemente)
+
         # cryptsetup --allow-discards --persistent open --type luks2 /dev/sda2 cryptroot
+
 - Formatar as partições
+
         # mkfs.ext4 /dev/mapper/cryptroot
         # mkfs.fat -F32 /dev/sda1
+
 - Montar as partições
+
         # mount /dev/mapper/cryptroot /mnt
         # mkdir /mnt/boot
         # mount /dev/sda1 /mnt/boot
+
 - Selecionar mirrors do arch rápidos
+
         # cd /etc/pacman.d
         # mv mirrorlist mirrorlist~
         # rankmirrors -vn 6 mirrorlist~ > mirrorlist
+
 - Instalar o sistema base
+
         # pacstrap /mnt base base-devel efibootmgr
+
 - Gerar o FSTAB
+
         # genfstab -U /mnt >> /mnt/etc/fstab
+
     - Editar o arquivo e arrumar as coisas
+
         # nano /mnt/etc/fstab
         - Trocar relatime por: 'noatime' em /boot e /dev/mapper/cryptoroot
         - Adicionar 'discard,' em /dev/mapper/cryptoroot
         - Adicionar uma entrada tmpfs para /tmp
             tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0
+
 - Chroot pro sistema
         # arch-chroot /mnt
 - Setar timezone e gerar /etc/adjtime
