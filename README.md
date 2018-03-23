@@ -138,19 +138,19 @@ INSTALAÇÃO
 - Configurar bootloader
     - Instalar microcode para intel
 
-        # pacman -S intel-ucode
+            # pacman -S intel-ucode
 
     - Pegar UUID de /dev/sda2
 
-        # blkid
+            # blkid
 
     - Criar entrada UEFI na placa mãe:
 
-        # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux" --loader /vmlinuz-linux --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=/intel-ucode.img initrd=/initramfs-linux.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
+            # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux" --loader /vmlinuz-linux --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=/intel-ucode.img initrd=/initramfs-linux.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
 
     - *Dica: após, apertar seta para cima, adicionar aspas simples no comando inteiro, echo na frente e redirecionar para /boot/efi-params.txt*
 
-        # echo 'efibootmgr [...]' > /boot/efi-params.txt
+            # echo 'efibootmgr [...]' > /boot/efi-params.txt
 
 - Sair do chroot, desmontar partições e reiniciar sistema!
 
@@ -158,45 +158,70 @@ INSTALAÇÃO
         # umount -R /mnt
         # reboot
 
-Post Install
-============
+## Post Install
+
 - Fazer login como root
 - Ativar e iniciar a internet
+
         # systemctl enable NetworkManager
         # systemctl start NetworkManager
+
     - Se precisar de WiFi, usar `wifi-menu`
 - Instalar algumas coisas:
+
         # pacman -S bash-completion xorg-xinit fortune-mod wget
-- Copiar backup das configurações salvas para /root
+
+- Copiar backup das configurações do bash para /root
+
         # mount [device] /mnt
         # cp /mnt/arch-install/bash-conf/.* /root/
+
     - Copiar regra udev para usar BFQ como I/O scheduler
-        # cp /mnt/arch-install/etc/udev/rules.d/60-ioscheduler.rules /etc/udev/rules.d/
+
+            # cp /mnt/arch-install/etc/udev/rules.d/60-ioscheduler.rules /etc/udev/rules.d/
+
     - Importar /etc/pacman.conf
-        # cp /mnt/arch-install/etc/pacman.conf /etc/pacman.conf
+
+            # cp /mnt/arch-install/etc/pacman.conf /etc/pacman.conf
+
     - Importar módulo snd_hda_intel (para evitar power-saving e ruídos):
-        # cp /mnt/arch-install/etc/modprobe.d/snd-hda-intel.conf /etc/modprobe.d/snd-hda-intel.conf
+
+            # cp /mnt/arch-install/etc/modprobe.d/snd-hda-intel.conf /etc/modprobe.d/snd-hda-intel.conf
+
     - Desmontar, sair e logar novamente
-        # sync && umount /mnt
-        # exit
+
+            # sync && umount /mnt
+            # exit
+
 - Editar /etc/sudoers
+
         # visudo
             %wheel ALL=(ALL) ALL
             Defaults timestamp_timeout=-1
             Defaults insults
+
 - Confirmar se discard está funcionando:
     - Ver se o header LUKS está permitindo discards (olhar FLAGS):
-        # cryptsetup luksDump /dev/sdaX
+
+            # cryptsetup luksDump /dev/sdaX
+
     - Ver se /dev/mapper/cryptroot está incluindo discard
-        # cat /proc/mounts
+
+            # cat /proc/mounts
+
 - Adicionar módulos dos drivers gráficos no Early KMS:
+
         # nano /etc/mkinitcpio.conf
             MODULES=(i915 amdgpu)
         # mkinicpio -p linux
+
 - Adicionar usuário
+
         # useradd -m -G users,wheel esauvisky
         # passwd esauvisky
+
 - Adicionar redirecionamento tty1 -> tty2 e auto-login do usuário em tty2
+
         # systemctl edit getty@tty1.service
             [Service]
             ExecStart=
@@ -209,16 +234,24 @@ Post Install
             ExecStart=
             ExecStart=-/usr/bin/agetty --autologin esauvisky --noclear %I $TERM
             TTYVTDisallocate=no
+
 - Instalar gnome, gnome-extra e xorg
+
         # pacman -S gnome gnome-extra xorg
+
     - Usar `^13 ^43` e assim por diante para selecionar tudo menos alguns
-    - Exclusões recomendadas
-        gnome:       ^13 ^43 ^45 ^50 ^51 ^52 (gnome-dictionary, rygel, totem, yelp, gnome-software, simple-scan)
-        gnome-extra: ^2 ^3 ^4 ^5 ^6 ^10 ^12 ^13 ^16 ^17 ^19 ^23 ^24 ^26 ^29 ^31 ^33 ^34 ^35 ^39 ^40 ^42 ^44 ^45 ^46 ^48 ^49 ^50
+    - Exclusões recomendadas:
+
+            gnome:       ^13 ^43 ^45 ^50 ^51 ^52 (gnome-dictionary, rygel, totem, yelp, gnome-software, simple-scan)
+            gnome-extra: ^2 ^3 ^4 ^5 ^6 ^10 ^12 ^13 ^16 ^17 ^19 ^23 ^24 ^26 ^29 ^31 ^33 ^34 ^35 ^39 ^40 ^42 ^44 ^45 ^46 ^48 ^49 ^50
+
 - Trocar para tty2, fazer login com o novo usuário e trocar de volta para tty1
-    **Atenção: .bash_profile irá executar startx imediatamente assim que for feito login com o usuário não-root em tty2!**
-    **Portanto, faça login antes de copiar o arquivo ou use outro tty**
+
+    - **Atenção: .bash_profile irá executar startx imediatamente assim que for feito login com o usuário não-root em tty2!**
+    - **Portanto, faça login antes de copiar o arquivo ou use outro tty**
+
 - Copiar os arquivos de configuração do bash para o usuário, apagar os em /root, criar links simbólicos e arrumar permissões
+
         # cd ~
         # cp .toprc .inputrc .bashrc .bash_profile /home/esauvisky
         # touch /home/esauvisky/.bash_eternal_history
@@ -226,13 +259,19 @@ Post Install
         # rm .toprc .inputrc .bashrc .bash_profile
         # ln -s /home/esauvisky/.bashrc /home/esauvisky/.inputrc /home/esauvisky/.toprc /home/esauvisky/.bash_profile /root/
         # chmod 664 .bashrc .inputrc .toprc .bash_profile .bash_eternal_history
+
 - Com o usuário, copiar esqueleto do .xinitrc
+
         $ cp /etc/X11/xinit/xinitrc ~/.xinitrc
+
 - Editar .xinitrc
+
         $ nano .xinitrc
-    - Apagar de 'twm' em diante e substituir por:
-        exec gnome-session
+            - Apagar de 'twm' em diante e substituir por:
+            exec gnome-session
+
 - Trocar para tty1 e reiniciar o sistema
+
         # reboot
 
 **Se tudo der certo, o sistema será reiniciado e o gnome iniciará automaticamente após digitar a senha do HD!!!11UM**
