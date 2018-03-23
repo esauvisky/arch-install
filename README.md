@@ -2,10 +2,10 @@ INSTALAÇÃO
 ==========
 
 ## Parâmetros da Configuração
-- Boot via UEFI diretamente pela placa mãe (Wiki)[https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly]
+- Boot via UEFI diretamente pela placa mãe [Wiki](https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly)
 - Orientação completa para SSDs
 - Somente duas partições, root e boot.
-- Encriptação total do sistema, menos /boot, via LUKS (Wiki)[https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system]
+- Encriptação total do sistema, menos /boot, via LUKS [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system)
 - Layout final das partições (GPT):
 
 >       +-----------------------+------------------------+
@@ -37,7 +37,7 @@ INSTALAÇÃO
         -- Partição #1 (/dev/sda1): Tamanho: 550MiB, Tipo: EF00, Nome: Boot Partition
         -- Partição #2 (/dev/sda2): Tamanho: 450GiB, Tipo: 8300, Nome: LUKS Partition
 
-- Encriptar Partição #2 [https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Preparing_non-boot_partitions]
+- Encriptar Partição #2 [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Preparing_non-boot_partitions)
 
         # cryptsetup -y -v luksFormat --type luks2 /dev/sda2
 
@@ -73,12 +73,10 @@ INSTALAÇÃO
     - Editar o arquivo e arrumar as coisas
 
             # nano /mnt/etc/fstab
-
-        - Trocar relatime por: 'noatime' em /boot e /dev/mapper/cryptoroot
-        - Adicionar 'discard,' em /dev/mapper/cryptoroot
-        - Adicionar uma entrada tmpfs para /tmp
-
-                tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0
+                - Trocar relatime por: 'noatime' em /boot e /dev/mapper/cryptoroot
+                - Adicionar 'discard,' em /dev/mapper/cryptoroot
+                - Adicionar uma entrada tmpfs para /tmp
+                    tmpfs    /tmp        tmpfs   rw,nodev,nosuid,noatime,size=2G     0       0
 
 - Chroot pro sistema
 
@@ -92,46 +90,70 @@ INSTALAÇÃO
 - Setar localizações e locales
 
         # nano /etc/locale.gen
-
             - Descomentar en_US.UTF-8 UTF-8
             - Descomentar pt_BR.UTF-8 UTF-8
 
         # locale-gen
-        - Criar locale.conf e adicionar variável LANG
+
+    - Criar locale.conf e adicionar variável LANG
+
             # nano /etc/locale.conf
                 LANG=en_US.UTF-8
-        - Criar vconsole.conf e adicionar variável KEYMAP
+
+    - Criar vconsole.conf e adicionar variável KEYMAP
+
             # nano /etc/vconsole.conf
                 KEYMAP=br-abnt2
+
 - Criar arquivo hostname e setar o nome do computador
+
         # nano /etc/hostname
             emi-arch
+
 - Editar arquivo hosts de acordo
+
         # nano /etc/hosts
             127.0.0.1   localhost
             ::1         localhost
             127.0.1.1   emi-arch.localdomain    emi-arch
+
 - Instalar ferramentas para conectar à internet depois de instalado
+
         # pacman -S iw dialog wpa_supplicant networkmanager
-- Configurar e regerar mkinitcpio para funcionar com o dm-crypt [https://wiki.archlinux.org/index.php/Dm-crypt Encrypting_an_entire_system#Configuring_mkinitcpio]
+
+- Configurar e regerar mkinitcpio para funcionar com o dm-crypt [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt Encrypting_an_entire_system#Configuring_mkinitcpio)
     - Adicionar HOOKS 'keyboard' e 'keymap' antes de 'block' e 'encrypt' antes de 'filesystems'
-        # nano /etc/mkinitcpio.conf
-            HOOKS=(... keyboard keymap block encrypt ... filesystems ...)
-            - Apagar instâncias repetidas
+
+            # nano /etc/mkinitcpio.conf
+                HOOKS=(... keyboard keymap block encrypt ... filesystems ...)
+                - Apagar instâncias repetidas
+
     - Regerar mkinitcpio
-        # mkinitcpio -p linux
+            # mkinitcpio -p linux
+
 - Setar senha do root
+
         # passwd
+
 - Configurar bootloader
     - Instalar microcode para intel
+
         # pacman -S intel-ucode
+
     - Pegar UUID de /dev/sda2
+
         # blkid
+
     - Criar entrada UEFI na placa mãe:
+
         # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux" --loader /vmlinuz-linux --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=/intel-ucode.img initrd=/initramfs-linux.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
-    - Dica: após, apertar seta para cima, adicionar aspas simples no comando inteiro, echo na frente e redirecionar para /boot/efi-params.txt
+
+    - *Dica: após, apertar seta para cima, adicionar aspas simples no comando inteiro, echo na frente e redirecionar para /boot/efi-params.txt*
+
         # echo 'efibootmgr [...]' > /boot/efi-params.txt
+
 - Sair do chroot, desmontar partições e reiniciar sistema!
+
         # exit
         # umount -R /mnt
         # reboot
