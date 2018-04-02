@@ -18,3 +18,5 @@ root ALL=(ALL) ALL
 # Used for profile-sync-daemon:
 # Allows any member of group wheel to run /usr/bin/psd-overlay-helper (without a password)
 %wheel ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
+# Same for i8kfan
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/i8kfan
