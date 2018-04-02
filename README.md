@@ -529,117 +529,32 @@ INSTALAÇÃO
                     Option      "DRI" "3"
             EndSection
 
-# Continuar Aqui #
+- Serviços e clientes de impressão:
 
-- Configurar Google Chrome
-    - Extensões
-        - LastPass
-            - Instalar extensão
-            - Instalar componente binário
-        - Stylus (antigo Stylish)
-            - Importar backup
-        - Tampermonkey
-            - Importar configurações via Google Drive ou backup
-        - uBlock Origin
-            - Ativar "Enable cloud storage support"
-            - Desativar "Disable pre-fetching (to prevent any connection for blocked network requests)"
-            - Baixar configurações da nuvem nas abas:
-                - 3rd-party filters
-                - My filters
-                - My rules
-                - Whitelist
-        - WOT
-            - Sincronizar perfil e configurar
-        - The Great Suspender
-        - Chrome Regex Search
-            - Configurar atalho para Ctrl+Shift+F
-        - Tabby Cat
-            - Tentar importar gatos (pesquisar por mefhakmgclhhfbdadeojlkbllmecialg no Default Profile do backup)
-        - MetaMask
-            - Importar seed
-        - Myibidder Auction Bid Sniper for eBay
-        - WikiWand
+    1. Instalar `cups`, `gutenprint` e `ghostscript`
 
-- Configurar Temas (gnome-tweak-tool)
-    - Instalar Temas
-        - Ativar Global Dark Theme (se já não estiver ativada)
-        - Ativar extensão User Themes (se já não estiver ativada)
-        - GTK+: NumixSolarizedDark
-        - Icons: Paper
-        - Shell: SolArc-Dark
-- Pulseaudio
-    - Configurações do usuário local
-        $ gedit ~/.config/pulse/daemon.conf
-            ## Utiliza volumes relativos. Soluciona vários probleminhas de volume e é bem melhor para resetar os volumes dos apps.
-            flat-volumes = no
-- Banco do Brasil (warsaw):
-    - Verificar configurações chrome://settings/content/flash
-    - Ativar flag chrome://flags/#allow-insecure-localhost
-    - Instalar warsaw da AUR:
-        $ aurget -S warsaw
-        $ systemctl restart warsaw.service
-        - Abrir http://www.dieboldnixdorf.com.br/warsaw e selecionar o banco desejado para atualizar
+            $ pacs cups gutenprint ghostscript
 
+    2. Para a integração com o Gnome (erro ao adicionar a impressora):
 
-- Instalar serviços e clientes de impressão:
+            $ pacs system-config-printer
 
-    - `system-config-printer` é necessário para a integração com o Gnome (senão dá erro ao adicionar a impressora)
-    - Para a ML-2165 instalar `samsung-ml2160` da AUR
-    - Comandos:
+    3. Para a ML-2165 instalar `samsung-ml2160` da AUR
 
-        $ pacs cups gutenprint system-config-printer ghostcript gsfonts
-        $ aurget -S samsung-ml2160
-        $ systemctl enable org.cups.cupsd.service
-        $ systemctl start org.cups.cupsd.service
+            $ aurget -S samsung-ml2160
 
-    - Adicionar impressora pelo gnome ou localhost:631
-        - Se no chrome não funcionar, tentar pelo epiphany
+    4. Ativar e iniciar serviços
 
-- Configuração Básica Samba (com usershares):
-    # pacman -S samba gvfs-smb
-    # cp /etc/samba/smb.conf.default /etc/samba/smb.conf
-    # gedit /etc/samba/smb.conf
-        workgroup = WORKGROUP
-        server string = Emi Server
-    # mkdir -p /var/lib/samba/usershare
-    # groupadd sambashare
-    # sudo chown root:sambashare /var/lib/samba/usershare
-    # chmod 1770 /var/lib/samba/usershare
-    # gedit /etc/samba/smb.conf
-        [global]
-        usershare path = /var/lib/samba/usershare
-        usershare max shares = 100
-        usershare allow guests = yes
-        usershare owner only = yes
-    # usermod -a -G sambashare esauvisky
-    # systemctl enable smbd nmbd
+            $ systemctl enable org.cups.cupsd.service
+            $ systemctl start org.cups.cupsd.service
 
-- Configurar Bluetooth:
-    - Gnome Settings -> Sharing
-        - Ativar Bluetooth Sharing
-        - Ativar Personal File Sharing para WiFi-Direct
-    $ pacs gnome-user-share gnome-bluetooth bluez bluez-utils obexftp obexfs
-    # systemctl enable bluetooth
-    # systemctl start bluetooth
-    - Opcional: instalar blueman para monitorar transferências e pareamentos.
+    5. Adicionar impressora
 
-- Configurar MTP
-    $ pacs libmtp mtpfs gvfs-mtp
+        - Pelo `gnome-control-center`
 
-- Configurar iPhones e iPods via Nautilus:
-    $ pacs gvfs-afc usbmuxd
+        - Ou pela interface web do cups em localhost:631
 
-- Instalar e configurar Wine/PlayOnLinux
-    $ pacs playonlinux
-    $ pacs wine-mono wine_gecko samba lib32-libxslt lib32-libxml2
-    $ pacs lib32-alsa-lib lib32-alsa-plugins lib32-mpg123 lib32-libpulse
-    - Usar no terminal TZ=America/New_York wine arquivo.exe se houver problema de TZ
-
-- noip
-    $ aurget -S noip
-    # noip2 -C
-        OU Copiar no-ip2.conf para /etc/
-    $ systemctl enable noip2.service
+            - Se no chrome não funcionar, tentar pelo epiphany ou outro navegador!
 
 - VirtualBox
 
@@ -703,82 +618,179 @@ INSTALAÇÃO
 
         - Outra opção é adicionar `NoDisplay=true` em vez de `Hidden=true`, mas a segunda parece mais abrangente.
 
-# Tips and Tricks
-- Para montar partições do Windows *com* permissão de escrita, instalar ntfs-3g
-- Como remover o popup "application is ready", e fazer a janela roubar o foco instalar (ou copiar do backup) a extensão Steal my Focus
-- Configurar GIT para usar o gnome-keyring:
-    $ git config --global credential.helper /usr/lib/git-core/git-credential-gnome-keyring
-- Desativar controle de mouse com joysticks
-    $ pacr xf86-input-joystick
-    - Como listar todas as bibliotecas necessárias por certo binário:
-        $ ldd binário
-    - Como listar o pacote que contém a biblioteca:
-        $ pkgfile -s libportaudio.so.2
-    - Copiar arquivos pelo rsync com verificação de crc & etc.
-        $ rsync -avhn --progress SOURCE DESTINO
-        - Verificar e remover -n para rodar
-        - Adicionar --del se quiser "sincronizar", ou seja, deletar arquivos em DESTINO que não estejam presentes em SOURCE
-        - Lembre-se que se SOURCE for um diretório com / no final, este é tratado como /\*, portanto se quiser lidar com a pasta como se fosse um arquivo, não coloque / no final.
+# A verificar/atualizar
+
+        - Configurar Google Chrome
+            - Extensões
+                - LastPass
+                    - Instalar extensão
+                    - Instalar componente binário
+                - Stylus (antigo Stylish)
+                    - Importar backup
+                - Tampermonkey
+                    - Importar configurações via Google Drive ou backup
+                - uBlock Origin
+                    - Ativar "Enable cloud storage support"
+                    - Desativar "Disable pre-fetching (to prevent any connection for blocked network requests)"
+                    - Baixar configurações da nuvem nas abas:
+                        - 3rd-party filters
+                        - My filters
+                        - My rules
+                        - Whitelist
+                - WOT
+                    - Sincronizar perfil e configurar
+                - The Great Suspender
+                - Chrome Regex Search
+                    - Configurar atalho para Ctrl+Shift+F
+                - Tabby Cat
+                    - Tentar importar gatos (pesquisar por mefhakmgclhhfbdadeojlkbllmecialg no Default Profile do backup)
+                - MetaMask
+                    - Importar seed
+                - Myibidder Auction Bid Sniper for eBay
+                - WikiWand
+
+        - Configurar Temas (gnome-tweak-tool)
+            - Instalar Temas
+                - Ativar Global Dark Theme (se já não estiver ativada)
+                - Ativar extensão User Themes (se já não estiver ativada)
+                - GTK+: NumixSolarizedDark
+                - Icons: Paper
+                - Shell: SolArc-Dark
+        - Pulseaudio
+            - Configurações do usuário local
+                $ gedit ~/.config/pulse/daemon.conf
+                    ## Utiliza volumes relativos. Soluciona vários probleminhas de volume e é bem melhor para resetar os volumes dos apps.
+                    flat-volumes = no
+        - Banco do Brasil (warsaw):
+            - Verificar configurações chrome://settings/content/flash
+            - Ativar flag chrome://flags/#allow-insecure-localhost
+            - Instalar warsaw da AUR:
+                $ aurget -S warsaw
+                $ systemctl restart warsaw.service
+                - Abrir http://www.dieboldnixdorf.com.br/warsaw e selecionar o banco desejado para atualizar
+
+        - Configuração Básica Samba (com usershares):
+            # pacman -S samba gvfs-smb
+            # cp /etc/samba/smb.conf.default /etc/samba/smb.conf
+            # gedit /etc/samba/smb.conf
+                workgroup = WORKGROUP
+                server string = Emi Server
+            # mkdir -p /var/lib/samba/usershare
+            # groupadd sambashare
+            # sudo chown root:sambashare /var/lib/samba/usershare
+            # chmod 1770 /var/lib/samba/usershare
+            # gedit /etc/samba/smb.conf
+                [global]
+                usershare path = /var/lib/samba/usershare
+                usershare max shares = 100
+                usershare allow guests = yes
+                usershare owner only = yes
+            # usermod -a -G sambashare esauvisky
+            # systemctl enable smbd nmbd
+
+        - noip
+            $ aurget -S noip
+            # noip2 -C
+                OU Copiar no-ip2.conf para /etc/
+            $ systemctl enable noip2.service
+
+        - Configurar Bluetooth:
+            - Gnome Settings -> Sharing
+                - Ativar Bluetooth Sharing
+                - Ativar Personal File Sharing para WiFi-Direct
+            $ pacs gnome-user-share gnome-bluetooth bluez bluez-utils obexftp obexfs
+            # systemctl enable bluetooth
+            # systemctl start bluetooth
+            - Opcional: instalar blueman para monitorar transferências e pareamentos.
+
+        - Configurar MTP
+            $ pacs libmtp mtpfs gvfs-mtp
+
+        - Configurar iPhones e iPods via Nautilus:
+            $ pacs gvfs-afc usbmuxd
+
+        - Instalar e configurar Wine/PlayOnLinux
+            $ pacs playonlinux
+            $ pacs wine-mono wine_gecko samba lib32-libxslt lib32-libxml2
+            $ pacs lib32-alsa-lib lib32-alsa-plugins lib32-mpg123 lib32-libpulse
+            - Usar no terminal TZ=America/New_York wine arquivo.exe se houver problema de TZ
 
 
-# Deprecado
-- * Drivers placa de vídeo Topaz XT [Radeon R7 M260/M265]
-    * O driver nativo da kernel 'amdgpu' está funcionando perfeitamente
-    - Carrega o módulo radeon antes do KMS
-        # gedit /etc/mkinitcpio.conf
-            MODULES="radeon"
-    - Adicionar radeon.dpm=1 à inicialização da Kernel??
-- Desabilitar touchpad se existe um mouse externo conectado
-    # gedit /etc/udev/rules.d/01-touchpad.rules
-        SUBSYSTEM=="input", KERNEL=="mouse[0-9]", ACTION=="add", PROGRAM="/usr/bin/find /var/run/gdm -name esauvisky -print -quit", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="$result/database", RUN+="/usr/bin/synclient TouchpadOff=1"
-        SUBSYSTEM=="input", KERNEL=="mouse[0-9]", ACTION=="remove", PROGRAM="/usr/bin/find /var/run/gdm -name esauvisky -print -quit", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="$result/database", RUN+="/usr/bin/synclient TouchpadOff=0"
-- Editar atalhos de softwares (accels) *on-the-fly*
-    $ dconf-editor
-        org.gnome.desktop.interface can-change-accels true
-- Configurações do Mouse
-    - Instalar solaar-git (para Logitech Unifiying Receivers)
-    $ dconf-editor
-        org.gnome.settings-daemon.plugins.mouse active false
-    # cp /usr/share/X11/xorg.conf.d/50-synaptics.conf /etc/X11/xorg.conf.d/50-synaptics.conf
-    $ gedit /etc/X11/xorg.conf.d/50-synaptics.conf
-        # Scroll horizontal com dois dedos
-        Option "HorizTwoFingerScroll" "1"
-        # Sensibilidade de pressão
-        Option "FingerLow" "20"
-        Option "FingerHigh" "25"
-        # Tempo máximo de tapping
-        Option "MaxTapTime" "150"
-        # Detecção de palmas
-        Option "PalmDetect" "1"
-        Option "PalmMinWidth" "8"
-        Option "PalmMinZ" "100"
-        # Sensibilidade
-        #Option "HorizHysteresis" "1"
-        #Option "VertHysteresis" "1"
-    - Autostart (EmliDaemon): syndaemon -t -k -i 2 (instalar pelo pacman)
-    - Autostart (EmliDaemon): touchpad-detect (script)
-    - Remover applet do Solaar da auto-inicialização:
-        $ sudo gedit /etc/xdg/autostart/solaar.desktop
-            X-GNOME-Autostart-enabled=false
-- Configurar Power Options
-    # gedit /etc/systemd/logind.conf
-        HandlePowerKey=ignore
-        HandleSuspendKey=ignore
-        HandleHibernateKey=ignore
-        HandleLidSwitch=ignore
-        HandleLidSwitchDocked=ignore
-        PowerKeyIgnoreInhibited=yes
-        SuspendKeyIgnoreInhibited=yes
-        HibernateKeyIgnoreInhibited=yes
-        LidSwitchIgnoreInhibited=yes
-    $ dconf-editor
-        org.gnome.settings-daemon.plugins.power
-    * Talvez valha a pena desativar org.gnome.settings-daemon.plugins.power (via active false) e utilizar somente systemd
-    * Se ao fechar a tampa o monitor externo (e o interno) ficarem desativados, remover ~/.config/monitors.xml
-- Pulseaudio
-    - Remover autostart do pulseaudio no GDM
-        # gedit /var/lib/gdm/.pulse/daemon.conf
-            autospawn = no
-            daemon-binary = /bin/true
-        # chown gdm:gdm /var/lib/gdm/.pulse -R
-- Autostart: EmliDaemon
+        ### Tips and Tricks
+        - Para montar partições do Windows *com* permissão de escrita, instalar ntfs-3g
+        - Como remover o popup "application is ready", e fazer a janela roubar o foco instalar (ou copiar do backup) a extensão Steal my Focus
+        - Configurar GIT para usar o gnome-keyring:
+            $ git config --global credential.helper /usr/lib/git-core/git-credential-gnome-keyring
+        - Desativar controle de mouse com joysticks
+            $ pacr xf86-input-joystick
+            - Como listar todas as bibliotecas necessárias por certo binário:
+                $ ldd binário
+            - Como listar o pacote que contém a biblioteca:
+                $ pkgfile -s libportaudio.so.2
+            - Copiar arquivos pelo rsync com verificação de crc & etc.
+                $ rsync -avhn --progress SOURCE DESTINO
+                - Verificar e remover -n para rodar
+                - Adicionar --del se quiser "sincronizar", ou seja, deletar arquivos em DESTINO que não estejam presentes em SOURCE
+                - Lembre-se que se SOURCE for um diretório com / no final, este é tratado como /\*, portanto se quiser lidar com a pasta como se fosse um arquivo, não coloque / no final.
+
+        ### Deprecado
+        - * Drivers placa de vídeo Topaz XT [Radeon R7 M260/M265]
+            * O driver nativo da kernel 'amdgpu' está funcionando perfeitamente
+            - Carrega o módulo radeon antes do KMS
+                # gedit /etc/mkinitcpio.conf
+                    MODULES="radeon"
+            - Adicionar radeon.dpm=1 à inicialização da Kernel??
+        - Desabilitar touchpad se existe um mouse externo conectado
+            # gedit /etc/udev/rules.d/01-touchpad.rules
+                SUBSYSTEM=="input", KERNEL=="mouse[0-9]", ACTION=="add", PROGRAM="/usr/bin/find /var/run/gdm -name esauvisky -print -quit", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="$result/database", RUN+="/usr/bin/synclient TouchpadOff=1"
+                SUBSYSTEM=="input", KERNEL=="mouse[0-9]", ACTION=="remove", PROGRAM="/usr/bin/find /var/run/gdm -name esauvisky -print -quit", ENV{DISPLAY}=":0", ENV{XAUTHORITY}="$result/database", RUN+="/usr/bin/synclient TouchpadOff=0"
+        - Editar atalhos de softwares (accels) *on-the-fly*
+            $ dconf-editor
+                org.gnome.desktop.interface can-change-accels true
+        - Configurações do Mouse
+            - Instalar solaar-git (para Logitech Unifiying Receivers)
+            $ dconf-editor
+                org.gnome.settings-daemon.plugins.mouse active false
+            # cp /usr/share/X11/xorg.conf.d/50-synaptics.conf /etc/X11/xorg.conf.d/50-synaptics.conf
+            $ gedit /etc/X11/xorg.conf.d/50-synaptics.conf
+                # Scroll horizontal com dois dedos
+                Option "HorizTwoFingerScroll" "1"
+                # Sensibilidade de pressão
+                Option "FingerLow" "20"
+                Option "FingerHigh" "25"
+                # Tempo máximo de tapping
+                Option "MaxTapTime" "150"
+                # Detecção de palmas
+                Option "PalmDetect" "1"
+                Option "PalmMinWidth" "8"
+                Option "PalmMinZ" "100"
+                # Sensibilidade
+                #Option "HorizHysteresis" "1"
+                #Option "VertHysteresis" "1"
+            - Autostart (EmliDaemon): syndaemon -t -k -i 2 (instalar pelo pacman)
+            - Autostart (EmliDaemon): touchpad-detect (script)
+            - Remover applet do Solaar da auto-inicialização:
+                $ sudo gedit /etc/xdg/autostart/solaar.desktop
+                    X-GNOME-Autostart-enabled=false
+        - Configurar Power Options
+            # gedit /etc/systemd/logind.conf
+                HandlePowerKey=ignore
+                HandleSuspendKey=ignore
+                HandleHibernateKey=ignore
+                HandleLidSwitch=ignore
+                HandleLidSwitchDocked=ignore
+                PowerKeyIgnoreInhibited=yes
+                SuspendKeyIgnoreInhibited=yes
+                HibernateKeyIgnoreInhibited=yes
+                LidSwitchIgnoreInhibited=yes
+            $ dconf-editor
+                org.gnome.settings-daemon.plugins.power
+            * Talvez valha a pena desativar org.gnome.settings-daemon.plugins.power (via active false) e utilizar somente systemd
+            * Se ao fechar a tampa o monitor externo (e o interno) ficarem desativados, remover ~/.config/monitors.xml
+        - Pulseaudio
+            - Remover autostart do pulseaudio no GDM
+                # gedit /var/lib/gdm/.pulse/daemon.conf
+                    autospawn = no
+                    daemon-binary = /bin/true
+                # chown gdm:gdm /var/lib/gdm/.pulse -R
+        - Autostart: EmliDaemon
