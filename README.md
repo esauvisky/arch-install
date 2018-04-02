@@ -3,9 +3,13 @@ INSTALAÇÃO
 
 ## Parâmetros da Configuração
 - Boot via UEFI diretamente pela placa mãe [Wiki](https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly)
+
 - Orientação completa para SSDs
+
 - Somente duas partições, root e boot.
+
 - Encriptação total do sistema, menos /boot, via LUKS [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system)
+
 - Layout final das partições (GPT):
 
 >       +-----------------------+------------------------+
@@ -22,11 +26,13 @@ INSTALAÇÃO
 ## Passo-a-Passo
 
 - Fazer boot da imagem do Arch
+
 - Modificar layout do teclado
 
         # loadkeys br-abnt2
 
 - Testar internet
+
 - Atualizar horário
 
         # timedatectl set-ntp true
@@ -121,7 +127,8 @@ INSTALAÇÃO
 
         # pacman -S iw dialog wpa_supplicant networkmanager
 
-- Configurar e regerar mkinitcpio para funcionar com o dm-crypt [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt Encrypting_an_entire_system#Configuring_mkinitcpio)
+- Configurar e regerar mkinitcpio para funcionar com o dm-crypt [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Configuring_mkinitcpio)
+
     - Adicionar HOOKS 'keyboard' e 'keymap' antes de 'block' e 'encrypt' antes de 'filesystems'
 
             # nano /etc/mkinitcpio.conf
@@ -129,6 +136,7 @@ INSTALAÇÃO
                 - Apagar instâncias repetidas
 
     - Regerar mkinitcpio
+
             # mkinitcpio -p linux
 
 - Setar senha do root
@@ -136,6 +144,7 @@ INSTALAÇÃO
         # passwd
 
 - Configurar bootloader
+
     - Instalar microcode para intel
 
             # pacman -S intel-ucode
@@ -161,12 +170,14 @@ INSTALAÇÃO
 ## Post Install
 
 - Fazer login como root
+
 - Ativar e iniciar a internet
 
         # systemctl enable NetworkManager
         # systemctl start NetworkManager
 
     - Se precisar de WiFi, usar `wifi-menu`
+
 - Instalar algumas coisas:
 
         # pacman -S bash-completion xorg-xinit fortune-mod wget
@@ -208,6 +219,44 @@ INSTALAÇÃO
     - Ver se /dev/mapper/cryptroot está incluindo discard
 
             # cat /proc/mounts
+
+    - Se tudo estiver ok, *most likely it's workin'*. No entanto, se quiser testar manualmente, seguir este passo-a-passo(https://unix.stackexchange.com/questions/85865/trim-with-lvm-and-dm-crypt/85880#85880)
+
+        - Criar um arquivo de teste (não aleatório de propósito):
+
+                # yes | dd iflag=fullblock bs=1M count=1 of=trim.test
+
+        - Pegar o endereço, comprimento e blocksize:
+
+                # filefrag -s -v trim.test
+                File size of trim.test is 1048576 (256 blocks, blocksize 4096)
+                 ext logical physical expected length flags
+                   0       0    34048             256 eof
+                trim.test: 1 extent found
+
+        - Pegar o mountpoint:
+
+                # df trim.test
+                /dev/mapper/something  32896880 11722824  20838512   37% /mount/point
+
+        - Ler diretamente do dispositivo e confirmar o padrão *yes*:
+
+                # dd bs=4096 skip=34048 count=256 if=/dev/mapper/something | hexdump -C
+                00000000  79 0a 79 0a 79 0a 79 0a  79 0a 79 0a 79 0a 79 0a  |y.y.y.y.y.y.y.y.|
+                *
+                00100000
+
+        - Deletar o arquivo, sincronizar e dropar os caches, senão dd não vai ler do disco:
+
+                # rm trim.test
+                # sync
+                # echo 1 > /proc/sys/vm/drop_caches
+
+        - Ler diretamente do dispositivo de novo, e confirmar que o padrão agora é aleatório
+
+                # dd bs=4096 skip=34048 count=256 if=/dev/mapper/something | hexdump -C
+
+        - *O padrão é aleatório porque o crypto layer está lendo zeros do SSD e "decriptando" eles, retornando um padrão aleatório*
 
 - Adicionar módulos dos drivers gráficos no Early KMS:
 
@@ -273,19 +322,20 @@ INSTALAÇÃO
 
         # reboot
 
+- Fazer um backup do header luks
+
+        # cryptsetup luksHeaderBackup /dev/sda2 --header-backup-file <file>.img
+
 **Se tudo der certo, o sistema será reiniciado e o gnome iniciará automaticamente após digitar a senha do HD!!!11UM**
 
-    + TODO: backup header LUKS
-
 # CONFIGURAÇÕES
-*aaanndd theere ve go!*
+*aaanndd heeere ve go!*
 
-- Configuração Básica Terminal e Pacotes
-
-        # pacman -S bash-completion
+- Configuração Básica Terminal
 
     - Configurar perfil do terminal
         - Tamanho: 100x30
+        - Cores: Solarized Dark
         - Etc...
 
     - Instalar aurget (usar o epiphany para baixar o pkgbuild e não precisar instalar o Firefox)
@@ -306,13 +356,17 @@ INSTALAÇÃO
 - Configurar Gnome
 
     - Gnome: Region & Language:
+
         - Language: English
+
         - Formats: Brasil
+
         - Layout Teclado: Portuguese (Brazil)
 
     - Configurar opções uma-a-uma
 
     - Configurar atalhos um-a-um, remover todos os não-utilizados
+
         - Custom Shortcuts:
 
                 Launch Terminal: gnome-terminal | Super+T
@@ -322,7 +376,10 @@ INSTALAÇÃO
                 Take a Screenshot: emiliano-screenshot | Print
 
 - Remover coisas aleatórias não utilizadas que foram instaladas anyways
+
         $ pacr gnome-contacts gnome-maps folks gnome-todo gnome-calendar evolution evolution-data-server gnome-photos
+        $ pacr -c yelp yelp-xsl
+
     - Ir no .config e apagar o que tá sobrando relacionado aos acima
 
 - Instalar Google Chrome
@@ -331,20 +388,28 @@ INSTALAÇÃO
 
     - Definir a senha do Default keyring em branco, senão você vai ter que digitar toda vez que abrir o Chrome.
 
-- Configurar Gnome-Shell (gnome-tweak-tool)
+- Configurar gnome-shell (gnome-tweak-tool)
+
+    - Desativar animações
+
     - Ação do botão de desligar
+
     - Ação de fechar a tampa
+
     - Setar "Super-Right" como tecla de overlay (para evitar super de abrir o activities)
+
     - Integrar extensões com o Chrome
-        - Instalar a extensão(https://goo.gl/89TkHr)
+
+        - Instalar a extensão(https://goo.gl/89TkHr) do Chrome
+
         - Instalar o conector nativo:
 
                 $ pacs chrome-gnome-shell
 
     - Extensões
-        * São instaladas em .local/share/gnome-shell/extensions
-        * Se der problema com schemas, entrar na pasta plugin@autor/schemas/ e executar:
-            $ glib-compile-schemas .
+
+        *São instaladas em .local/share/gnome-shell/extensions*
+
         - Extensões Utilizadas:
             - Freon
             - Lock keys
@@ -357,59 +422,114 @@ INSTALAÇÃO
             - Volume mixer
             - Workspace grid
             - Shellshape
-        - Editar o extension.js de cada uma para reorganizar elas no menu
-            - Pesquisar por: 'addToStatusArea'
-            - Editar de acordo:
-                Main.panel.addToStatusArea('shellshape-indicator', _indicator, 1, 'left');
-- Adicionar tmpfs para algumas pastas em /etc/fstab
-        - .cache/google-chrome
-        - .cache/spotify
-        - .aurget
-- Instalar e configurar Profile-sync-daemon[https://wiki.archlinux.org/index.php/Profile-sync-daemon]
-- Configurações do SMART para o HD
-    - Ativa o daemon do SmartmonTools
-        $ pacs smartmontools
-        $ gedit /etc/smartd.conf
-            - Substituir DEVICESCAN por:
-                /dev/sda -a -o on -S on -s (S/../.././02|L/../../6/03) -W 4,35,45
-            - Substituir /dev/sda acima por DEVICESCAN se desejar escanear *todos* os hds presentes
-        $ systemctl start smartd
-        $ systemctl status smartd
-        $ systemctl enable smartd
-    - Verifica o estado dos HDs
-        # smartctl --all /dev/sda
-- Teclado
-    - Instalar e configurar clipit
-        - Items in history: MAX (1000)
-        - Items in menu: MIN (5)
-        - Manage Hotkey: Super+Q
-        - Deletar todas as outras hotkeys
-        - Adicionar no auto-start do gnome-tweak tool
-    - Editar layout do teclado podre US em /usr/share/X11/xkb/symbols/br (ou encontrar um user-specific)
-      Já que .Xmodmap não funciona no gnome pelo visto:
-        Linha 18 (Editar): key <AE12> { [        equal,           plus,           bar,     dead_ogonek ] };
-        Linha 19 (Adici.): key <AD09> { [            o,              O,   Greek_OMEGA,     Greek_OMEGA ] };
-- Instalar e configurar linux-ck (*para MuQSS + BFQ baby!*) [https://wiki.archlinux.org/index.php/Linux-ck]
-    - Adicionar o repo do no /etc/pacman.conf:
-        [repo-ck]
-        Server = http://repo-ck.com/$arch
-    - Lembrar de usar wget no pacman porque o servidor dele dá problema o tempo inteiro (pacman.conf):
-        XferCommand  = /usr/bin/wget --passive-ftp -q --show-progress -c -O %o %u
-    - Instalar linux-ck-haswell e linux-ck-haswell headers
-        $ pacs linux-ck-haswell linux-ck-haswell-headers
-    - Pegar UUID de /dev/sda2
-        # blkid
-    - Criar entrada UEFI na placa mãe:
-        # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux MuQSS+BFQ" --loader /vmlinuz-linux-ck-haswell --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=/intel-ucode.img initrd=/initramfs-linux-ck-haswell.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
-    - Reiniciar e verificar se MuQSS está rodando:
-        # dmesg | grep -i muqss
-- Configurar sensores de temperatura
-    $ pacs lm_sensors
-    # sensors-detect
-    # systemctl enable lm_sensors
-    TODO: i8k e controle do fan
 
-# EU PAREI AQUI #
+        - Editar o `extension.js` de cada extensão para reorganizar elas no painel
+            - Pesquisar por: `addToStatusArea`
+            - Editar de acordo. Ex.:
+
+                    Main.panel.addToStatusArea('shellshape-indicator', _indicator, 1, 'left');
+                                                                             Ordem ^   ^ Lugar
+
+        - *Se der problema com schemas, entrar na pasta plugin@autor/schemas/ e executar:*
+
+                $ glib-compile-schemas .
+
+- Instalar e configurar profile-sync-daemon(https://wiki.archlinux.org/index.php/Profile-sync-daemon)
+
+- Instalar e configurar anything-sync-daemon(https://wiki.archlinux.org/index.php/anything-sync-daemon)
+    - Diretórios para sincronizar
+
+            .cache/google-chrome
+            .cache/spotify
+            .aurget
+
+- Configurações do SMART para o HD
+
+    - Ativa o daemon do SmartmonTools
+
+            $ pacs smartmontools
+            $ gedit /etc/smartd.conf
+                - Substituir DEVICESCAN por:
+                    /dev/sda -a -o on -S on -s (S/../.././02|L/../../6/03) -W 4,35,45
+                - Substituir /dev/sda acima por DEVICESCAN se desejar escanear *todos* os hds presentes
+            $ systemctl start smartd
+            $ systemctl status smartd
+            $ systemctl enable smartd
+
+- Teclado
+
+    - Instalar e configurar clipit
+        - Copiar backup `.config/clipit/clipitrc`
+
+    - Editar layout do teclado podre US em /usr/share/X11/xkb/symbols/br *(já que .Xmodmap não funciona no gnome pelo visto)*:
+
+            Linha 17 (Adici.): key <AE11> { [        minus,     underscore,        endash,          emdash ] };
+            Linha 18 (Editar): key <AE12> { [        equal,           plus,           bar,     dead_ogonek ] };
+            Linha 19 (Adici.): key <AD09> { [            o,              O,   Greek_OMEGA,     Greek_OMEGA ] };
+
+- Instalar e configurar linux-ck(https://wiki.archlinux.org/index.php/Linux-ck) (*para MuQSS + BFQ baby!*)
+
+    - Adicionar o repo do no /etc/pacman.conf:
+
+            [repo-ck]
+            Server = http://repo-ck.com/$arch
+
+    - Lembrar de usar wget no pacman porque o servidor dele dá problema o tempo inteiro (pacman.conf):
+
+            XferCommand  = /usr/bin/wget --passive-ftp -q --show-progress -c -O %o %u
+
+    - Instalar linux-ck-haswell e linux-ck-haswell headers
+
+            $ pacs linux-ck-haswell linux-ck-haswell-headers
+
+    - Pegar UUID de /dev/sda2
+
+            # blkid
+
+    - Criar entrada UEFI na placa mãe:
+
+            # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux MuQSS+BFQ" --loader /vmlinuz-linux-ck-haswell --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=/intel-ucode.img initrd=/initramfs-linux-ck-haswell.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
+
+    - Reiniciar e verificar se MuQSS está rodando:
+
+            # dmesg | grep -i muqss
+
+- Configurar sensores de temperatura
+
+        $ pacs lm_sensors
+        # sensors-detect
+        # systemctl enable lm_sensors
+
+    - Instalar e configurar i8kfan (para controle manual do fan)
+
+            $ aurget -S i8kutils
+            $ sudo EDITOR=nano visudo
+                # Permite usuários do grupo wheel rodarem i8kfan com sudo sem precisar de senha
+                %wheel ALL=(ALL) NOPASSWD: /usr/bin/i8kfan
+
+- Configurar e instalar drivers do Xorg para amdgpu e intel
+
+        $ pacs xf86-video-intel xf86-video-amdgpu
+
+    - Opcional: criar arquivo de configuração para poder utilizar opções
+
+        $ sudo touch /etc/X11/xorg.conf.d/20-gpu.conf
+        $ subl3 /etc/X11/xorg.conf.d/20-gpu.conf
+            Section "Device"
+                    Identifier  "Intel Graphics"
+                    Driver      "intel"
+                    Option      "DRI" "3"
+                    #Option     "AccelMethod"  "sna" # default
+                    #Option     "AccelMethod"  "uxa" # fallback
+            EndSection
+
+            Section "Device"
+                    Identifier  "AMD Graphics"
+                    Driver      "amdgpu"
+                    Option      "DRI" "3"
+            EndSection
+
+# Continuar Aqui #
 
 - Configurar Google Chrome
     - Extensões
@@ -460,15 +580,21 @@ INSTALAÇÃO
         $ systemctl restart warsaw.service
         - Abrir http://www.dieboldnixdorf.com.br/warsaw e selecionar o banco desejado para atualizar
 
-- Adicionar links para meus softwares em ~/Documentos/Programação/Projetos
-    $ cdp
-    $ ./Atualizar_Projetos
+
 - Instalar serviços e clientes de impressão:
-    $ pacs cups ghotscript gsfonts gutenprint
-    $ systemctl enable org.cups.cupsd.socket
-    $ systemctl start org.cups.cupsd.service
-        - Navegar para localhost:631
-        - Configurar impressora (logar como root)
+
+    - `system-config-printer` é necessário para a integração com o Gnome (senão dá erro ao adicionar a impressora)
+    - Para a ML-2165 instalar `samsung-ml2160` da AUR
+    - Comandos:
+
+        $ pacs cups gutenprint system-config-printer ghostcript gsfonts
+        $ aurget -S samsung-ml2160
+        $ systemctl enable org.cups.cupsd.service
+        $ systemctl start org.cups.cupsd.service
+
+    - Adicionar impressora pelo gnome ou localhost:631
+        - Se no chrome não funcionar, tentar pelo epiphany
+
 - Configuração Básica Samba (com usershares):
     # pacman -S samba gvfs-smb
     # cp /etc/samba/smb.conf.default /etc/samba/smb.conf
@@ -516,13 +642,66 @@ INSTALAÇÃO
     $ systemctl enable noip2.service
 
 - VirtualBox
-    - USB 3.0 Passthrough
-        - Necessário instalar a extensão VirtualBox da Oracle
-            $ aurget -S virtualbox-ext-oracle
-        - Depois adicionar o usuário no grupo vboxusers
-            # sudo usermod -aG vboxusers esauvisky
-        - Depois instalar na máquina virtual o driver USB 3.0 (xHCD) da Intel[https://goo.gl/NqkZ1U]
 
+    - USB 3.0 Passthrough
+
+        - Necessário instalar a extensão VirtualBox da Oracle:
+
+                $ aurget -S virtualbox-ext-oracle
+
+        - Depois adicionar o usuário no grupo vboxusers
+
+                # sudo usermod -aG vboxusers esauvisky
+
+        - Depois instalar na máquina virtual o [driver USB 3.0 (xHCD) da Intel](https://goo.gl/NqkZ1U)
+
+### Mimetypes, associações, arquivos .desktop e [Default Applications](https://wiki.archlinux.org/index.php/Default_applications)
+
+- Lidando com mimetypes:
+
+    - Descobrir o mimetype de um arquivo
+
+            $ xdg-mime query filetype *[arquivo]*
+
+    - As configurações de mimetype (mimeapps.list) encontram-se em:
+
+        1. `~/.config/mimeapps.list`
+
+        2. `~/.local/share/applications/mimeapps.list` (em fase de deprecação)
+
+        - Seções do arquivo:
+
+            1. [Added Associations]
+                - Associações listadas em ordem de preferência, separadas por ponto-e-vírgula.
+            2. [Default Applications]
+                - Aplicativo padrão *(ao dar duplo-clique, por exemplo)*, somente um por linha.
+            3. [Removed Applications]
+                - Associações explícitamente removidas *(é preferível remover das seções acima)*.
+
+        - Exemplo útil:
+
+            - Abre por padrão com **eog**, mas ao clicar em *Open with another application*, o primeiro da lista será o **GIMP**.
+
+                    [Added Associations]
+                    image/png=gimp.desktop;eog.desktop;
+                    [Default Applications]
+                    image/png=eog.desktop
+
+    - Depois de editar mimetypes, atualizar o banco de dados:
+
+            # update-desktop-database
+
+- Remover/organizar as entradas do *Open with/Abrir com* do Nautilus
+
+    1. Copiar cada entrada de /usr/share/applications para .local/share/applications
+
+    2. Editar a entrada local e:
+
+        - Editar a linha `Exec=[...]` e remover `%U` do final (ainda permite iniciar o software pelo Alt+F1)
+
+        - Ou adicionar `Hidden=true` para ocultar por completo o software (inclusive do Alt+F1)
+
+        - Outra opção é adicionar `NoDisplay=true` em vez de `Hidden=true`, mas a segunda parece mais abrangente.
 
 # Tips and Tricks
 - Para montar partições do Windows *com* permissão de escrita, instalar ntfs-3g
@@ -539,7 +718,7 @@ INSTALAÇÃO
         $ rsync -avhn --progress SOURCE DESTINO
         - Verificar e remover -n para rodar
         - Adicionar --del se quiser "sincronizar", ou seja, deletar arquivos em DESTINO que não estejam presentes em SOURCE
-        - Lembre-se que se SOURCE for um diretório com / no final, este é tratado como /*, portanto se quiser lidar com a pasta como se fosse um arquivo, não coloque / no final.
+        - Lembre-se que se SOURCE for um diretório com / no final, este é tratado como /\*, portanto se quiser lidar com a pasta como se fosse um arquivo, não coloque / no final.
 
 
 # Deprecado

@@ -1,0 +1,20 @@
+##
+## sudoers file.
+##
+
+## Options
+# Allows for no timeout once the password is typen (per shell):
+Defaults timestamp_timeout=-1
+# Insults you when you type the wrong password
+Defaults insults
+
+## User privilege specification
+# Allows root to run sudo
+root ALL=(ALL) ALL
+
+# Allows members of group wheel to execute any command (with password)
+%wheel ALL=(ALL) ALL
+
+# Used for profile-sync-daemon:
+# Allows any member of group wheel to run /usr/bin/psd-overlay-helper (without a password)
+%wheel ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
