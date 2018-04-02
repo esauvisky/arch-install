@@ -513,21 +513,21 @@ INSTALAÇÃO
 
     - Opcional: criar arquivo de configuração para poder utilizar opções
 
-        $ sudo touch /etc/X11/xorg.conf.d/20-gpu.conf
-        $ subl3 /etc/X11/xorg.conf.d/20-gpu.conf
-            Section "Device"
-                    Identifier  "Intel Graphics"
-                    Driver      "intel"
-                    Option      "DRI" "3"
-                    #Option     "AccelMethod"  "sna" # default
-                    #Option     "AccelMethod"  "uxa" # fallback
-            EndSection
+            $ sudo touch /etc/X11/xorg.conf.d/20-gpu.conf
+            $ subl3 /etc/X11/xorg.conf.d/20-gpu.conf
+                Section "Device"
+                        Identifier  "Intel Graphics"
+                        Driver      "intel"
+                        Option      "DRI" "3"
+                        #Option     "AccelMethod"  "sna" # default
+                        #Option     "AccelMethod"  "uxa" # fallback
+                EndSection
 
-            Section "Device"
-                    Identifier  "AMD Graphics"
-                    Driver      "amdgpu"
-                    Option      "DRI" "3"
-            EndSection
+                Section "Device"
+                        Identifier  "AMD Graphics"
+                        Driver      "amdgpu"
+                        Option      "DRI" "3"
+                EndSection
 
 - Serviços e clientes de impressão:
 
