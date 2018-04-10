@@ -10,8 +10,8 @@
 # - O .xinitrc do usuário deve estar propriamente configurado e funcionando
 
 
-# Inicia o X automaticamente após o login no tty2 somente se não for root
-if [[ ! $DISPLAY && $XDG_VTNR -eq 2 && $EUID -gt 0 ]]; then
+# Inicia o X automaticamente após o login no tty1 somente se não for root
+if [[ ! $DISPLAY && $XDG_VTNR -eq 1 && $EUID -gt 0 ]]; then
     # Faz com que o X fique spawning back se fizer LogOut no Gnome
     #exec startx
 

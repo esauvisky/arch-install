@@ -50,22 +50,23 @@ echo "Running gnome-tweak-tool-lid-inhibitor"
 xscreensaver & xscreensaver-stopper &
 
 # Deluge
-sleep 10 && (   deluged && sleep 5 &&
-                if [[ $(deluge-console info | grep -c Downloading) -eq 0 ]]; then
-                    killall deluged;
-                else
-                    killall deluged && deluge;
-                fi) &
+sleep 5 && ( 
+    deluged && sleep 5 &&
+    if [[ $(deluge-console info | egrep -c 'Error|Downloading') -eq 0 ]]; then
+        killall deluged
+    else
+        killall deluged && systemd-run --user --unit deluge deluge
+    fi) &
 
 # Roda o TitanIV
 echo "Running Discord's Bot: TitanIV"
-systemd-run --unit TitanIV --user /home/esauvisky/Coding/Discord/TitanIV/titan_start.sh &
+systemd-run --user --unit TitanIV /home/esauvisky/Coding/Discord/TitanIV/titan_start.sh &
 
 # Roda dropbox depois de 20 segundos
 echo "Running dropbox..."
-sleep 10 && systemd-run --unit Dropbox --user dropbox &
+sleep 10 && systemd-run --user --unit Dropbox dropbox &
 
 echo "Running electrum..."
-sleep 10 && systemd-run --unit electrum --user electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
+sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
 
 exec gnome-session

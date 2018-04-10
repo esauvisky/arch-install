@@ -1,4 +1,5 @@
-# Set scheduler for non-rotating disks
-ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="bfq"
-# Set scheduler for rotating disks
-ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
+# Set scheduler for everything (internal SSD and USB flash drives, most likely)
+ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/scheduler}="mq-deadline"
+
+# Set scheduler for ORICO USB Dock (rotational disks will be BFQ)
+ACTION=="add|change", KERNEL=="sd[a-z]", ATTRS{idVendor}=="152d", ATTRS{idProduct}=="9561", ATTR{queue/scheduler}="bfq"
