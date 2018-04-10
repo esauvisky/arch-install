@@ -1,1 +1,12 @@
-/etc/fstab
+# /dev/mapper/cryptroot
+UUID=0d73fd89-bc3b-4759-80eb-135ddbb33022   /        ext4     rw,noatime,discard                 0  1
+
+# /dev/sda1
+UUID=6BE1-2DC5                              /boot    vfat     rw,noatime,utf8                    0  2
+
+# /tmp
+tmpfs                                       /tmp     tmpfs    rw,nodev,nosuid,noatime,size=4G    0  0
+
+# Caches /home/esauvisky/
+tmpfs        /home/esauvisky/.cache/spotify          tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
+tmpfs        /home/esauvisky/.PlayOnLinux/tmp        tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0

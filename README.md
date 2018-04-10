@@ -1,5 +1,5 @@
-INSTALAÇÃO
-==========
+# INSTALAÇÃO
+
 
 ## Parâmetros da Configuração
 - Boot via UEFI diretamente pela placa mãe [Wiki](https://wiki.archlinux.org/index.php/EFISTUB#Using_UEFI_directly)
@@ -22,6 +22,7 @@ INSTALAÇÃO
 >       | Type: EF00            | Type: 8300             |
 >       | /dev/sda1             | /dev/sda2              |
 >       +-----------------------+------------------------+
+
 
 ## Passo-a-Passo
 
@@ -167,7 +168,8 @@ INSTALAÇÃO
         # umount -R /mnt
         # reboot
 
-## Post Install
+
+# POST INSTALL
 
 - Fazer login como root
 
@@ -289,10 +291,13 @@ INSTALAÇÃO
         # pacman -S gnome gnome-extra xorg
 
     - Usar `^13 ^43` e assim por diante para selecionar tudo menos alguns
-    - Exclusões recomendadas:
 
-            gnome:       ^13 ^43 ^45 ^50 ^51 ^52 (gnome-dictionary, rygel, totem, yelp, gnome-software, simple-scan)
-            gnome-extra: ^2 ^3 ^4 ^5 ^6 ^10 ^12 ^13 ^16 ^17 ^19 ^23 ^24 ^26 ^29 ^31 ^33 ^34 ^35 ^39 ^40 ^42 ^44 ^45 ^46 ^48 ^49 ^50
+        - *Atenção: não recomendo mais porque ele instala anyways e é necessário desinstalar manualmente as coisas depois*
+
+        - Exclusões recomendadas:
+
+                gnome:       ^13 ^43 ^45 ^50 ^51 ^52 (gnome-dictionary, rygel, totem, yelp, gnome-software, simple-scan)
+                gnome-extra: ^2 ^3 ^4 ^5 ^6 ^10 ^12 ^13 ^16 ^17 ^19 ^23 ^24 ^26 ^29 ^31 ^33 ^34 ^35 ^39 ^40 ^42 ^44 ^45 ^46 ^48 ^49 ^50
 
 - Trocar para tty2, fazer login com o novo usuário e trocar de volta para tty1
 
@@ -369,11 +374,11 @@ INSTALAÇÃO
 
         - Custom Shortcuts:
 
-                Launch Terminal: gnome-terminal | Super+T
-                Shorten URL: shortenurl -c | Super+W
-                Download URL to /tmp: uridownload | Super+R
-                Launch System Monitor: gnome-system-monitor | Ctrl+Alt+Delete
-                Take a Screenshot: emiliano-screenshot | Print
+            - Launch Terminal: `gnome-terminal` | **Super+T**
+            - Shorten URL: `shortenurl -c` | **Super+W**
+            - Download URL to /tmp: `uridownload` | **Super+R**
+            - Launch System Monitor: `gnome-system-monitor` | **Ctrl+Alt+Delete**
+            - Take a Screenshot: `takeScreenshot` | **Print**
 
 - Remover coisas aleatórias não utilizadas que foram instaladas anyways
 
@@ -396,7 +401,7 @@ INSTALAÇÃO
 
     - Ação de fechar a tampa
 
-    - Setar "Super-Right" como tecla de overlay (para evitar super de abrir o activities)
+    - Setar "Super-Right" como tecla de overlay (para evitar Super de abrir o Activities)
 
     - Integrar extensões com o Chrome
 
@@ -417,7 +422,7 @@ INSTALAÇÃO
             - Pomodoro
             - Removable drive menu
             - System Monitor
-            - Topicons Plus (restaura a barra deprecada dos ícones de notificação)
+            - Topicons Plus *(restaura a barra dos ícones de notificação)*
             - User themes
             - Volume mixer
             - Workspace grid
@@ -461,11 +466,9 @@ INSTALAÇÃO
     - Instalar e configurar clipit
         - Copiar backup `.config/clipit/clipitrc`
 
-    - Editar layout do teclado podre US em /usr/share/X11/xkb/symbols/br *(já que .Xmodmap não funciona no gnome pelo visto)*:
+    - Copiar backup do layout do teclado /usr/share/X11/xkb/symbols/br
 
-            Linha 17 (Adici.): key <AE11> { [        minus,     underscore,        endash,          emdash ] };
-            Linha 18 (Editar): key <AE12> { [        equal,           plus,           bar,     dead_ogonek ] };
-            Linha 19 (Adici.): key <AD09> { [            o,              O,   Greek_OMEGA,     Greek_OMEGA ] };
+        - TODO: Procurar uma forma de fazer isso de forma local (por usuário)
 
 - Instalar e configurar linux-ck(https://wiki.archlinux.org/index.php/Linux-ck) (*para MuQSS + BFQ baby!*)
 
@@ -513,8 +516,7 @@ INSTALAÇÃO
 
     - Opcional: criar arquivo de configuração para poder utilizar opções
 
-            $ sudo touch /etc/X11/xorg.conf.d/20-gpu.conf
-            $ subl3 /etc/X11/xorg.conf.d/20-gpu.conf
+            # subl3 /etc/X11/xorg.conf.d/20-gpu.conf
                 Section "Device"
                         Identifier  "Intel Graphics"
                         Driver      "intel"
@@ -529,7 +531,7 @@ INSTALAÇÃO
                         Option      "DRI" "3"
                 EndSection
 
-- Serviços e clientes de impressão:
+- [Serviços e clientes de impressão](https://wiki.archlinux.org/index.php/CUPS)
 
     1. Instalar `cups`, `gutenprint` e `ghostscript`
 
@@ -556,19 +558,38 @@ INSTALAÇÃO
 
             - Se no chrome não funcionar, tentar pelo epiphany ou outro navegador!
 
-- VirtualBox
+# Tips-and-Tricks
 
-    - USB 3.0 Passthrough
+### USB Flash Drives
 
-        - Necessário instalar a extensão VirtualBox da Oracle:
+    - TODO: Geram alto IOWAIT, param de ser reconhecidos, mesmo depois de desplugar e plugar.
+        - Tem a ver com udev, ele trava e fica esperando.
 
-                $ aurget -S virtualbox-ext-oracle
+    - Se Foram escritos com *iso9660 filesystem signatures* — como um USB bootavel escrito com `dd` — executar este comando para apagar as signaturas:
 
-        - Depois adicionar o usuário no grupo vboxusers
+        # wipefs --all /dev/sdx
 
-                # sudo usermod -aG vboxusers esauvisky
 
-        - Depois instalar na máquina virtual o [driver USB 3.0 (xHCD) da Intel](https://goo.gl/NqkZ1U)
+
+### VirtualBox(https://wiki.archlinux.org/index.php/VirtualBox)
+
+1. Instalar VirtualBox e hook DKMS (para os módulos funcionarem com qualquer kernel)
+
+        $ pacs virtualbox virtualbox-host-dkms virtualbox-guest-iso
+
+2. Adicionar usuário ao grupo `vboxusers`
+
+        # gpasswd -a esauvisky vboxusers
+
+3. Reiniciar o sistema, abrir o VirtualBox e editar o diretório padrão das VMs
+
+- USB 3.0 Passthrough
+
+    - Necessário instalar a extensão VirtualBox da Oracle:
+
+            $ aurget -S virtualbox-ext-oracle
+
+    - Depois instalar na máquina virtual o [driver USB 3.0 (xHCD) da Intel](https://goo.gl/NqkZ1U)
 
 ### Mimetypes, associações, arquivos .desktop e [Default Applications](https://wiki.archlinux.org/index.php/Default_applications)
 

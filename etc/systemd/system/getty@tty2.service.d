@@ -1,1 +1,0 @@
-/etc/systemd/system/getty@tty2.service.d/
