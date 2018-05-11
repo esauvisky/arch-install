@@ -49,7 +49,7 @@ export HISTTIMEFORMAT='[%F %T] '
 # Sets EDITOR env variable for user and root
 [[ $EUID -gt 0 ]] && export EDITOR="subl3" || export EDITOR="nano"
 # Magic with `less` (like colors and other cool stuff)
-export LESS="-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
+export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
 # Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
 
@@ -64,8 +64,8 @@ alias ls='ls -Fl --color=always'
 alias grep="grep -n -C 2 --color=always"
 # mkdir recursivo
 alias mkdir="mkdir -p"
-# alias para tageador de músicas
-alias et="emiliano-tag"
+# Alias para xdg-open
+alias go="xdg-open"
 # entra na pasta de projetos de programação
 alias cdp="cd /home/esauvisky/Documentos/Programacao/Projetos/"
 # cd no desktop
@@ -81,6 +81,7 @@ alias je='journalctl -ef'
 alias jb='journalctl -b'
 # Alias para usar open-subl3 no lugar de subl3
 alias subl3='open-subl3'
+alias subl='open-subl3'
 # Adiciona flags no dd para verbosidade no progresso e auto-sync
 alias dd='dd status=progress oflag=sync'
 # usar perl-rename ao inves de rename

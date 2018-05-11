@@ -47,10 +47,10 @@ echo "Running gnome-tweak-tool-lid-inhibitor"
 /usr/lib/gnome-tweak-tool-lid-inhibitor &
 
 # xscreensaver
-xscreensaver & xscreensaver-stopper &
+#xscreensaver & xscreensaver-stopper &
 
 # Deluge
-sleep 5 && ( 
+sleep 5 && (
     deluged && sleep 5 &&
     if [[ $(deluge-console info | egrep -c 'Error|Downloading') -eq 0 ]]; then
         killall deluged
