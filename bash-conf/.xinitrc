@@ -34,6 +34,9 @@ fi
 export GIMP2_DIRECTORY="/home/esauvisky/.config/gimp-2.8"
 # Faz com que a Radeon seja a placa padrão pra tudo (esquenta pra caralho!)
 #export DRI_PRIME=0
+# Linka o bash ao gnome-keyring-daemon
+eval $(/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
+export SSH_AUTH_SOCK
 
 ########## Autostart ##########
 ## Trazer tudo de .config/autostart para aqui!
@@ -66,7 +69,7 @@ systemd-run --user --unit TitanIV /home/esauvisky/Coding/Discord/TitanIV/titan_s
 echo "Running dropbox..."
 sleep 10 && systemd-run --user --unit Dropbox dropbox &
 
-echo "Running electrum..."
-sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
+#echo "Running electrum..."
+#sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
 
 exec gnome-session

@@ -101,7 +101,7 @@ alias paci="pacman -Qi"
 # alias para obter informações dos conteúdos de pacotes
 alias pacl="pacman -Ql"
 # atualiza o pacman e a AUR
-alias pacsyu="sudo pacman -Syu && aurget -Syu --noconfirm"
+alias pacsyu="sudo pacman -Syu && aurget -Syu --devel --noconfirm"
 # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
 # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
 alias aurcheck="\pacman -Qm | sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
