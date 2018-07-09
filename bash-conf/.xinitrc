@@ -65,9 +65,20 @@ sleep 5 && (
 echo "Running Discord's Bot: TitanIV"
 systemd-run --user --unit TitanIV /home/esauvisky/Coding/Discord/TitanIV/titan_start.sh &
 
-# Roda dropbox depois de 20 segundos
+# Roda dropbox depois de 10 segundos
 echo "Running dropbox..."
-sleep 10 && systemd-run --user --unit Dropbox dropbox &
+sleep 10 && dropbox &
+#sleep 10 && systemd-run --user --unit DropboxDelayed dropbox &
+
+# Magica para fazer Alt+Tabs serem exclusivos por display (de acordo com o mouse)
+# Autor da solução: https://goo.gl/KJ345J
+# Autor 2 da solução (bash): https://goo.gl/xyC1Bs
+sleep 10 && gdbus call --session --dest org.gnome.Shell --object-path /org/gnome/Shell --method org.gnome.Shell.Eval 'imports.ui.altTab.WindowSwitcherPopup.prototype._getWindowList = function() {
+let workspace = this._settings.get_boolean("current-workspace-only") ? global.screen.get_active_workspace() : null;
+let allWindows = global.display.get_tab_list(Meta.TabList.NORMAL, workspace);
+allWindows = allWindows.filter(w => w.get_monitor() === global.screen.get_current_monitor());
+return allWindows;
+}' &
 
 #echo "Running electrum..."
 #sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &

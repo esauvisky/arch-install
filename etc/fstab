@@ -7,6 +7,9 @@ UUID=6BE1-2DC5                              /boot    vfat     rw,noatime,utf8   
 # /tmp
 tmpfs                                       /tmp     tmpfs    rw,nodev,nosuid,noatime,size=4G    0  0
 
+# Swapfile
+/swapfile                                   none     swap     defaults,noatime,discard           0  0
+
 # Caches /home/esauvisky/
 tmpfs        /home/esauvisky/.cache/spotify          tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
 tmpfs        /home/esauvisky/.PlayOnLinux/tmp        tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0

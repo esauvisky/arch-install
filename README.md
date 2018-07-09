@@ -639,6 +639,40 @@
 
         - Outra opção é adicionar `NoDisplay=true` em vez de `Hidden=true`, mas a segunda parece mais abrangente.
 
+- Criar swapfile para habilitar suporte para Suspensão
+
+    1. [Criar swapfile](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation)
+
+            # cat /proc/meminfo | grep MemTotal
+            # fallocate -l [MAX-MEM] /swapfile
+            # chmod 600 /swapfile
+            # mkswap /swapfile
+            # swapon /swapfile
+
+    2. Adicionar entrada no fstab
+
+            # subl3 /etc/fstab
+                # Swapfile
+                /swapfile  none  swap  defaults,noatime,discard  0  0
+
+    3. Descobrir offset do arquivo e adicionar entrada UEFI
+
+            # filefrag -v /swapfile | awk '{if($1=="0:"){print $4}}'
+            # efibootmgr [...] root=/dev/mapper/cryptroot resume=/dev/mapper/cryptroot resume_offset=[OFFSET_ACIMA] rw [...]
+
+    4. Adicionar hook `resume` do mkinicpio (depois de encrypt mas antes de filesystems) e regerar initramfs
+
+            # subl3 /etc/mkinitcpio.conf
+                HOOKS=(... encrypt resume ... filesystems ...)
+            # mkinitcpio -p linux-ck-haswell
+
+    5. Aumentar [tamanho máximo da imagem de hibernação](https://wiki.archlinux.org/index.php/Power_management/Suspend_and_hibernate#About_swap_partition.2Ffile_size) via [tmpfiles](https://wiki.archlinux.org/index.php/Systemd#Temporary_files)
+
+            $ free -b
+            # subl3 /etc/tmpfiles.d/hibernation_size.conf
+                #Type   Path                                Mode    UID     GID     Age     Argument
+                w       /sys/power/image_size               -       -       -       -       [TAMANHO-SWAP-BYTES]
+
 # A verificar/atualizar
 
         - Configurar Google Chrome

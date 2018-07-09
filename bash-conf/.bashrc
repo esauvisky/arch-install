@@ -56,20 +56,22 @@ export IGNOREEOF=1
 ###########
 # Aliases #
 ###########
+## Pastas e navegação
+# mkdir recursivo
+alias mkdir="mkdir -p"
+# Alias para xdg-open
+alias go="xdg-open"
+# Entra no diretório de Projetos
+alias cdp="cd /home/esauvisky/Coding/Projects"
+# Entra no diretório do projeto em andamento da Bravi
+alias cdb="cd ~/Bravi/somos-ciee"
+
 # permite utilizar aliases após o sudo (por causa do espaço)
 alias sudo='sudo '
 # ls com classificação listar e cores
 alias ls='ls -Fl --color=always'
 # grep com numeros de linha e cores
 alias grep="grep -n -C 2 --color=always"
-# mkdir recursivo
-alias mkdir="mkdir -p"
-# Alias para xdg-open
-alias go="xdg-open"
-# entra na pasta de projetos de programação
-alias cdp="cd /home/esauvisky/Documentos/Programacao/Projetos/"
-# cd no desktop
-alias cdd="cd /home/esauvisky/Downloads/Desktop/"
 # alias para diff
 alias diff="colordiff -b -U -1"
 # alias para color em watch
@@ -87,6 +89,11 @@ alias dd='dd status=progress oflag=sync'
 # usar perl-rename ao inves de rename
 alias rename='perl-rename'
 
+# Git
+alias gitl='git log --all --decorate --oneline'
+alias gits='git status'
+alias gitcam='git commit -a -m '
+
 ## Pacman Aliases
 # obriga a utilizar o pacman
 alias pacman="pacman"
@@ -101,12 +108,14 @@ alias paci="pacman -Qi"
 # alias para obter informações dos conteúdos de pacotes
 alias pacl="pacman -Ql"
 # atualiza o pacman e a AUR
-alias pacsyu="sudo pacman -Syu && aurget -Syu --devel --noconfirm"
+alias pacsyu="sudo pacman -Syu; echo \"Press Enter to update AUR packages, Ctrl+C to Quit\"; read; aurget -Syu --devel --noconfirm; echo Done - Press enter to exit; read"
 # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
 # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
 alias aurcheck="\pacman -Qm | sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
 # comandos para otimização do pacman
 #alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
+
+
 
 ## True screen clearing
 function _clear () {
@@ -114,12 +123,16 @@ function _clear () {
 }
 alias clear="_clear"
 
+# Load bash autocompletions
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+fi
+
 ################################
 # pacman Autocomplete Wrappers #
 ################################
 # Loads pacman's completions
 if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
     . /usr/share/bash-completion/completions/pacman
 fi
 # Autocompletes `pacman -S`
