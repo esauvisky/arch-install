@@ -74,7 +74,7 @@ alias cdb="cd ~/Bravi/somos-ciee"
 # permite utilizar aliases após o sudo (por causa do espaço)
 alias sudo='sudo '
 # ls com classificação listar e cores
-alias ls='ls -Fl --color=always'
+alias ls='ls -Fl --color=always --group-directories-first'
 # grep com numeros de linha e cores
 alias grep="grep -n -C 2 --color=always"
 # alias para diff
