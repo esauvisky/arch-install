@@ -18,8 +18,8 @@ export HISTSIZE=50000
 export HISTFILESIZE=100000
 # Ignora estes comandos e não os salva no histórico.
 export HISTIGNORE="clear:exit:history"
-# Ignora comandos repetidos
-export HISTCONTROL=ignoredups
+# Ignora comandos duplicados ou já presentes no histórico, preservando a ordem
+export HISTCONTROL=ignoreboth:erasedups
 # Prefixo das entradas do histórico em formato data (strftime) para saber em que data o comando foi executado.
 export HISTTIMEFORMAT='[%F %T] '
 
@@ -56,48 +56,53 @@ export IGNOREEOF=1
 # Originais:
 #LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
 # Baixadas:
-eval $(dircolors -b $HOME/.dircolors)
+[[ -f ~/.dircolors ]] && eval $(dircolors -b ~/.dircolors)
 
 ###########
 # Aliases #
 ###########
-## Pastas e navegação
-# mkdir recursivo
-alias mkdir="mkdir -p"
-# Alias para xdg-open
-alias go="xdg-open"
+## Configuração
+# Permite utilizar outros alias após o sudo
+# Quem faz a mágica é o espacinho no final.
+alias sudo='sudo '
+
+## Diretórios Prédefinidos
 # Entra no diretório de Projetos
 alias cdp="cd /home/esauvisky/Coding/Projects"
 # Entra no diretório do projeto em andamento da Bravi
-alias cdb="cd ~/Bravi/somos-ciee"
+alias cdb="cd ~/Bravi/omos-ciee"
 
-# permite utilizar aliases após o sudo (por causa do espaço)
-alias sudo='sudo '
-# ls com classificação listar e cores
-alias ls='ls -l --classify --human-readable --color=always --group-directories-first --literal'
-# grep com numeros de linha e cores
+
+## Navegação
+alias mkdir="mkdir -p"
+alias go="xdg-open"
+alias ls='ls -l --classify --human-readable --color=always --group-directories-first --literal --sort=extension --time-style=long-iso'
+
+
 alias grep="grep -n -C 2 --color=always"
-# alias para diff
 alias diff="colordiff -b -U -1"
-# alias para color em watch
 alias watch='watch --color -n0.5'
-# alias dmesg
+
+## Logging
 alias dmesg='dmesg --time-format ctime'
-# abre o journal
 alias je='journalctl -ef'
 alias jb='journalctl -b'
+
+## Random
 # Alias para usar open-subl3 no lugar de subl3
 alias subl3='open-subl3'
 alias subl='open-subl3'
 # Adiciona flags no dd para verbosidade no progresso e auto-sync
 alias dd='dd status=progress oflag=sync'
-# usar perl-rename ao inves de rename
+# Usa perl-rename quando chamando rename
 alias rename='perl-rename'
 
-# Git
-alias gitl='git log --all --decorate --oneline'
+## Git
+alias gitl='git log --all --decorate=full --oneline'
 alias gits='git status'
 alias gitcam='git commit -a -m '
+alias gitundo='git checkout -- '
+alias gitr='git reset HEAD '
 
 ## Pacman Aliases
 # obriga a utilizar o pacman
@@ -113,7 +118,7 @@ alias paci="pacman -Qi"
 # alias para obter informações dos conteúdos de pacotes
 alias pacl="pacman -Ql"
 # atualiza o pacman e a AUR
-alias pacsyu="sudo pacman -Syu; echo \"Press Enter to update AUR packages, Ctrl+C to Quit\"; read; aurget -Syu --devel --noconfirm; echo Done - Press enter to exit; read"
+alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
 # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
 # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
 alias aurcheck="\pacman -Qm | sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"

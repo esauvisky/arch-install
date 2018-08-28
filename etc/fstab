@@ -10,6 +10,6 @@ tmpfs                                       /tmp     tmpfs    rw,nodev,nosuid,no
 # Swapfile
 /swapfile                                   none     swap     defaults,noatime,discard           0  0
 
-# Caches /home/esauvisky/
-tmpfs        /home/esauvisky/.cache/spotify          tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
-tmpfs        /home/esauvisky/.PlayOnLinux/tmp        tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
+# Caches /home/esauvisky/ (movidos para `asd`)
+#tmpfs        /home/esauvisky/.cache/spotify          tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
+#tmpfs        /home/esauvisky/.PlayOnLinux/tmp        tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
