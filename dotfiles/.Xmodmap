@@ -1,1 +1,4 @@
-keycode  20 = minus underscore minus underscore endash emdash
+keycode 20 = minus      underscore  minus       underscore  endash  emdash
+
+! U2219 is the bullet
+keycode 49 = apostrophe quotedbl    apostrophe  quotedbl    U2219   U2219

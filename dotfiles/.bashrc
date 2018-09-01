@@ -69,8 +69,6 @@ alias sudo='sudo '
 ## Diretórios Prédefinidos
 # Entra no diretório de Projetos
 alias cdp="cd /home/esauvisky/Coding/Projects"
-# Entra no diretório do projeto em andamento da Bravi
-alias cdb="cd ~/Bravi/omos-ciee"
 
 
 ## Navegação

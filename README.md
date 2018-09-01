@@ -562,13 +562,19 @@
 
 ### USB Flash Drives
 
-    - TODO: Geram alto IOWAIT, param de ser reconhecidos, mesmo depois de desplugar e plugar.
-        - Tem a ver com udev, ele trava e fica esperando.
+- TODO: Geram alto IOWAIT, param de ser reconhecidos, mesmo depois de desplugar e plugar.
+    - Tem a ver com udev, ele trava e fica esperando.
 
-    - Se Foram escritos com *iso9660 filesystem signatures* — como um USB bootavel escrito com `dd` — executar este comando para apagar as signaturas:
+- Se Foram escritos com *iso9660 filesystem signatures* — como um USB bootavel escrito com `dd` — executar este comando para apagar as signaturas:
 
-        # wipefs --all /dev/sdx
+    # wipefs --all /dev/sdx
 
+### Abrir gnome-calculator com locale en_US
+
+_Em função dos pontos decimais invertidos_
+
+- Criar um atalho customizado com o seguinte comando
+        env LC_NUMERIC=en_US.UTF-8 gnome-calculator
 
 
 ### VirtualBox(https://wiki.archlinux.org/index.php/VirtualBox)
