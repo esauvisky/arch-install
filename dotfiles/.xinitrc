@@ -62,8 +62,16 @@ sleep 5 && (
     fi) &
 
 # Roda o TitanIV
-echo "Running Discord's Bot: TitanIV"
-systemd-run --user --unit TitanIV /home/esauvisky/Coding/Discord/TitanIV/titan_start.sh &
+# echo "Running Discord's Bot: TitanIV"
+# systemd-run --user --unit TitanIV /home/esauvisky/Coding/Discord/TitanIV/titan_start.sh &
+
+# Roda o monitor do Discord Pokedex100
+echo "Running Discord's Bot: DiscoWatch"
+systemd-run --user --unit DiscoWatch /home/esauvisky/Coding/Projects/PGo-DiscoWatch/start.sh &
+
+# Roda o COOLmeDOWN
+echo "Running COOLmeDOWN"
+systemd-run --user --unit COOLmeDOWN /home/esauvisky/Coding/Projects/PGo-COOLmeDOWN/COOLmeDOWN &
 
 # Roda dropbox depois de 10 segundos
 echo "Running dropbox..."

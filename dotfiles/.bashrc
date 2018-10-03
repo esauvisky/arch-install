@@ -17,7 +17,7 @@ export HISTSIZE=50000
 # Número máximo de linhas em HISTFILE. (nada é infinito)
 export HISTFILESIZE=100000
 # Ignora estes comandos e não os salva no histórico.
-export HISTIGNORE="clear:exit:history"
+export HISTIGNORE="clear:exit:history:cd .."
 # Ignora comandos duplicados ou já presentes no histórico, preservando a ordem
 export HISTCONTROL=ignoreboth:erasedups
 # Prefixo das entradas do histórico em formato data (strftime) para saber em que data o comando foi executado.
@@ -203,11 +203,11 @@ function _fix_bottom_padding () {
 # trap '_fix_bottom_padding' WINCH
 
 # Sets bottom padding and changes clear alias **only** in TTYs
-if [[ ! $DISPLAY ]]; then
-    _clear
-    _set_bottom_padding
-    alias clear="_clear; _set_bottom_padding"
-fi
+#if [[ ! $DISPLAY ]]; then
+#    _clear
+#    _set_bottom_padding
+#    alias clear="_clear; _set_bottom_padding"
+#fi
 
 
 ########################### CONFIGURAÇÕES VARIADAS ############################
