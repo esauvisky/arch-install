@@ -46,7 +46,7 @@ export SSH_AUTH_SOCK
 ##     sudo chattr +i /home/esauvisky/config/autostart
 
 # Gnome-Tweak Ignore Lid Switch
-echo "Running gnome-tweak-tool-lid-inhibitor"
+#echo "Running gnome-tweak-tool-lid-inhibitor"
 /usr/lib/gnome-tweak-tool-lid-inhibitor &
 
 # xscreensaver
@@ -54,29 +54,29 @@ echo "Running gnome-tweak-tool-lid-inhibitor"
 
 # Deluge
 sleep 5 && (
-    deluged && sleep 5 &&
-    if [[ $(deluge-console info | egrep -c 'Error|Downloading') -eq 0 ]]; then
-        killall deluged
-    else
-        killall deluged && systemd-run --user --unit deluge deluge
-    fi) &
+   deluged && sleep 5 &&
+   if [[ $(deluge-console info | egrep -c 'Error|Downloading') -eq 0 ]]; then
+       killall deluged
+   else
+       killall deluged && systemd-run --user --unit deluge deluge
+   fi) &
 
 # Roda o TitanIV
 # echo "Running Discord's Bot: TitanIV"
 # systemd-run --user --unit TitanIV /home/esauvisky/Coding/Discord/TitanIV/titan_start.sh &
 
-# Roda o monitor do Discord Pokedex100
-echo "Running Discord's Bot: DiscoWatch"
-systemd-run --user --unit DiscoWatch /home/esauvisky/Coding/Projects/PGo-DiscoWatch/start.sh &
+# # Roda o monitor do Discord Pokedex100
+# echo "Running Discord's Bot: DiscoWatch"
+# systemd-run --user --unit DiscoWatch
 
-# Roda o COOLmeDOWN
-echo "Running COOLmeDOWN"
-systemd-run --user --unit COOLmeDOWN /home/esauvisky/Coding/Projects/PGo-COOLmeDOWN/COOLmeDOWN &
+# # Roda o COOLmeDOWN
+# echo "Running COOLmeDOWN"
+# ./COOLmeDOWN &
 
 # Roda dropbox depois de 10 segundos
 echo "Running dropbox..."
 sleep 10 && dropbox &
-#sleep 10 && systemd-run --user --unit DropboxDelayed dropbox &
+sleep 10 && systemd-run --user --unit DropboxDelayed dropbox &
 
 # Magica para fazer Alt+Tabs serem exclusivos por display (de acordo com o mouse)
 # Autor da solução: https://goo.gl/KJ345J
@@ -91,4 +91,7 @@ return allWindows;
 #echo "Running electrum..."
 #sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
 
-exec gnome-session
+#export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
+#export GNOME_SHELL_SESSION_MODE=classic
+exec gnome-session #--session=gnome-classic
+
