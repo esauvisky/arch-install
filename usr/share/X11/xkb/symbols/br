@@ -17,23 +17,27 @@ xkb_symbols "abnt2" {
     key <AE06> { [            6, dead_diaeresis,       notsign,       diaeresis ] };
     key <AE11> { [        minus,     underscore,        endash,          emdash ] };
     key <AE12> { [        equal,           plus,           bar,     dead_ogonek ] };
-    key <AD09> { [            o,              O,   Greek_omega,     Greek_OMEGA ] };
 
     key <AD01> { [            q,              Q,      question,       Greek_PHI ] };
     key <AD02> { [            w,              W,         slash,     Greek_SIGMA ] };
-    key <AD03> { [            e,              E,      EuroSign,        EuroSign ] };
+    key <AD03> { [            e,              E,            ae,              AE ] };
     key <AD04> { [            r,              R,    registered,      registered ] };
+    key <AD05> { [            t,              T,   Greek_theta,     Greek_THETA ] };
+    key <AD09> { [            o,              O,   Greek_omega,     Greek_OMEGA ] };
+    key <AD10> { [            p,              P,      Greek_pi,        Greek_PI ] };
     key <AD11> { [   dead_acute,     dead_grave,         acute,           grave ] };
     key <AD12> { [  bracketleft,      braceleft,   ordfeminine,     dead_macron ] };
     key <BKSL> { [ bracketright,     braceright,     masculine,       masculine ] };
 
+    key <AC01> { [            a,              A,   Greek_alpha,     Greek_ALPHA ] };
     key <AC03> { [            d,              D,   Greek_delta,     Greek_DELTA ] };
     key <AC10> { [     ccedilla,       Ccedilla,    dead_acute,dead_doubleacute ] };
     key <AC11> { [   dead_tilde,dead_circumflex,    asciitilde,     asciicircum ] };
 
     key <LSGT> { [    backslash,            bar,     masculine,      dead_breve ] };
-    key <AB03> { [            c,              C,     copyright,       copyright ] };
-    key <AB07> { [            m,              M,            mu,              mu ] };
+    key <AB03> { [            c,              C,     copyright,           U2113 ] }; // U2113 is checkmark
+    key <AB05> { [            b,              B,    Greek_beta,      Greek_BETA ] };
+    key <AB07> { [            m,              M,            mu,              MU ] };
     key <AB10> { [    semicolon,          colon, dead_belowdot,   dead_abovedot ] };
 
     // The ABNT-2 keyboard has this special key:
