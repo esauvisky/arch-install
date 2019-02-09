@@ -1,0 +1,75 @@
+### Tor configuration file for and by Emi Bemol.
+## Check out the original file for more documentation, this is quite trimmed down.
+## Also, check out, obviously, the Arch Wiki with lots of information (https://goo.gl/Pu8onW)
+
+
+###############
+### LOGGING ###
+###############
+## Send all messages of level 'notice' or higher to /var/log/tor/notices.log
+#Log notice file /var/log/tor/notices.log
+
+## Send every possible message to /var/log/tor/debug.log
+#Log debug file /var/log/tor/debug.log
+
+## Use the system log instead of Tor's logfiles
+Log notice syslog
+
+## To send all messages to stderr:
+#Log debug stderr
+
+
+#####################
+### MAIN SETTINGS ###
+#####################
+## The directory for keeping all the keys/etc. By default, we store
+## things in $HOME/.tor on Unix, and in Application Data\tor on Windows.
+DataDirectory /var/lib/tor
+
+### PROBABLY NOT REQUIRED BECAUSE OF SYSTEMD!
+## Uncomment this to start the process in the background... or use
+## --runasdaemon 1 on the command line. This is ignored on Windows;
+## see the FAQ entry if you want Tor to run as an NT service.
+#RunAsDaemon 1
+
+
+####################
+### CONTROL PORT ###
+####################
+## The port on which Tor will listen for local connections from Tor
+## controller applications, as documented in control-spec.txt.
+## This allows libraries and other apps to control Tor, like requesting new
+## routes, and stuff.
+ControlPort 9051
+
+## Authentication for the ControlPort, to prevent attackers from accesing it.
+## You can use either cookie or password. I'm trying cookie for now, looks more KISS.
+CookieAuthentication 1
+CookieAuthFile /var/lib/tor/control_auth_cookie
+CookieAuthFileGroupReadable 1
+DataDirectoryGroupReadable 1
+CacheDirectoryGroupReadable 1 # workaround for tor bug #26913
+
+## The alternative way to authenticate is via password:
+# HashedControlPassword 16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C
+
+
+######################
+### CONTROL SOCKET ###
+######################
+ControlSocket /var/lib/tor/control_socket
+ControlSocketsGroupWritable 1
+DataDirectoryGroupReadable 1
+CacheDirectoryGroupReadable 1 # workaround for tor bug #26913
+
+
+##################################
+### RELAY CONFIGS WERE REMOVED ###
+##################################
+### Lets wait until I get my AWS server :)
+
+
+################################################
+### LOCATION-HIDDEN SERVICES CONFIGS REMOVED ###
+################################################
+### I don't even quite know what this is about, so for now let's make this file clean.
