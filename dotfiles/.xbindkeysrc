@@ -1,0 +1,5 @@
+"xdotool key alt+Left"
+  b:8
+
+"xdotool key alt+Right"
+  b:9
