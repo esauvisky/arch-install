@@ -5,9 +5,11 @@
 # Se não estiver rodando interativamente, não fazer nada
 [[ $- != *i* ]] && return
 
-###################
-# Command History #
-###################
+
+########################
+# Configs and Settings #
+########################
+## Bash's eternal history
 # Incrementa o histórico ao invés de reescrevê-lo sempre que a shell for fechada.
 shopt -s histappend
 # Change the file location because certain bash sessions truncate .bash_history file upon close.
@@ -23,65 +25,109 @@ export HISTCONTROL=ignoreboth:erasedups
 # Prefixo das entradas do histórico em formato data (strftime) para saber em que data o comando foi executado.
 export HISTTIMEFORMAT='[%F %T] '
 
-#####################
-# STDOUT Log Saving #
-#####################
-# TODO: Needs some work
-#if [ -z "$UNDER_SCRIPT" ]; then
-#        logdir=$HOME/.terminal-logs
-#        if [ ! -d $logdir ]; then mkdir $logdir; fi
-#        if [[ $(du -sk $logdir | sed 's/\t.*$//') -gt 1000000 ]]; then
-#            # removes oldest file ONCE
-#            #echo "Removing oldest log"
-#            rm $logdir/$(\ls -t $logdir | tail -1)
-#        fi
-#        #gzip -q $logdir/*.log
-#        logfile=$logdir/$(date +%F_%T).$$.log
-#        export UNDER_SCRIPT=$logfile
-#        script -f -q $logfile
-#        exit
-#fi
+## Keybind removal for my precious Control+W and Control+D (it's set up on .inputrc)
+stty werase undef
+stty eof undef
+
+## Dangerous stuff that interferes with scripts.
+# Permite expansão case-insensitive de globs (*, ?).
+# shopt -s nocaseglob
+# Permite expansão avançada de globs (*, ?).
+# shopt -s extglob
+
 
 #########################
 # Environment Variables #
 #########################
-## You should really consider putting these in .xinitrc, depending on the intended behaviour
-# Sets EDITOR env variable for user and root
+## Sets EDITOR env variable for user and root
 [[ $EUID -gt 0 ]] && export EDITOR="subl3" || export EDITOR="nano"
-# Magic with `less` (like colors and other cool stuff)
+
+## Magic with `less` (like colors and other cool stuff)
 export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
-# Asks for Ctrl+D to be pressed twice to exit the shell
+
+## Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
-## Cores!!!
-# Originais:
-#LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
-# Baixadas:
-[[ -f ~/.dircolors ]] && eval $(dircolors -b ~/.dircolors)
+
+
+###################
+## COLORS, LOTS! ##
+###################
+# Default Set:
+# LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
+
+# Custom Sets:
+[[ -f ~/.dircolors ]] && eval $(dircolors -b ~/.dircolors)   # LS_COLORS
+source /etc/profile.d/grc.bashrc                             # grc
+
+
+# Loads bash and pacman completions
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+fi
+
+
+#####################
+# STDOUT Log Saving #
+#####################
+if [ -z "$UNDER_SCRIPT" ]; then
+    logdir=$HOME/.terminal-logs
+    if [ ! -d $logdir ]; then mkdir $logdir; fi
+    # TODO: This routine is very resource intensive
+    # and slows down the shell init *considerably*.
+    # if [[ $(du -sk $logdir | sed 's/\t.*$//') -gt 1000000 ]]; then
+    #     # removes oldest file ONCE
+    #     #echo "Removing oldest log"
+    #     rm $logdir/$(\ls -t $logdir | tail -1)
+    # fi
+    # gzip -q $logdir/*.log
+    logfile=$logdir/$(date +%F_%T).$$.log
+    export UNDER_SCRIPT=$logfile
+    script -f -q $logfile
+    exit
+fi
+
 
 ###########
-# Aliases #
+# CDZEIRO #
 ###########
-## Configuração
+function cdzeiro() {
+    cd /home/esauvisky/Coding/Projects
+    search=$(fd -d1 -td -i -a ${*})
+
+    if [[ $(fd -d1 -td -i -a ${*} | wc -l) -eq 1 ]]; then
+        cd "${search}"
+    fi
+}
+
+
+#########
+# Alias #
+#########
+## Boilerplate
 # Permite utilizar outros alias após o sudo
 # Quem faz a mágica é o espacinho no final.
 alias sudo='sudo '
 
 ## Diretórios Prédefinidos
 # Entra no diretório de Projetos
-alias cdp="cd /home/esauvisky/Coding/Projects"
-
+alias cdp="cdzeiro"
+alias cdb='cd /home/esauvisky/Bravi'
+alias cdbp='cd /home/esauvisky/Bravi/portal'
+alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
+alias cdpok='cd /home/esauvisky/Coding/Pokémon'
 
 ## Navegação
+alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls='ls -l --classify --human-readable --color=always --group-directories-first --literal --sort=extension --time-style=long-iso'
+alias ls='colourify ls -oX --classify --human-readable -rt --color=always --group-directories-first --literal --time-style=long-iso'
 
-
-alias grep="grep -n -C 2 --color=always"
-alias diff="colordiff -b -U -1"
-alias watch='watch --color -n0.5'
+# Filtros e comparações
+alias grep="grep -n -C 2 --color"
+alias diff="colordiff -w -B -U 5 --suppress-common-lines"
 
 ## Logging
+alias watch='watch --color -n0.5'
 alias dmesg='dmesg --time-format ctime'
 alias je='journalctl -ef'
 alias jb='journalctl -b'
@@ -102,20 +148,40 @@ alias gitcam='git commit -a -m '
 alias gitundo='git checkout -- '
 alias gitr='git reset HEAD '
 
-## Pacman Aliases
-# obriga a utilizar o pacman
+
+# Loads bash_completion.
+# Dotfile .bash_completion does the magic afterwards.
+if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+fi
+
+
+## Systemctl
+alias start="systemctl start"
+alias stop="systemctl stop"
+alias restart="systemctl restart"
+alias st="systemctl status -n9999 --no-legend -a -l"
+complete -F _complete_alias start
+complete -F _complete_alias stop
+complete -F _complete_alias restart
+complete -F _complete_alias st
+
+
+## Pacman
 alias pacman="pacman"
-# alias para instalar pacotes (não reinstala se já existir)
 alias pacs="sudo pacman -S --needed"
-# alias para remover pacotes (remove pacotes e dependências - se faltarem dependências adicionar -c)
 alias pacr="sudo pacman -Rs"
-# alias para pesquisar pacotes
 alias pacss="pacman -Ss"
-# alias para obter informações de pacotes
 alias paci="pacman -Qi"
-# alias para obter informações dos conteúdos de pacotes
 alias pacl="pacman -Ql"
-# atualiza o pacman e a AUR
+complete -F _complete_alias pacs
+complete -F _complete_alias pacr
+complete -F _complete_alias pacss
+complete -F _complete_alias paci
+complete -F _complete_alias pacl
+
+
+# Updaters
 alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
 # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
 # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
@@ -124,46 +190,18 @@ alias aurcheck="\pacman -Qm | sed 's/ .*$//' | while read line; do echo -e \"\e[
 #alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
 
 
-## True screen clearing
-function _clear () {
-    echo -en "\033c"
-}
-alias clear="_clear"
 
-# Load bash autocompletions
-if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-fi
-
-################################
-# pacman Autocomplete Wrappers #
-################################
-# Loads pacman's completions
-if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/completions/pacman
-fi
-# Autocompletes `pacman -S`
-function _pacman_sync () {
-    COMPREPLY=()
-    cur=`_get_cword`
-    _pacman_pkg Slq
-}
-# Autocompletes `pacman -R`
-function _pacman_remove () {
-    COMPREPLY=()
-    cur=`_get_cword`
-    _pacman_pkg Qq
-}
-# Adds autocomplete functions to the alises as well
-complete -F _pacman_sync pacs
-complete -F _pacman_remove pacr
-complete -F _pacman_sync pacss
-complete -F _pacman_sync paci
-complete -F _pacman_sync pacl
 
 ############################
 # Bottom Padding (DECSTBM) #
 ############################
+## Besides the first couple functions, this attempt
+## was a major fail. Any resizing of the window screws things up.
+# True screen clearing
+function _clear () {
+    echo -en "\033c"
+}
+
 # Leaves 3 lines of clearance at the bottom of the terminal
 function _set_bottom_padding () {
     echo -e "\n\033[1;$((LINES-3))r"
@@ -199,30 +237,26 @@ function _fix_bottom_padding () {
         tput cuu1
     fi
 }
-# Runs _fix_bottom_padding each time the window is resized
+# Runs _fix_bottom_padding each time the window is resized:
 # trap '_fix_bottom_padding' WINCH
 
 # Sets bottom padding and changes clear alias **only** in TTYs
-#if [[ ! $DISPLAY ]]; then
-#    _clear
-#    _set_bottom_padding
-#    alias clear="_clear; _set_bottom_padding"
-#fi
+if [[ ! $DISPLAY ]]; then
+   _clear
+   _set_bottom_padding
+   alias clear="_clear; _set_bottom_padding"
+fi
 
 
-########################### CONFIGURAÇÕES VARIADAS ############################
-##  TODO: Cuidado! Estas configurações alteram o funcionamento padrão de scripts   ##
-# Permite expansão case-insensitive de globs (*, ?).
-#shopt -s nocaseglob
-# Permite expansão avançada de globs (*, ?).
-#shopt -s extglob
-# Remove o keybind Ctrl+W e Ctrl+D do stty para poder setar em .inputrc
-stty werase undef
-stty eof undef
+# Lets disable the embedded prompt and make our own :)
+export VIRTUAL_ENV_DISABLE_PROMPT=0
+function virtualenv_info {
+    [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
+}
 
-##############
-# The Prompt #
-##############
+#####################################
+## The Divine and Beautiful Prompt ##
+#####################################
 [[ "$PS1" ]] && /usr/bin/fortune
 set_prompt () {
     # Deve vir primeiro!
@@ -234,7 +268,9 @@ set_prompt () {
 
     # Cores
     Blue='\[\e[01;34m\]'
+    Bluelly='\[\e[38;5;31;1m\]'
     White='\[\e[01;37m\]'
+    Magenta='\[\e[01;36m\]'
     Red='\[\e[01;31m\]'
     Green='\[\e[01;32m\]'
 
@@ -256,13 +292,16 @@ set_prompt () {
     if [[ $Last_Command == 0 ]]; then
         # Se o código de saída for diferente de 0 (erro)
         PS1+="$Green$Checkmark ${White}000 "
-        PS1+="$Green\\u@\\h "
+        PS1+="$Green\\u@\\h"
     else
         PS1+="$Red$FancyX $White"$(printf "%03d" $Last_Command)" "
-        PS1+="$Red\\u@\\h "
+        PS1+="$Red\\u@\\h"
     fi
     #PS1+="$Blue\\w\\n$YellowB\\\$ $YellowN"
-    PS1+="$Blue\\w\\n$YellowB\\\$ $YellowN"
+    if [[ ! -z $VIRTUAL_ENV ]]; then
+        PS1+=" $Magenta(venv:$(virtualenv_info))"
+    fi
+    PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
 
     # Continuação (PS2)
     PS2=" | "
