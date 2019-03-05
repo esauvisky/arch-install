@@ -133,6 +133,9 @@ alias je='journalctl -ef'
 alias jb='journalctl -b'
 
 ## Random
+alias sed-perl='perl -lpe'
+alias perl-sed='perl -lpe'
+
 # Alias para usar open-subl3 no lugar de subl3
 alias subl3='open-subl3'
 alias subl='open-subl3'
@@ -260,11 +263,33 @@ function virtualenv_info {
 #####################################
 [[ "$PS1" ]] && /usr/bin/fortune
 
-function set_title {
-    # Changes the terminal title to the command that is going to be run
-    echo -ne "\033]0;$BASH_COMMAND\007" > /dev/stderr
+function pre_command {
+    # Show the currently running command in the terminal title:
+    # @see http://www.davidpashley.com/articles/xterm-titles-with-bash.html
+    # @see https://gist.github.com/fly-away/751f32e7f6150419697d
+    # @see https://goo.gl/xJMzHG
 
-    # Small fix that clears up all prompt colors, so we don't colorize any output
+    # Instead of using $BASH_COMMAND, which doesn't deals with aliases,
+    # uses an awesome tip by @zeroimpl. It's scary, touch it and it breaks!!!
+    # @see https://goo.gl/2ZFDfM
+    local this_command=$(HISTTIMEFORMAT= history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//")
+    case "$this_command" in
+        *\033]0*|set_prompt*|echo*|printf*|cd*|ls)
+            # The command is trying to set the title bar as well;
+            # this is most likely the execution of $PROMPT_COMMAND.
+            # In any case nested escapes confuse the terminal, so don't
+            # output them.
+            ;;
+        *)
+            # Changes the terminal title to the command that is going to be run
+            # uses printf in case there are scapes characters on the command, which
+            # would block the rendering.
+            printf "\033]0;${this_command%% *}\007"
+            ;;
+    esac
+
+
+    # Small fix that clears up all prompt colors, so we don't colorize any output by mistake
     echo -ne "\e[0m"
 }
 
@@ -329,7 +354,7 @@ set_prompt () {
     PS1="\033]0;\w\007${PS1}"
 
     # If something is running, run set_title and change to the program name.
-    trap 'set_title' DEBUG
+    trap 'pre_command' DEBUG
 }
 
 PROMPT_COMMAND='set_prompt'
