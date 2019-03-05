@@ -254,19 +254,29 @@ function virtualenv_info {
     [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
 }
 
+
 #####################################
 ## The Divine and Beautiful Prompt ##
 #####################################
 [[ "$PS1" ]] && /usr/bin/fortune
+
+function set_title {
+    # Changes the terminal title to the command that is going to be run
+    echo -ne "\033]0;$BASH_COMMAND\007" > /dev/stderr
+
+    # Small fix that clears up all prompt colors, so we don't colorize any output
+    echo -ne "\e[0m"
+}
+
 set_prompt () {
-    # Deve vir primeiro!
+    # Must come first
     Last_Command=$?
 
-    # Salva o comando no histórico após cada comando
+    # Saves on history after each command
     history -a
     # crazy shit history -n; history -w; history -c; history -r;
 
-    # Cores
+    # Colors
     Blue='\[\e[01;34m\]'
     Bluelly='\[\e[38;5;31;1m\]'
     White='\[\e[01;37m\]'
@@ -274,7 +284,8 @@ set_prompt () {
     Red='\[\e[01;31m\]'
     Green='\[\e[01;32m\]'
 
-    # Se o usuário é root, utilizar outras cores
+    # 1337 users get different colors
+    # a.k.a: warns if you're in a root shell
     if [ $(id -u) -eq 0 ]; then
         YellowB='\[\e[01;31m\]'
         YellowN='\[\e[00;31m\]'
@@ -290,30 +301,35 @@ set_prompt () {
     # Prompt (PS1)
     PS1="$YellowN---$Reset\\n\\n"
     if [[ $Last_Command == 0 ]]; then
-        # Se o código de saída for diferente de 0 (erro)
+        # If we didn't had an error (exit code == 0)
         PS1+="$Green$Checkmark ${White}000 "
         PS1+="$Green\\u@\\h"
     else
         PS1+="$Red$FancyX $White"$(printf "%03d" $Last_Command)" "
         PS1+="$Red\\u@\\h"
     fi
-    #PS1+="$Blue\\w\\n$YellowB\\\$ $YellowN"
+
+    # Deals with python venvs
     if [[ ! -z $VIRTUAL_ENV ]]; then
         PS1+=" $Magenta(venv:$(virtualenv_info))"
     fi
+
     PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
 
-    # Continuação (PS2)
+    # Aligns stuff when you don't close quotes
     PS2=" | "
 
     # Debug (PS4)
-    # ** Não funciona quando set -x é executando fora do script! **
-    # Funciona legal se implementado diretamente no script a ser debugado com set -x ou set -o xtrace.
-    # Cuidado! O primeiro caractere da string (+) deve ser sem formatação, pois o bash repete ele de acordo com a hierarquia dos subprocessos.
+    # ** Does not work if set -x is used outside an script :( **
+    # It works wonderfully if you copy this to the script and apply set -x there though.
     #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
 
-    # Faz com que somente o comando fique em amarelo, e não o output do programa.
-    trap 'echo -ne "\e[0m"' DEBUG
+
+    # Changes the terminal window title to the current dir by default.
+    PS1="\033]0;\w\007${PS1}"
+
+    # If something is running, run set_title and change to the program name.
+    trap 'set_title' DEBUG
 }
 
 PROMPT_COMMAND='set_prompt'
