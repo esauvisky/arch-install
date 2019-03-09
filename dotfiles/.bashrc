@@ -248,11 +248,11 @@ function _fix_bottom_padding () {
 # trap '_fix_bottom_padding' WINCH
 
 # Sets bottom padding and changes clear alias **only** in TTYs
-if [[ ! $DISPLAY ]]; then
-   _clear
-   _set_bottom_padding
-   alias clear="_clear; _set_bottom_padding"
-fi
+#if [[ ! $DISPLAY ]]; then
+#   _clear
+#   _set_bottom_padding
+#   alias clear="_clear; _set_bottom_padding"
+#fi
 
 
 # Lets disable the embedded prompt and make our own :)
