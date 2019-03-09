@@ -65,32 +65,26 @@ if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
 fi
 
-
 #####################
 # STDOUT Log Saving #
 #####################
 if [ -z "$UNDER_SCRIPT" ]; then
     logdir=$HOME/.terminal-logs
     if [ ! -d $logdir ]; then mkdir $logdir; fi
-    # TODO: This routine is very resource intensive
-    # and slows down the shell init *considerably*.
-    # if [[ $(du -sk $logdir | sed 's/\t.*$//') -gt 1000000 ]]; then
-    #     # removes oldest file ONCE
-    #     #echo "Removing oldest log"
-    #     rm $logdir/$(\ls -t $logdir | tail -1)
-    # fi
-    # gzip -q $logdir/*.log
+    # Deletes all logs older than two weeks
+    find ~/.terminal-logs/ -type f -name '*.log' -mtime +14 -exec rm {} \;
+    # Compresses all logs older than one week
+    find ~/.terminal-logs/ -type f -name '*.log' -mtime +7 -exec gzip -q {} \;
     logfile=$logdir/$(date +%F_%T).$$.log
     export UNDER_SCRIPT=$logfile
     script -f -q $logfile
     exit
 fi
 
-
 ###########
 # CDZEIRO #
 ###########
-function cdzeiro() {
+function cdp() {
     cd /home/esauvisky/Coding/Projects
     search=$(fd -d1 -td -i -a ${*})
 
@@ -98,6 +92,22 @@ function cdzeiro() {
         cd "${search}"
     fi
 }
+
+################
+# COOL SPAWNER #
+################
+# Spawns and closes the terminal without killing the process
+function e {
+    if ! [ -x "$(command -v ${1})" ]; then
+        echo "Error: ${1} is not installed." >&2
+        exit 1
+    else
+        eval ${@} & disown
+        exit 0
+    fi
+}
+# Adds list of completions to e (basically every executable)
+complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 
 
 #########
@@ -110,7 +120,6 @@ alias sudo='sudo '
 
 ## Diretórios Prédefinidos
 # Entra no diretório de Projetos
-alias cdp="cdzeiro"
 alias cdb='cd /home/esauvisky/Bravi'
 alias cdbp='cd /home/esauvisky/Bravi/portal'
 alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
@@ -152,11 +161,6 @@ alias gitundo='git checkout -- '
 alias gitr='git reset HEAD '
 
 
-# Loads bash_completion.
-# Dotfile .bash_completion does the magic afterwards.
-if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-fi
 
 
 ## Systemctl
