@@ -98,11 +98,11 @@ function cdp() {
 ################
 # Spawns and closes the terminal without killing the process
 function e {
-    if ! [ -x "$(command -v ${1})" ]; then
-        echo "Error: ${1} is not installed." >&2
+    if [ -x "$(command -v ${1})" ] || alias ${1} &>/dev/null; then
+        eval ${@} & disown
         exit 1
     else
-        eval ${@} & disown
+        echo "Error: ${1} is not installed." >&2
         exit 0
     fi
 }
