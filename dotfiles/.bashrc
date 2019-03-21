@@ -10,8 +10,6 @@
 # Configs and Settings #
 ########################
 ## Bash's eternal history
-# Incrementa o histórico ao invés de reescrevê-lo sempre que a shell for fechada.
-shopt -s histappend
 # Change the file location because certain bash sessions truncate .bash_history file upon close.
 export HISTFILE=~/.bash_eternal_history
 # Número máximo de entradas de histórico na sessão atual. (nada é infinito)
@@ -21,7 +19,9 @@ export HISTFILESIZE=100000
 # Ignora estes comandos e não os salva no histórico.
 export HISTIGNORE="clear:exit:history:cd .."
 # Ignora comandos duplicados ou já presentes no histórico, preservando a ordem
-export HISTCONTROL=ignoreboth:erasedups
+export HISTCONTROL=ignoredups:erasedups
+# Incrementa o histórico ao invés de reescrevê-lo sempre que a shell for fechada.
+shopt -s histappend
 # Prefixo das entradas do histórico em formato data (strftime) para saber em que data o comando foi executado.
 export HISTTIMEFORMAT='[%F %T] '
 
@@ -58,7 +58,6 @@ export IGNOREEOF=1
 # Custom Sets:
 [[ -f ~/.dircolors ]] && eval $(dircolors -b ~/.dircolors)   # LS_COLORS
 source /etc/profile.d/grc.bashrc                             # grc
-
 
 # Loads bash and pacman completions
 if [ -f /usr/share/bash-completion/bash_completion ]; then
@@ -138,8 +137,8 @@ alias diff="colordiff -w -B -U 5 --suppress-common-lines"
 ## Logging
 alias watch='watch --color -n0.5'
 alias dmesg='dmesg --time-format ctime'
-alias je='journalctl -ef'
-alias jb='journalctl -b'
+alias je='colourify journalctl -ef'
+alias jb='colourify journalctl -b'
 
 ## Random
 alias sed-perl='perl -lpe'
@@ -157,11 +156,6 @@ alias rename='perl-rename'
 alias gitl='git log --all --decorate=full --oneline'
 alias gits='git status'
 alias gitcam='git commit -a -m '
-alias gitundo='git checkout -- '
-alias gitr='git reset HEAD '
-
-
-
 
 ## Systemctl
 alias start="systemctl start"
@@ -302,8 +296,10 @@ set_prompt () {
     Last_Command=$?
 
     # Saves on history after each command
-    history -a
-    # crazy shit history -n; history -w; history -c; history -r;
+    history -a;
+    # Crazy shit that's supposed to actually erase previous dups (https://goo.gl/DXAcPO)
+    # doesn't work
+    # history -n; history -w; history -c; history -r;
 
     # Colors
     Blue='\[\e[01;34m\]'

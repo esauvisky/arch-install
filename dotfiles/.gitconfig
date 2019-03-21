@@ -7,3 +7,6 @@
 	default = current
 [core]
 	filemode = false
+	excludesfile = /home/esauvisky/.gitignore-global
+	autocrlf = input
+	editor = open-subl3 -w

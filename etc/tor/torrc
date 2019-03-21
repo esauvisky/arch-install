@@ -44,14 +44,14 @@ ControlPort 9051
 
 ## Authentication for the ControlPort, to prevent attackers from accesing it.
 ## You can use either cookie or password. I'm trying cookie for now, looks more KISS.
-CookieAuthentication 1
-CookieAuthFile /var/lib/tor/control_auth_cookie
-CookieAuthFileGroupReadable 1
-DataDirectoryGroupReadable 1
-CacheDirectoryGroupReadable 1 # workaround for tor bug #26913
+#CookieAuthentication 1
+#CookieAuthFile /var/lib/tor/control_auth_cookie
+#CookieAuthFileGroupReadable 1
+#DataDirectoryGroupReadable 1
+#CacheDirectoryGroupReadable 1 # workaround for tor bug #26913
 
 ## The alternative way to authenticate is via password:
-# HashedControlPassword 16:872860B76453A77D60CA2BB8C1A7042072093276A3D701AD684053EC4C
+HashedControlPassword 16:88020A123B14DE866040871E1C5AD9E5A033C81D9E8B4467185B93908D
 
 
 ######################
