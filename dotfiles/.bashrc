@@ -2,6 +2,10 @@
 #
 # Author: Emiliano Sauvisky
 
+# TODO:
+# Figure out git completion
+# Add git current branch to PS1
+
 # Se não estiver rodando interativamente, não fazer nada
 [[ $- != *i* ]] && return
 
@@ -61,10 +65,21 @@ export IGNOREEOF=1
 [[ -f ~/.dircolors ]] && eval $(dircolors -b ~/.dircolors)   # LS_COLORS
 source /etc/profile.d/grc.bashrc                             # grc
 
+
+##################
+# AUTOCOMPLETION #
+##################
+## Tip: Autocompletion for custom funcs without writing our own completion function
+# 1. Type the command, and press <Tab> to autocomplete
+# 2. Run `complete -p command`
+# 3. The output is the hook that was used to complete it.
+# 4. Change it accordingly to apply it to your function.
+
 # Loads bash and pacman completions
 if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
 fi
+
 
 #####################
 # STDOUT Log Saving #
@@ -107,7 +122,7 @@ function e {
         exit 0
     fi
 }
-# Adds list of completions to e (basically every executable)
+# Adds list of completions to e() (basically every executable)
 complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 
 
@@ -158,6 +173,14 @@ alias rename='perl-rename'
 alias gitl='git log --all --decorate=full --oneline'
 alias gits='git status'
 alias gitcam='git commit -a -m '
+function gitdelbranch {
+    # First command deletes local branch, but exits > 0 if not fully merged,
+    # so the second command (which deletes the remote branch), will only run
+    # if the first one suceeds, making it safe.
+    git branch --delete ${1} && git push origin --delete ${1}
+}
+# WIP
+# complete -o bashdefault -o default -o nospace -W __git_heads -F __git_complete_refs gitdelbranch
 
 ## Systemctl
 alias start="systemctl start"
