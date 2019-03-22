@@ -17,7 +17,10 @@ xkb_symbols "abnt2" {
     // The command below is helpful for insta-debugging
     // $ sudo chattr -i /usr/share/X11/xkb/symbols/br && sudo cp br /usr/share/X11/xkb/symbols && sudo chattr +i /usr/share/X11/xkb/symbols/br && setxkbmap -v 10 -model abnt2 -layout br -variant abnt2
     //
-    // The latin layout is available below. Eventually, we'll stop including latin and define all keys on this file.
+    // The latin layout is available at the end of the file.
+    // Eventually, I'll stop including latin and define all keys on this file.
+    //
+    // Any blank space is a space for a character, make use of them.
 
 
     include "latin"
@@ -52,7 +55,6 @@ xkb_symbols "abnt2" {
     key <AC03> { [            d,              D,   Greek_delta,     Greek_DELTA ] };
     key <AC10> { [     ccedilla,       Ccedilla,    dead_acute,dead_doubleacute ] };
     key <AC11> { [   dead_tilde,dead_circumflex,    asciitilde,     asciicircum ] };
-    key <AC12> { [   dead_tilde,dead_circumflex,    asciitilde,     asciicircum ] };
 
     key <LSGT> { [    backslash,            bar,         U2022,           U2714 ] }; // U2022 is bullet, U2714 is bold checkmark
     key <AB01> { [            z,              Z                                 ] };
@@ -62,7 +64,7 @@ xkb_symbols "abnt2" {
     key <AB07> { [            m,              M,            mu,              MU ] };
     key <AB08> { [        comma,           less, guillemotleft                  ] };
     key <AB09> { [       period,        greater,guillemotright                  ] };
-    key <AB10> { [        slash,       question, dead_belowdot,   dead_abovedot ] };
+    key <AB10> { [    semicolon,          colon                                 ] };
 
     // The ABNT-2 keyboard has this special key:
     key <AB11> { [        slash,       question,        degree,    questiondown ] };

@@ -5,6 +5,8 @@
 # Se não estiver rodando interativamente, não fazer nada
 [[ $- != *i* ]] && return
 
+# GPG Signing TTY
+GPG_TTY=$(tty)
 
 ########################
 # Configs and Settings #
