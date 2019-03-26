@@ -1,0 +1,4 @@
+#!/bin/sh
+#scp to host
+Eterm --trans --shade 40 --scrollbar off --menubar off -e scp $@ user@host:~
+

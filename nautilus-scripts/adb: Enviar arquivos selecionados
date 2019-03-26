@@ -1,0 +1,44 @@
+#!/bin/sh
+android_path=`zenity --entry --text "Para qual diretório você quer copiar os arquivos?" --entry-text="/sdcard/Download"`
+
+
+i=1
+failed=0
+message=''
+TMP=$(mktemp)
+num_devices=$(($(adb devices | wc -l)-2))
+if [[ num_devices -ge 1 ]]; then
+    devices=$(zenity --separator=' ' --list --text="Selecione os dispositivos que deseja instalar os APKs" --title="Selecionar" --multiple --column=Dispositivo --column=Estado $(adb devices | tail -n+2))
+else
+    zenity --title "Nenhum dispositivo conectado" --error --text "Não encontrei nenhum dispositivo conectado! Se tiver certeza que está conectado experimente rodar 'adb devices'." --width 300 --height 35;
+    exit
+fi
+
+(
+for thing in "$@"; do
+    echo $(($i * 100 / ($# * $num_devices)))
+    for device in $devices; do
+        echo "# Fazendo push do arquivo \"${thing}\" ao dispositivo de ID $device" ;
+    	message+="# Fazendo push do arquivo \"${thing}\" ao dispositivo de ID $device...\n" ;
+    	message+=$(adb -s ${device} push "${thing}" $android_path)$'\n\n'
+        # adb push "${thing}" $android_path
+
+        if [[ $? -ne 0 ]]; then
+            failed=$(($failed+1))
+        fi
+        i=$(($i+1))
+    done
+done;
+
+i=$(($i-1))
+if [[ $failed -ge 1 ]]; then
+    echo "# Algumas transferências falharam. Clique em OK para ver os logs."
+    echo "$message" > $TMP
+else
+    echo "# $i arquivos foram transmitidos com sucesso!"
+fi ) | zenity --progress --auto-kill --text "Copiando arquivos..." --title "Fazendo push dos arquivos para $android_path" --width 400 --height 150
+
+if [[ -s $TMP ]]; then
+    cat $TMP | zenity --text-info --width 650 --height 400
+    rm $TMP
+fi

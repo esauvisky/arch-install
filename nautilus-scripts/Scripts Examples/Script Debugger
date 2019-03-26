@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+export IFS=$'\n'
+curpath=${NAUTILUS_SCRIPT_CURRENT_URI#file://}
+files=$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS
+cd "$curpath"
+
+message+=$'# Newline-delimited URIs for selected files.\n'
+message+=$'"$NAUTILUS_SCRIPT_SELECTED_URIS":\n'
+message+="$NAUTILUS_SCRIPT_SELECTED_URIS"
+
+message+=$'\n# Current location URI.\n'
+message+=$'"$NAUTILUS_SCRIPT_CURRENT_URI":\n'
+message+="$NAUTILUS_SCRIPT_CURRENT_URI"
+
+message+=$'\n# Current location path.\n'
+message+=$'"$PWD":\n'
+message+="$PWD"
+
+message+=$'\n\n# Newline-delimited paths for selected files (only if local).\n'
+message+=$'"$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS":\n'
+message+="$NAUTILUS_SCRIPT_SELECTED_FILE_PATHS"
+
+message+=$'\n# Space-delimited filenames for selected files without dirpath.\n'
+message+="# Good because it doesn't need IFS='\\\n' to parse them in a for loop."
+message+=$'\nfor file in "$@"; do echo "$file"\n'
+for file in "$@"; do
+    let n++
+    message+="$n: $file"$'\n'
+done
+
+# TODO
+#message+=$'\n# One liner for all selected files separated by spaces.\n'
+#message+=
+
+message+=$'\n# Position and size of current window.\n'
+message+=$'"$NAUTILUS_SCRIPT_WINDOW_GEOMETRY":\n'
+message+="$NAUTILUS_SCRIPT_WINDOW_GEOMETRY"
+
+echo "$message" | zenity --text-info

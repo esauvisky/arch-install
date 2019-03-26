@@ -1,0 +1,61 @@
+#!/usr/bin/python
+#
+# simple script to recurse a subtree, find all the mp3 and queue them to
+# XMMS.
+#
+# Please modify this script!  My python is rusty at best.
+#
+# Travis Hume -- travis@usermail.com
+# Thu Oct 24 11:06:54 2002
+
+import sys, glob, os, os.path
+
+FALSE,TRUE = 0,1
+
+def isAudioFile( f ):
+    # to support additional file types just add their appropriate
+    # extentions to this list (lower case).
+    file_types = ['.mp3','.ogg','.wav']
+
+    p,ext = os.path.splitext(f)
+    try:
+        file_types.index(ext.lower())
+    except:
+        return FALSE
+
+    return TRUE
+
+
+# change this to something other than None to make the script
+# follow symlinks
+follow_links = None
+
+def find_mp3s( dirs=None ):
+    """ finds all mp3 files rooted at dirs and returns them as a list """
+    if not dirs:
+        return []
+
+    mp3s = []
+    while dirs:
+        if os.path.isfile(dirs[0]) and isAudioFile(dirs[0]):
+            mp3s.append(dirs[0])
+        else:
+            found_dirs = []
+            for f in glob.glob( dirs[0] + "/*" ):
+                if os.path.isfile(f) and isAudioFile(f):
+                    mp3s.append( f )
+
+                if os.path.islink( f ):
+                    if follow_links:
+                        found_dirs.append( f )
+                elif os.path.isdir( f ) and not f.endswith( "/proc" ):
+                    found_dirs.append( f )
+
+            dirs = found_dirs + dirs[1:]
+
+    return mp3s
+
+dirs = sys.argv[1:]
+dirs.reverse()
+mp3s = find_mp3s( dirs )
+os.execvp("xmms", ['xmms','-p']+mp3s )

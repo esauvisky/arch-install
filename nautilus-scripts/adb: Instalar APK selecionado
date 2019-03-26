@@ -1,0 +1,45 @@
+#!/bin/bash
+
+
+
+i=0
+failed=0
+message=''
+TMP=$(mktemp)
+num_devices=$(($(adb devices | wc -l)-2))
+# num_devices=$(adb devices | \grep device$ | sed 's/[\t ][\t ]*..*$//' | wc -l)
+if [[ $num_devices -ge 1 ]]; then
+    devices=$(zenity --separator=' ' --list --text="Selecione os dispositivos que deseja transferir" --title="Selecionar" --multiple --column=Dispositivo --column=Estado $(adb devices | tail -n+2))
+else
+    zenity --title "Nenhum dispositivo conectado" --error --text "Não encontrei nenhum dispositivo conectado! Se tiver certeza que está conectado experimente rodar 'adb devices'." --width 300 --height 35;
+    exit
+fi
+
+(
+    for thing in "$@"; do
+        echo $(($i * 100 / ($# * $num_devices)))
+
+        for device in $devices; do
+            echo "# Instalando \"${thing}\" no dispositivo ID $device"
+            message+="# Instalando \"${thing}\" no dispositivo ID $device"$'\n'
+            message+=$(adb -s $device install "${thing}" 2>&1)$'\n\n'
+            if [[ $? != 0 ]]; then
+                failed=$(($failed+1))
+            fi
+            i=$(($i+1))
+        done
+    done
+
+    echo "$message" > $TMP
+    if [[ $failed -ge 1 ]]; then
+        echo "# $failed de $i instalações falharam! Confira os logs a seguir..."
+    else
+        echo "# $i APKs foram instalados com sucesso!"
+    fi
+
+) | zenity --progress --text "Instalando apps..." --title "Instalando os APKs" --width 400 --height 150 --auto-kill
+
+# if [[ -s $TMP ]]; then
+cat $TMP | zenity --text-info --width 650 --height 400
+rm $TMP
+# fi

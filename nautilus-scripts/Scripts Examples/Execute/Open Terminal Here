@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+#
+# Open terminal here
+#
+# Nautilus script that opens a gnome-terminal at the current location, if it's
+# a valid one. This could be done in shell script, but I love Perl!.
+#
+# 20020930 -- Javier Donaire <jyuyu@fraguel.org>
+# http://www.fraguel.org/~jyuyu/
+# Licensed under the GPL v2+
+#
+# Modified by: Dexter Ang [thepoch@mydestiny.net]
+# 2003-12-08: Modified for Gnome 2.4
+#		- Added checking if executed on Desktop "x-nautilus-desktop:///"
+#		  so that it opens in /home/{user}/Desktop
+
+use strict;
+
+$_ = $ENV{'NAUTILUS_SCRIPT_CURRENT_URI'};
+if ($_ and m#^file:///#) {
+  s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+  s#^file://##;
+  exec "gnome-terminal --working-directory='$_'";
+}
+
+# Added 2003-12-08 Dexter Ang
+if ($_ == "x-nautilus-desktop:///") {
+  $_ = $ENV{'HOME'};
+  $_ = $_.'/Desktop';
+  exec "gnome-terminal --working-directory='$_'";
+}
+

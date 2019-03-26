@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while [ $# -gt 0 ]; do
+	picture=$1
+	jpg_file=`echo "$picture" | sed 's/\.\w*$/.jpg/'`
+	/usr/bin/convert -quality 75 "$picture" jpeg:"$jpg_file"
+	shift
+done

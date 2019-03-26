@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while [ $# -gt 0 ]; do
+	picture=$1
+	png_file=`echo "$picture" | sed 's/\.\w*$/.png/'`
+	/usr/bin/convert "$picture" png:"$png_file"
+	shift
+done

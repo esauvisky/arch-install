@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -o errexit  # Exit on error. Append "|| true" if you expect an error.
+set -o errtrace # Exit on error inside any functions or subshells.
+
+cd "$PWD"
+
+message="Current PWD: $PWD"$'\n'
+message+=$(git status)
+message+=$'\n\nClick OK to commit and push changes (if any)'
+
+if [[ $(echo "$message" | zenity --text-info --width 500 --height 400) -eq 0 ]]; then
+    output=$(git commit -a -m "$(zenity --entry --text="Commit message:" --title="GitHub" --width 500)")
+    output+=$(git push)
+    echo "$output" | zenity --text-info --width 500 --height 400
+fi
+

@@ -1,0 +1,4 @@
+#!/bin/sh
+#This script opens the selected file in ghex--a hex editor
+#It will only open a single file
+ghex $@
