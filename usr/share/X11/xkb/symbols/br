@@ -24,7 +24,7 @@ xkb_symbols "abnt2" {
 
 
     include "latin"
-    name[Group1]="Portuguese (Emi's ABNT2)";
+    name[Group1]="Portuguese (Brazil)";
 
     key <TLDE> { [   apostrophe,       quotedbl,       notsign,         notsign ] };
     key <AE01> { [            1,         exclam,   onesuperior,           U2081 ] };
