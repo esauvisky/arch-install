@@ -3,7 +3,6 @@
 # Author: Emiliano Sauvisky
 
 # TODO:
-# Figure out git completion
 # Add git current branch to PS1
 
 # Se não estiver rodando interativamente, não fazer nada
@@ -78,6 +77,9 @@ source /etc/profile.d/grc.bashrc                             # grc
 # Loads bash and pacman completions
 if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
+fi
+if [ -f /usr/share/bash-completion/completions/git ]; then
+    . /usr/share/bash-completion/completions/git
 fi
 
 
@@ -179,8 +181,11 @@ function gitdelbranch {
     # if the first one suceeds, making it safe.
     git branch --delete ${1} && git push origin --delete ${1}
 }
-# WIP
-# complete -o bashdefault -o default -o nospace -W __git_heads -F __git_complete_refs gitdelbranch
+# Autocomplete local branches only
+git_local_branches () {
+    __gitcomp_direct "$(__git_heads "" "$cur" " ")"
+}
+__git_complete gitdelbranch git_local_branches
 
 ## Systemctl
 alias start="systemctl start"
