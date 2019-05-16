@@ -53,7 +53,7 @@ xkb_symbols "abnt2" {
 
     key <AC01> { [            a,              A,   Greek_alpha,     Greek_ALPHA ] };
     key <AC03> { [            d,              D,   Greek_delta,     Greek_DELTA ] };
-    key <AC10> { [     ccedilla,       Ccedilla,    dead_acute,dead_doubleacute ] };
+    key <AC10> { [     ccedilla,       Ccedilla                                 ] };
     key <AC11> { [   dead_tilde,dead_circumflex,    asciitilde,     asciicircum ] };
 
     key <LSGT> { [    backslash,            bar,         U2022,           U2714 ] }; // U2022 is bullet, U2714 is bold checkmark
@@ -79,8 +79,8 @@ xkb_symbols "abnt2" {
 // EXTRAS:
 
 partial alphanumeric_keys
-	xkb_symbols "sun_type6" {
-	include "sun_vndr/br(sun_type6)"
+    xkb_symbols "sun_type6" {
+    include "sun_vndr/br(sun_type6)"
 };
 
 
