@@ -45,6 +45,9 @@ export SSH_AUTH_SOCK
 # Gnome-Tweak Ignore Lid Switch
 /usr/lib/gnome-tweak-tool-lid-inhibitor &
 
+# Allows to lock the screen
+gnome-screensaver &
+
 # Deluge
 sleep 5 && (
     deluged && sleep 5 &&
