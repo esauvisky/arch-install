@@ -2,10 +2,9 @@
 #
 # Author: Emiliano Sauvisky
 
-# TODO:
-# Add git current branch to PS1
+## THIS IS CERTAINLY NOT POSIX COMPATIBLE
 
-# Se não estiver rodando interativamente, não fazer nada
+# Don't do anything if running interactively
 [[ $- != *i* ]] && return
 
 # GPG Signing TTY
@@ -35,18 +34,15 @@ stty werase undef
 stty eof undef
 
 ## Dangerous stuff that interferes with scripts.
-# Permite expansão case-insensitive de globs (*, ?).
+# Allows non case-sensitive wildcard globs (*, ?):
 # shopt -s nocaseglob
-# Permite expansão avançada de globs (*, ?).
+# Allows extended wildcard globs, like **
 # shopt -s extglob
 
 
 #########################
 # Environment Variables #
 #########################
-## Sets EDITOR env variable for user and root
-[[ $EUID -gt 0 ]] && export EDITOR="subl3" || export EDITOR="nano"
-
 ## Magic with `less` (like colors and other cool stuff)
 export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
 
@@ -57,26 +53,28 @@ export IGNOREEOF=1
 ###################
 ## COLORS, LOTS! ##
 ###################
-# TODO: refactor like this
-    # # enable color support of ls and also add handy aliases
-    # if [ -x /usr/bin/dircolors ]; then
-    #     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    #     alias ls='ls --color=auto'
-    #     #alias dir='dir --color=auto'
-    #     #alias vdir='vdir --color=auto'
+# TODO: refactor like this:
+# # enable color support of ls and also add handy aliases
+# if [ -x /usr/bin/dircolors ]; then
+#     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+#     alias ls='ls --color=auto'
+#     #alias dir='dir --color=auto'
+#     #alias vdir='vdir --color=auto'
 
-    #     alias grep='grep --color=auto'
-    #     alias fgrep='fgrep --color=auto'
-    #     alias egrep='egrep --color=auto'
-    # fi
+#     alias grep='grep --color=auto'
+#     alias fgrep='fgrep --color=auto'
+#     alias egrep='egrep --color=auto'
+# fi
 
 # Default Set:
 # LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
 
 # Custom Sets:
-[[ -f ~/.dircolors ]] && eval $(dircolors -b ~/.dircolors)   # LS_COLORS
-source /etc/profile.d/grc.bashrc                             # grc
-
+[[ -f ~/.dircolors ]] &&                          # dircolors
+    eval $(dircolors -b ~/.dircolors)
+[[ -f /etc/profile.d/grc.bashrc ]]   &&
+    source /etc/profile.d/grc.bashrc &&           # grc/colourify
+    _COLOURIFY_CMD='colourify'                        # enables colourify dinamycally
 
 ##################
 # AUTOCOMPLETION #
@@ -87,10 +85,11 @@ source /etc/profile.d/grc.bashrc                             # grc
 # 3. The output is the hook that was used to complete it.
 # 4. Change it accordingly to apply it to your function.
 
-# Loads bash and pacman completions
+# Loads bash's system-wide installed completions
 if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
 fi
+# Loads gits completion file for our custom completions
 if [ -f /usr/share/bash-completion/completions/git ]; then
     . /usr/share/bash-completion/completions/git
 fi
@@ -112,78 +111,77 @@ if [ -z "$UNDER_SCRIPT" ]; then
     exit
 fi
 
+
 ###########
 # CDZEIRO #
 ###########
+# Searches for directories up to two depth levels
+# e.g.: `cdp Unik` would make it cd into ~/Coding/Android/MyUnikProject
+#       if that's the only directory with 'Unik' in it's name.
+_BASEDIR='/home/esauvisky/Coding/'
 function cdp() {
-    cd /home/esauvisky/Coding/Projects
-    search=$(fd -d1 -td -i -a ${*})
+    # Black magic ;)
+    # results=()
+    # while IFS=  read -r -d $'\0'; do
+    #     results+=("$REPLY")
+    # done < <(find ${_BASEDIR} -depth  -maxdepth 2 -type d -iname \*${*}\* -print0)
 
-    if [[ $(fd -d1 -td -i -a ${*} | wc -l) -eq 1 ]]; then
-        cd "${search}"
+    # Neat black magic (bash 4.4 only)
+    readarray -d '' results < <(find ${_BASEDIR} -maxdepth 2 -type d -iname \*${*}\* -print0)
+
+    # If there's an unique result for the argument, cd into it:
+    if [[ ${#results[@]} -eq 1 ]]; then
+        cd "${results[0]}"
+    else
+        cd "${_BASEDIR}/Projects"
     fi
 }
+
 
 ################
 # COOL SPAWNER #
 ################
-# Spawns and closes the terminal without killing the process
+# Spawns a process and closes the terminal, without killing the process.
 function e {
     if [ -x "$(command -v ${1})" ] || alias ${1} &>/dev/null; then
         eval ${@} & disown
-        exit 1
+        exit 0
     else
         echo "Error: ${1} is not installed." >&2
-        exit 0
+        exit 1
     fi
 }
-# Adds list of completions to e() (basically every executable)
+# Adds list of completions to e() (basically adds every executable)
 complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 
 
-#########
-# Alias #
-#########
-## Boilerplate
-# Permite utilizar outros alias após o sudo
-# Quem faz a mágica é o espacinho no final.
+###########
+# Aliases #
+###########
+## Allows using aliases after sudo (the ending space is what does teh trick)
 alias sudo='sudo '
-
-## Diretórios Prédefinidos
-# Entra no diretório de Projetos
-alias cdb='cd /home/esauvisky/Bravi'
-alias cdbp='cd /home/esauvisky/Bravi/portal'
-alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
-alias cdbc='cd /home/esauvisky/Bravi/ciee-meta'
-alias cdpok='cd /home/esauvisky/Coding/Pokémon'
 
 ## Navegação
 alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls='colourify ls -oX --classify --human-readable -rt --color=always --group-directories-first --literal --time-style=long-iso'
+alias ls=$_COLOURIFY_CMD' ls -oX --classify --human-readable -rt --color=always --group-directories-first --literal --time-style=long-iso'
 
 # Filtros e comparações
 alias grep="grep -n -C 2 --color"
 alias diff="colordiff -w -B -U 5 --suppress-common-lines"
 
+# Makes sed useful
+alias sed="sed -E"
+
 ## Logging
 alias watch='watch --color -n0.5'
 alias dmesg='dmesg --time-format ctime'
-alias je='colourify journalctl -ef'
-alias jb='colourify journalctl -b'
-
-## Random
-alias sed-perl='perl -lpe'
-alias perl-sed='perl -lpe'
-
-# Alias para usar open-subl3 no lugar de subl3
-alias subl3='open-subl3'
-alias subl='open-subl3'
 # Adiciona flags no dd para verbosidade no progresso e auto-sync
 alias dd='dd status=progress oflag=sync'
 # Usa perl-rename quando chamando rename
 alias rename='perl-rename'
+
 
 ## Git
 alias gitl='git log --all --decorate=full --oneline'
@@ -192,14 +190,15 @@ alias gitcam='git commit -a -m '
 function gitdelbranch {
     # First command deletes local branch, but exits > 0 if not fully merged,
     # so the second command (which deletes the remote branch), will only run
-    # if the first one suceeds, making it safe.
+    # if the first one suceeds, making it "safe".
     git branch --delete ${1} && git push origin --delete ${1}
 }
 # Autocomplete local branches only
-git_local_branches () {
+_git_local_branches () {
     __gitcomp_direct "$(__git_heads "" "$cur" " ")"
 }
-__git_complete gitdelbranch git_local_branches
+__git_complete gitdelbranch _git_local_branches
+
 
 ## Systemctl
 alias start="systemctl start"
@@ -224,17 +223,6 @@ complete -F _complete_alias pacr
 complete -F _complete_alias pacss
 complete -F _complete_alias paci
 complete -F _complete_alias pacl
-
-
-# Updaters
-alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
-# alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
-# pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
-alias aurcheck="\pacman -Qm | sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
-# comandos para otimização do pacman
-#alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
-
-
 
 
 ############################
@@ -314,7 +302,7 @@ function pre_command {
     # Instead of using $BASH_COMMAND, which doesn't deals with aliases,
     # uses an awesome tip by @zeroimpl. It's scary, touch it and it breaks!!!
     # @see https://goo.gl/2ZFDfM
-    local this_command=$(HISTTIMEFORMAT= history 1 | sed -e "s/^[ ]*[0-9]*[ ]*//")
+    local this_command=$(HISTTIMEFORMAT= history 1 | \sed -e "s/^[ ]*[0-9]*[ ]*//")
     case "$this_command" in
         *\033]0*|set_prompt*|echo*|printf*|cd*|ls)
             # The command is trying to set the title bar as well;
@@ -367,10 +355,16 @@ set_prompt () {
     FancyX='\342\234\227'
     Checkmark='\342\234\223'
 
-    # Prompt (PS1)
+    ######################
+    ## Teh Prompt (PS1) ##
+    ######################
+    # Prints  ---\n\n after previous command without spawning
+    # a newline after it, so you can actually easily notice
+    # if it's output has an EOF linebreak.
     PS1="$YellowN---$Reset\\n\\n"
+
     if [[ $Last_Command == 0 ]]; then
-        # If we didn't had an error (exit code == 0)
+        # If last cmd didn't return an error (exit code == 0)
         PS1+="$Green$Checkmark ${White}000 "
         PS1+="$Green\\u@\\h"
     else
@@ -378,10 +372,15 @@ set_prompt () {
         PS1+="$Red\\u@\\h"
     fi
 
-    # Deals with python venvs
+    # Nicely shows you're in a python virtual environment
     if [[ ! -z $VIRTUAL_ENV ]]; then
         PS1+=" $Magenta(venv:$(virtualenv_info))"
     fi
+    # Nicely shows you're in a git repository
+    if [[ -e "$(git rev-parse --git-dir 2> /dev/null)" ]]; then
+        PS1+=" $Magenta[]"
+    fi
+
 
     PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
 
@@ -402,3 +401,65 @@ set_prompt () {
 }
 
 PROMPT_COMMAND='set_prompt'
+
+
+## PERSONAL RANDOM STUFF YOU WONT PROBABLY NEED
+if [[ $USER == 'esauvisky' ]]; then
+
+    # Updaters
+    alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
+    # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
+    # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
+    alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
+    # comandos para otimização do pacman
+    #alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
+
+    ## Sets EDITOR env variable for user and root
+    [[ $EUID -gt 0 ]] && export EDITOR="subl3" || export EDITOR="nano"
+    ## Diretórios Prédefinidos
+    # Entra no diretório de Projetos
+    alias cdb='cd /home/esauvisky/Bravi'
+    alias cdbp='cd /home/esauvisky/Bravi/portal'
+    alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
+    alias cdbc='cd /home/esauvisky/Bravi/ciee-meta'
+    alias cdpok='cd /home/esauvisky/Coding/Pokémon'
+
+
+    alias je=$_COLOURIFY_CMD' journalctl -ef'
+    alias jb=$_COLOURIFY_CMD' journalctl -b'
+
+    ## Diretórios Prédefinidos
+    # Entra no diretório de Projetos
+    alias cdb='cd /home/esauvisky/Bravi'
+    alias cdbp='cd /home/esauvisky/Bravi/portal'
+    alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
+    alias cdbc='cd /home/esauvisky/Bravi/ciee-meta'
+    alias cdpok='cd /home/esauvisky/Coding/Pokémon'
+
+    # Alias para usar open-subl3 no lugar de subl3
+    alias subl3='open-subl3'
+    alias subl='open-subl3'
+
+    ## In development
+    # [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ] &&   # bash-git-prompt (http://tinyurl.com/kth96po)
+    #     GIT_PROMPT_ONLY_IN_REPO=1 &&
+    #     GIT_PROMPT_THEME=Solarized &&
+    #     source $HOME/.bash-git-prompt/gitprompt.sh
+
+    ## add these from above (and whatever else necessary) to this one and ditch it
+    # # Use exit status from declare command to determine whether input argument is a
+    # # bash function
+    # function is_function {
+    #   declare -Ff "${1}" >/dev/null;
+    # }
+
+    # # Helper function that truncates $PWD depending on window width
+    # # Optionally specify maximum length as parameter (defaults to 1/3 of terminal)
+    # function gp_truncate_pwd {
+    #   local tilde="~"
+    #   local newPWD="${PWD/#${HOME}/${tilde}}"
+    #   local pwdmaxlen="${1:-$((${COLUMNS:-80}/3))}"
+    #   [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="...${newPWD:3-$pwdmaxlen}"
+    #   echo -n "${newPWD}"
+    # }
+fi
