@@ -45,6 +45,11 @@ export SSH_AUTH_SOCK
 # Gnome-Tweak Ignore Lid Switch
 /usr/lib/gnome-tweak-tool-lid-inhibitor &
 
+# msgrs
+slack &
+telegram-desktop &
+keybase-gui &
+
 # Allows to lock the screen
 gnome-screensaver &
 

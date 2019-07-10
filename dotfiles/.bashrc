@@ -1,43 +1,34 @@
 # ~/.bashrc
-#
-# Author: Emiliano Sauvisky
+# Author: emi~ (@esauvisky)
 
-## THIS IS CERTAINLY NOT POSIX COMPATIBLE
-
-# Don't do anything if running interactively
+############################################
+## THIS IS CERTAINLY NOT POSIX COMPATIBLE ##
+############################################
+## Don't do anything if not running interactively
 [[ $- != *i* ]] && return
 
-# GPG Signing TTY
-GPG_TTY=$(tty)
+## GPG Signing TTY
+# Has to be called at the very beggining
+GPG_TTY=$(tty)]
 
-########################
-# Configs and Settings #
-########################
+#####################
+# HISTORY SETTINGS #
+####################
 ## Bash's eternal history
 # Change the file location because certain bash sessions truncate .bash_history file upon close.
 export HISTFILE=~/.bash_eternal_history
-# Número máximo de entradas de histórico na sessão atual. (nada é infinito)
-export HISTSIZE=50000
-# Número máximo de linhas em HISTFILE. (nada é infinito)
-export HISTFILESIZE=100000
-# Ignora estes comandos e não os salva no histórico.
+# Maximum number of entries on the current session (nothing is infinite).
+export HISTSIZE=500000
+# Maximum number of lines in HISTFILE (nothing is infinite).
+export HISTFILESIZE=1000000
+# Commands to ignore and skip saving
 export HISTIGNORE="clear:exit:history:cd .."
-# Ignora comandos duplicados ou já presentes no histórico, preservando a ordem
+# Ignores dupes and deletes old ones (latest doesn't work _quite_ properly, but does the trick)
 export HISTCONTROL=ignoredups:erasedups
-# Incrementa o histórico ao invés de reescrevê-lo sempre que a shell for fechada.
-shopt -s histappend
-# Prefixo das entradas do histórico em formato data (strftime) para saber em que data o comando foi executado.
+# Custom history time prefix format
 export HISTTIMEFORMAT='[%F %T] '
-
-## Keybind removal for my precious Control+W and Control+D (it's set up on .inputrc)
-stty werase undef
-stty eof undef
-
-## Dangerous stuff that interferes with scripts.
-# Allows non case-sensitive wildcard globs (*, ?):
-# shopt -s nocaseglob
-# Allows extended wildcard globs, like **
-# shopt -s extglob
+# ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
+shopt -s histappend
 
 
 #########################
@@ -49,32 +40,29 @@ export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFil
 ## Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
 
+## Sets default EDITOR environment variable
+if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
+    for editor in "subl3" "gedit"; do
+        hash $editor >& /dev/null && export EDITOR=$editor && break || continue
+        export EDITOR="vi"
+    done
+else
+    # if root use exclusively non-gui editors
+    hash "nano" >& /dev/null && export EDITOR="nano" || export EDITOR="vi"
+fi
+
 
 ###################
 ## COLORS, LOTS! ##
 ###################
-# TODO: refactor like this:
-# # enable color support of ls and also add handy aliases
-# if [ -x /usr/bin/dircolors ]; then
-#     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-#     alias ls='ls --color=auto'
-#     #alias dir='dir --color=auto'
-#     #alias vdir='vdir --color=auto'
-
-#     alias grep='grep --color=auto'
-#     alias fgrep='fgrep --color=auto'
-#     alias egrep='egrep --color=auto'
-# fi
-
-# Default Set:
-# LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'
-
-# Custom Sets:
-[[ -f ~/.dircolors ]] &&                          # dircolors
-    eval $(dircolors -b ~/.dircolors)
-[[ -f /etc/profile.d/grc.bashrc ]]   &&
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    _COLOR_ALWAYS_ARG='--color=always'
+fi
+if [[ -f /etc/profile.d/grc.bashrc ]]; then
     source /etc/profile.d/grc.bashrc &&           # grc/colourify
-    _COLOURIFY_CMD='colourify'                        # enables colourify dinamycally
+    _COLOURIFY_CMD='colourify'                    # enables colourify dinamycally
+fi
 
 ##################
 # AUTOCOMPLETION #
@@ -165,23 +153,24 @@ alias sudo='sudo '
 alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls=$_COLOURIFY_CMD' ls -oX --classify --human-readable -rt --color=always --group-directories-first --literal --time-style=long-iso'
+alias ls=$_COLOURIFY_CMD" ls -oX --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 
-# Filtros e comparações
-alias grep="grep -n -C 2 --color"
-alias diff="colordiff -w -B -U 5 --suppress-common-lines"
-
+# Makes grep useful
+alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 # Makes sed useful
 alias sed="sed -E"
+# Makes diff decent
+alias diff="colordiff $_COLOR_ALWAYS_ARG -w -B -U 5 --suppress-common-lines"
 
 ## Logging
-alias watch='watch --color -n0.5'
+alias watch="watch --color -n0.5"
 alias dmesg='dmesg --time-format ctime'
-# Adiciona flags no dd para verbosidade no progresso e auto-sync
+# Makes dd pretty
 alias dd='dd status=progress oflag=sync'
-# Usa perl-rename quando chamando rename
-alias rename='perl-rename'
 
+# journalctl handy aliases
+alias je=$_COLOURIFY_CMD' journalctl -ef'
+alias jb=$_COLOURIFY_CMD' journalctl -b'
 
 ## Git
 alias gitl='git log --all --decorate=full --oneline'
@@ -280,28 +269,26 @@ function _fix_bottom_padding () {
 #   alias clear="_clear; _set_bottom_padding"
 #fi
 
-
 # Lets disable the embedded prompt and make our own :)
 export VIRTUAL_ENV_DISABLE_PROMPT=0
-function virtualenv_info {
+function _virtualenv_info {
     [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
 }
-
 
 #####################################
 ## The Divine and Beautiful Prompt ##
 #####################################
 [[ "$PS1" ]] && /usr/bin/fortune
 
-function pre_command {
+function _pre_command {
     # Show the currently running command in the terminal title:
-    # @see http://www.davidpashley.com/articles/xterm-titles-with-bash.html
-    # @see https://gist.github.com/fly-away/751f32e7f6150419697d
-    # @see https://goo.gl/xJMzHG
+    # *see http://www.davidpashley.com/articles/xterm-titles-with-bash.html
+    # *see https://gist.github.com/fly-away/751f32e7f6150419697d
+    # *see https://goo.gl/xJMzHG
 
     # Instead of using $BASH_COMMAND, which doesn't deals with aliases,
     # uses an awesome tip by @zeroimpl. It's scary, touch it and it breaks!!!
-    # @see https://goo.gl/2ZFDfM
+    # *see https://goo.gl/2ZFDfM
     local this_command=$(HISTTIMEFORMAT= history 1 | \sed -e "s/^[ ]*[0-9]*[ ]*//")
     case "$this_command" in
         *\033]0*|set_prompt*|echo*|printf*|cd*|ls)
@@ -317,7 +304,6 @@ function pre_command {
             printf "\033]0;${this_command%% *}\007"
             ;;
     esac
-
 
     # Small fix that clears up all prompt colors, so we don't colorize any output by mistake
     echo -ne "\e[0m"
@@ -374,12 +360,13 @@ set_prompt () {
 
     # Nicely shows you're in a python virtual environment
     if [[ ! -z $VIRTUAL_ENV ]]; then
-        PS1+=" $Magenta(venv:$(virtualenv_info))"
+        PS1+=" $Magenta(venv:$(_virtualenv_info))"
     fi
-    # Nicely shows you're in a git repository
-    if [[ -e "$(git rev-parse --git-dir 2> /dev/null)" ]]; then
-        PS1+=" $Magenta[]"
-    fi
+
+    # # TODO: Nicely shows you're in a git repository
+    # if [[ -e "$(git rev-parse --git-dir 2> /dev/null)" ]]; then
+    #     PS1+=" $Magenta[]"
+    # fi
 
 
     PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
@@ -397,15 +384,24 @@ set_prompt () {
     PS1="\033]0;\w\007${PS1}"
 
     # If something is running, run set_title and change to the program name.
-    trap 'pre_command' DEBUG
+    trap '_pre_command' DEBUG
 }
 
-PROMPT_COMMAND='set_prompt'
+## vte.sh
+# Fixes a bug (http://tinyurl.com/ohy3kmb) where spawning a new tab or window in gnome-terminal
+# does not keep the current PWD, and defaults back to HOME (http://tinyurl.com/y7yknu3r).
+# vte.sh replaces your PROMPT_COMMAND, so just source it and add it's function '__vte_prompt_command'
+# to the end of your own PROMPT_COMMAND.
+if [[ ! -z $VTE_VERSION ]]; then
+    source /etc/profile.d/vte.sh
+    PROMPT_COMMAND='set_prompt;__vte_prompt_command'
+else
+    PROMPT_COMMAND='set_prompt'
+fi
 
 
-## PERSONAL RANDOM STUFF YOU WONT PROBABLY NEED
+## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
 if [[ $USER == 'esauvisky' ]]; then
-
     # Updaters
     alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
     # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
@@ -414,8 +410,6 @@ if [[ $USER == 'esauvisky' ]]; then
     # comandos para otimização do pacman
     #alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
 
-    ## Sets EDITOR env variable for user and root
-    [[ $EUID -gt 0 ]] && export EDITOR="subl3" || export EDITOR="nano"
     ## Diretórios Prédefinidos
     # Entra no diretório de Projetos
     alias cdb='cd /home/esauvisky/Bravi'
@@ -424,21 +418,33 @@ if [[ $USER == 'esauvisky' ]]; then
     alias cdbc='cd /home/esauvisky/Bravi/ciee-meta'
     alias cdpok='cd /home/esauvisky/Coding/Pokémon'
 
-
-    alias je=$_COLOURIFY_CMD' journalctl -ef'
-    alias jb=$_COLOURIFY_CMD' journalctl -b'
-
     ## Diretórios Prédefinidos
     # Entra no diretório de Projetos
     alias cdb='cd /home/esauvisky/Bravi'
     alias cdbp='cd /home/esauvisky/Bravi/portal'
     alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
     alias cdbc='cd /home/esauvisky/Bravi/ciee-meta'
-    alias cdpok='cd /home/esauvisky/Coding/Pokémon'
 
     # Alias para usar open-subl3 no lugar de subl3
     alias subl3='open-subl3'
     alias subl='open-subl3'
+
+    # Uses perl-rename as default for rename
+    alias rename='perl-rename'
+
+
+    # TODO: check what is this for
+    source /usr/share/nvm/init-nvm.sh
+
+    ## Dangerous stuff that interferes with scripts
+    ## Put these at the end of your .bashrc preferably so it doesn't
+    ## intereferes with anything that is being done there.
+    # Allows non case-sensitive wildcard globs (*, ?):
+    # shopt -s nocaseglob
+    # Allows extended wildcard globs
+    # shopt -s extglob
+    # Enables the ** glob
+    shopt -s globstar
 
     ## In development
     # [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ] &&   # bash-git-prompt (http://tinyurl.com/kth96po)
