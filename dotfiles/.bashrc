@@ -36,7 +36,6 @@ export HISTTIMEFORMAT='[%F %T] '
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
 
-
 #########################
 # Environment Variables #
 #########################
@@ -49,14 +48,13 @@ export IGNOREEOF=1
 ## Sets default EDITOR environment variable
 if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
     for editor in "subl3" "gedit"; do
-        hash $editor >& /dev/null && export EDITOR=$editor && break || continue
+        hash "$editor" >&/dev/null && export EDITOR=$editor && break || continue
         export EDITOR="vi"
     done
 else
     # if root use exclusively non-gui editors
-    hash "nano" >& /dev/null && export EDITOR="nano" || export EDITOR="vi"
+    hash "nano" >&/dev/null && export EDITOR="nano" || export EDITOR="vi"
 fi
-
 
 ###################
 ## COLORS, LOTS! ##
@@ -66,8 +64,8 @@ if [ -x /usr/bin/dircolors ]; then
     _COLOR_ALWAYS_ARG='--color=always'
 fi
 if [[ -f /etc/profile.d/grc.bashrc ]]; then
-    source /etc/profile.d/grc.bashrc &&           # grc/colourify
-    _COLOURIFY_CMD='colourify'                    # enables colourify dinamycally
+    source /etc/profile.d/grc.bashrc # grc/colourify
+    _COLOURIFY_CMD='colourify'       # enables colourify dinamycally
 fi
 
 ##################
@@ -88,7 +86,6 @@ if [ -f /usr/share/bash-completion/completions/git ]; then
     . /usr/share/bash-completion/completions/git
 fi
 
-
 #####################
 # STDOUT Log Saving #
 #####################
@@ -105,7 +102,6 @@ if [ -z "$UNDER_SCRIPT" ]; then
     exit
 fi
 
-
 ###########
 # CDZEIRO #
 ###########
@@ -117,25 +113,24 @@ function cdp() {
     # results=()
     # while IFS=  read -r -d $'\0'; do
     #     results+=("$REPLY")
-    # done < <(find ${_BASEDIR} -depth  -maxdepth 2 -type d -iname \*${*}\* -print0)
+    # done < <(find ${_CDZEIRO_DIR} -depth  -maxdepth 2 -type d -iname \*${*}\* -print0)
 
     # Neat black magic (bash 4.4 only)
-    readarray -d '' results < <(find ${_BASEDIR} -maxdepth 2 -type d -iname \*${*}\* -print0)
+    readarray -d '' results < <(find ${_CDZEIRO_DIR} -maxdepth 2 -type d -iname \*${*}\* -print0)
 
     # If there's an unique result for the argument, cd into it:
     if [[ ${#results[@]} -eq 1 ]]; then
         cd "${results[0]}"
     else
-        cd "${_BASEDIR}/Projects"
+        cd "${_CDZEIRO_DIR}/Projects"
     fi
 }
-
 
 ################
 # COOL SPAWNER #
 ################
 # Spawns a process and closes the terminal, without killing the process.
-function e {
+function e() {
     if [ -x "$(command -v ${1})" ] || alias ${1} &>/dev/null; then
         eval ${@} & disown
         exit 0
@@ -146,7 +141,6 @@ function e {
 }
 # Adds list of completions to e() (basically adds every executable)
 complete -W "$(compgen -c)" -o bashdefault -o default 'e'
-
 
 ###########
 # Aliases #
@@ -172,10 +166,11 @@ alias watch="watch --color -n0.5"
 alias dmesg='dmesg --time-format ctime'
 # Makes dd pretty
 alias dd='dd status=progress oflag=sync'
-
 # journalctl handy aliases
-alias je=$_COLOURIFY_CMD' journalctl -ef'
-alias jb=$_COLOURIFY_CMD' journalctl -b'
+hash "journalctl" && (
+    alias je=$_COLOURIFY_CMD' journalctl -ef'
+    alias jb=$_COLOURIFY_CMD' journalctl -b'
+)
 
 ## Git
 alias gitl='git log --all --decorate=full --oneline'
@@ -225,17 +220,17 @@ complete -F _complete_alias pacl
 ## Besides the first couple functions, this attempt
 ## was a major fail. Any resizing of the window screws things up.
 # True screen clearing
-function _clear () {
+function _clear() {
     echo -en "\033c"
 }
 
 # Leaves 3 lines of clearance at the bottom of the terminal
-function _set_bottom_padding () {
-    echo -e "\n\033[1;$((LINES-3))r"
+function _set_bottom_padding() {
+    echo -e "\n\033[1;$((LINES - 3))r"
 }
 
 # FIXME: Tries to fix the padding when resizing the terminal window
-function _fix_bottom_padding () {
+function _fix_bottom_padding() {
     # Saves current cursor position
     tput sc
 
@@ -245,7 +240,7 @@ function _fix_bottom_padding () {
     CURPOS=${CURPOS#*;}
 
     # Calculates difference between number of lines -3 and cursor position
-    DIFERENCE=$(( $((LINES-3)) - ${CURPOS%;*} ))
+    DIFERENCE=$(($((LINES - 3)) - ${CURPOS%;*}))
 
     # Prints debug on first line
     #tput cup 0 0
@@ -254,12 +249,12 @@ function _fix_bottom_padding () {
 
     # Do the magic (except it doesn't work)
     if [[ $DIFERENCE -ge 0 ]]; then
-        echo -e "\033[1;$((LINES-3))r"
+        echo -e "\033[1;$((LINES - 3))r"
         tput rc
     elif [[ $DIFERENCE -eq -1 ]]; then
         tput cup $LINES 0
         #for ((i=-1; i>=$DIFERENCE; i--)); do echo -en '\n'; done
-        echo -e "\n\033[1;$((LINES-3))r"
+        echo -e "\n\033[1;$((LINES - 3))r"
         tput rc
         tput cuu1
     fi
@@ -276,7 +271,7 @@ function _fix_bottom_padding () {
 
 # Lets disable the embedded prompt and make our own :)
 export VIRTUAL_ENV_DISABLE_PROMPT=0
-function _virtualenv_info {
+function _virtualenv_info() {
     [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
 }
 
@@ -285,7 +280,7 @@ function _virtualenv_info {
 #####################################
 [[ "$PS1" ]] && /usr/bin/fortune
 
-function _pre_command {
+function _pre_command() {
     # Show the currently running command in the terminal title:
     # *see http://www.davidpashley.com/articles/xterm-titles-with-bash.html
     # *see https://gist.github.com/fly-away/751f32e7f6150419697d
@@ -296,7 +291,7 @@ function _pre_command {
     # *see https://goo.gl/2ZFDfM
     local this_command=$(HISTTIMEFORMAT= history 1 | \sed -e "s/^[ ]*[0-9]*[ ]*//")
     case "$this_command" in
-        *\033]0*|set_prompt*|echo*|printf*|cd*|ls)
+        *\033]0* | set_prompt* | echo* | printf* | cd* | ls)
             # The command is trying to set the title bar as well;
             # this is most likely the execution of $PROMPT_COMMAND.
             # In any case nested escapes confuse the terminal, so don't
@@ -314,12 +309,12 @@ function _pre_command {
     echo -ne "\e[0m"
 }
 
-set_prompt () {
+set_prompt() {
     # Must come first
     Last_Command=$?
 
     # Saves on history after each command
-    history -a;
+    history -a
     # Crazy shit that's supposed to actually erase previous dups (https://goo.gl/DXAcPO)
     # doesn't work
     # history -n; history -w; history -c; history -r;
@@ -373,7 +368,6 @@ set_prompt () {
     #     PS1+=" $Magenta[]"
     # fi
 
-
     PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
 
     # Aligns stuff when you don't close quotes
@@ -383,7 +377,6 @@ set_prompt () {
     # ** Does not work if set -x is used outside an script :( **
     # It works wonderfully if you copy this to the script and apply set -x there though.
     #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
-
 
     # Changes the terminal window title to the current dir by default.
     PS1="\033]0;\w\007${PS1}"
