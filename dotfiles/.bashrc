@@ -173,46 +173,56 @@ hash "journalctl" && (
 )
 
 ## Git
-alias gitl='git log --all --decorate=full --oneline'
-alias gits='git status'
-alias gitcam='git commit -a -m '
-function gitdelbranch {
-    # First command deletes local branch, but exits > 0 if not fully merged,
-    # so the second command (which deletes the remote branch), will only run
-    # if the first one suceeds, making it "safe".
-    git branch --delete ${1} && git push origin --delete ${1}
-}
-# Autocomplete local branches only
-_git_local_branches () {
-    __gitcomp_direct "$(__git_heads "" "$cur" " ")"
-}
-__git_complete gitdelbranch _git_local_branches
-
+if hash "git"; then
+    alias gitl='git log --all --decorate=full --oneline'
+    alias gits='git status'
+    alias gitcam='git commit -a -m '
+    function gitdelbranch() {
+        # First command deletes local branch, but exits > 0 if not fully merged,
+        # so the second command (which deletes the remote branch), will only run
+        # if the first one suceeds, making it "safe".
+        git branch --delete ${1} && git push origin --delete ${1}
+    }
+    # Autocomplete local branches only
+    _git_local_branches() {
+        __gitcomp_direct "$(__git_heads "" "$cur" " ")"
+    }
+    __git_complete gitdelbranch _git_local_branches
+fi
 
 ## Systemctl
-alias start="systemctl start"
-alias stop="systemctl stop"
-alias restart="systemctl restart"
-alias st="systemctl status -n9999 --no-legend -a -l"
-complete -F _complete_alias start
-complete -F _complete_alias stop
-complete -F _complete_alias restart
-complete -F _complete_alias st
-
+if hash "systemctl"; then
+    alias start="systemctl start"
+    alias stop="systemctl stop"
+    alias restart="systemctl restart"
+    alias st="systemctl status -n9999 --no-legend -a -l"
+    complete -F _complete_alias start
+    complete -F _complete_alias stop
+    complete -F _complete_alias restart
+    complete -F _complete_alias st
+fi
 
 ## Pacman
-alias pacman="pacman"
-alias pacs="sudo pacman -S --needed"
-alias pacr="sudo pacman -Rs"
-alias pacss="pacman -Ss"
-alias paci="pacman -Qi"
-alias pacl="pacman -Ql"
-complete -F _complete_alias pacs
-complete -F _complete_alias pacr
-complete -F _complete_alias pacss
-complete -F _complete_alias paci
-complete -F _complete_alias pacl
+if hash "pacman"; then
+    alias pacman="pacman"
+    alias pacs="sudo pacman -S --needed"
+    alias pacr="sudo pacman -Rs"
+    alias pacss="pacman -Ss"
+    alias paci="pacman -Qi"
+    alias pacl="pacman -Ql"
+    complete -F _complete_alias pacs
+    complete -F _complete_alias pacr
+    complete -F _complete_alias pacss
+    complete -F _complete_alias paci
+    complete -F _complete_alias pacl
 
+    # Updater (pacman + aurget + aurget dev packages):
+    alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
+    # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
+    alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
+    # comandos para otimização do pacman
+    alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
+fi
 
 ############################
 # Bottom Padding (DECSTBM) #
@@ -398,14 +408,6 @@ else
 fi
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
-    # Updaters
-    alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
-    # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
-    # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
-    alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
-    # comandos para otimização do pacman
-    #alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
-
 if [[ $_ENABLE_RANDOM_STUFF ]]; then
     ## Diretórios Prédefinidos
     # Entra no diretório de Projetos
