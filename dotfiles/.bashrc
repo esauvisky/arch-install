@@ -1,6 +1,12 @@
 # ~/.bashrc
 # Author: emi~ (@esauvisky)
 
+###########
+# CONFIGS #
+###########
+_CDZEIRO_DIR="$HOME/Coding/" # Check CDZEIRO function below
+_ENABLE_RANDOM_STUFF=1       # Check the big if block at the end of the file
+
 ############################################
 ## THIS IS CERTAINLY NOT POSIX COMPATIBLE ##
 ############################################
@@ -106,7 +112,6 @@ fi
 # Searches for directories up to two depth levels
 # e.g.: `cdp Unik` would make it cd into ~/Coding/Android/MyUnikProject
 #       if that's the only directory with 'Unik' in it's name.
-_BASEDIR='/home/esauvisky/Coding/'
 function cdp() {
     # Black magic ;)
     # results=()
@@ -399,9 +404,7 @@ else
     PROMPT_COMMAND='set_prompt'
 fi
 
-
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
-if [[ $USER == 'esauvisky' ]]; then
     # Updaters
     alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
     # alias pacsyu="echo -n 'Limite de kbps? [700] '; read kbps; if test ! \$kbps; then kbps=700; fi; sudo trickle -s -d \$kbps pacman  -Syu --noconfirm; trickle -s -d \$kbps aurget -Syu --deps --noconfirm"
@@ -410,20 +413,21 @@ if [[ $USER == 'esauvisky' ]]; then
     # comandos para otimização do pacman
     #alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
 
+if [[ $_ENABLE_RANDOM_STUFF ]]; then
     ## Diretórios Prédefinidos
     # Entra no diretório de Projetos
-    alias cdb='cd /home/esauvisky/Bravi'
-    alias cdbp='cd /home/esauvisky/Bravi/portal'
-    alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
-    alias cdbc='cd /home/esauvisky/Bravi/ciee-meta'
-    alias cdpok='cd /home/esauvisky/Coding/Pokémon'
+    alias cdb="cd $HOME/Bravi"
+    alias cdbp="cd $HOME/Bravi/portal"
+    alias cdbs="cd $HOME/Bravi/somos-ciee"
+    alias cdbc="cd $HOME/Bravi/ciee-meta"
+    alias cdpok="cd $HOME/Coding/Pokémon"
 
     ## Diretórios Prédefinidos
     # Entra no diretório de Projetos
-    alias cdb='cd /home/esauvisky/Bravi'
-    alias cdbp='cd /home/esauvisky/Bravi/portal'
-    alias cdbs='cd /home/esauvisky/Bravi/somos-ciee'
-    alias cdbc='cd /home/esauvisky/Bravi/ciee-meta'
+    alias cdb="cd $HOME/Bravi"
+    alias cdbp="cd $HOME/Bravi/portal"
+    alias cdbs="cd $HOME/Bravi/somos-ciee"
+    alias cdbc="cd $HOME/Bravi/ciee-meta"
 
     # Alias para usar open-subl3 no lugar de subl3
     alias subl3='open-subl3'
@@ -431,7 +435,6 @@ if [[ $USER == 'esauvisky' ]]; then
 
     # Uses perl-rename as default for rename
     alias rename='perl-rename'
-
 
     # TODO: check what is this for
     source /usr/share/nvm/init-nvm.sh
