@@ -4,8 +4,8 @@
 ###########
 # CONFIGS #
 ###########
+_ENABLE_RANDOM_STUFF=0       # Check the big if block at the end of the file
 _CDZEIRO_DIR="$HOME/Coding/" # Check CDZEIRO function below
-_ENABLE_RANDOM_STUFF=1       # Check the big if block at the end of the file
 
 ############################################
 ## THIS IS CERTAINLY NOT POSIX COMPATIBLE ##
@@ -463,6 +463,12 @@ if [[ ! -z $VTE_VERSION ]]; then
 else
     PROMPT_COMMAND='_set_prompt'
 fi
+
+
+## transfer.sh
+# TODO: refactor this, prettify and add auto copy to clipboard with xclip
+transfer() { if [ $# -eq 0 ]; then echo -e "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"; return 1; fi
+tmpfile=$( mktemp -t transferXXX ); if tty -s; then basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g'); curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile; else curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile ; fi; cat $tmpfile; rm -f $tmpfile; }
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
 if [[ $_ENABLE_RANDOM_STUFF ]]; then
