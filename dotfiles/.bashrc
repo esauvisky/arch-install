@@ -142,6 +142,13 @@ function e() {
 # Adds list of completions to e() (basically adds every executable)
 complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 
+#############
+# FIND DIRS #
+#############
+function findir() {
+    find -type d -iname *${@}* 2>/dev/null
+}
+
 ###########
 # Aliases #
 ###########
@@ -167,13 +174,13 @@ alias dmesg='dmesg --time-format ctime'
 # Makes dd pretty
 alias dd='dd status=progress oflag=sync'
 # journalctl handy aliases
-hash "journalctl" && (
+if hash "journalctl" >&/dev/null; then
     alias je=$_COLOURIFY_CMD' journalctl -ef'
     alias jb=$_COLOURIFY_CMD' journalctl -b'
-)
+fi
 
 ## Git
-if hash "git"; then
+if hash "git" >&/dev/null; then
     alias gitl='git log --all --decorate=full --oneline'
     alias gits='git status'
     alias gitcam='git commit -a -m '
@@ -184,14 +191,14 @@ if hash "git"; then
         git branch --delete ${1} && git push origin --delete ${1}
     }
     # Autocomplete local branches only
-    _git_local_branches() {
+    function_git_local_branches() {
         __gitcomp_direct "$(__git_heads "" "$cur" " ")"
     }
     __git_complete gitdelbranch _git_local_branches
 fi
 
 ## Systemctl
-if hash "systemctl"; then
+if hash "systemctl" >&/dev/null; then
     alias start="systemctl start"
     alias stop="systemctl stop"
     alias restart="systemctl restart"
@@ -203,7 +210,7 @@ if hash "systemctl"; then
 fi
 
 ## Pacman
-if hash "pacman"; then
+if hash "pacman" >&/dev/null; then
     alias pacman="pacman"
     alias pacs="sudo pacman -S --needed"
     alias pacr="sudo pacman -Rs"
@@ -288,7 +295,7 @@ function _virtualenv_info() {
 #####################################
 ## The Divine and Beautiful Prompt ##
 #####################################
-[[ "$PS1" ]] && /usr/bin/fortune
+[[ "$PS1" ]] && hash "fortune" >&/dev/null && /usr/bin/fortune
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
@@ -319,7 +326,7 @@ function _pre_command() {
     echo -ne "\e[0m"
 }
 
-set_prompt() {
+function _set_prompt() {
     # Must come first
     Last_Command=$?
 
@@ -402,9 +409,9 @@ set_prompt() {
 # to the end of your own PROMPT_COMMAND.
 if [[ ! -z $VTE_VERSION ]]; then
     source /etc/profile.d/vte.sh
-    PROMPT_COMMAND='set_prompt;__vte_prompt_command'
+    PROMPT_COMMAND='_set_prompt;__vte_prompt_command'
 else
-    PROMPT_COMMAND='set_prompt'
+    PROMPT_COMMAND='_set_prompt'
 fi
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
@@ -444,26 +451,11 @@ if [[ $_ENABLE_RANDOM_STUFF ]]; then
     # Enables the ** glob
     shopt -s globstar
 
-    ## In development
-    # [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ] &&   # bash-git-prompt (http://tinyurl.com/kth96po)
-    #     GIT_PROMPT_ONLY_IN_REPO=1 &&
-    #     GIT_PROMPT_THEME=Solarized &&
-    #     source $HOME/.bash-git-prompt/gitprompt.sh
-
-    ## add these from above (and whatever else necessary) to this one and ditch it
-    # # Use exit status from declare command to determine whether input argument is a
-    # # bash function
-    # function is_function {
-    #   declare -Ff "${1}" >/dev/null;
-    # }
-
-    # # Helper function that truncates $PWD depending on window width
-    # # Optionally specify maximum length as parameter (defaults to 1/3 of terminal)
-    # function gp_truncate_pwd {
-    #   local tilde="~"
-    #   local newPWD="${PWD/#${HOME}/${tilde}}"
-    #   local pwdmaxlen="${1:-$((${COLUMNS:-80}/3))}"
-    #   [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="...${newPWD:3-$pwdmaxlen}"
-    #   echo -n "${newPWD}"
-    # }
+    # In development:
+    # add these from above (and whatever else necessary) to this one and ditch it
+    # Use exit status from declare command to determine whether input argument is a
+    # bash function
+    function is_function() {
+        declare -Ff "${1}" >/dev/null
+    }
 fi
