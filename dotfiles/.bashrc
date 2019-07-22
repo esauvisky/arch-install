@@ -336,6 +336,13 @@ function _pre_command() {
     echo -ne "\e[0m"
 }
 
+# Helper function to read the first line of a file into a variable.
+# __git_eread requires 2 arguments, the file path and the name of the
+# variable, in that order.
+function __git_eread() {
+    test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
+}
+
 function _set_prompt() {
     # Must come first
     Last_Command=$?
@@ -350,9 +357,16 @@ function _set_prompt() {
     Blue='\[\e[01;34m\]'
     Bluelly='\[\e[38;5;31;1m\]'
     White='\[\e[01;37m\]'
+    Violet='\[\e[01;35m\]'
     Magenta='\[\e[01;36m\]'
     Red='\[\e[01;31m\]'
     Green='\[\e[01;32m\]'
+    GreenLight='\[\e[01;92m\]'
+    YellowLight='\[\e[01;93m\]'
+    VioletLight='\[\e[01;95m\]'
+    PinkLight='\[\e[01;91m\]'
+    GrayBackground='\[\e[01;40m\]'
+
 
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
@@ -391,21 +405,35 @@ function _set_prompt() {
     fi
 
     ## Nicely shows you're in a git repository
-    if [[ -e "$(git rev-parse --git-dir 2> /dev/null)" ]]; then
+    ## @see: /usr/share/git/git-prompt.sh for more use cases and much more robust
+    repo_info="$(git rev-parse --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
+    rev_parse_exit_code="$?"
+
+    if [[ ! -z $repo_info ]]; then
+        if [ "$rev_parse_exit_code" = "0" ]; then
+            short_sha="${repo_info##*$'\n'}"
+            repo_info="${repo_info%$'\n'*}"
+        fi
         branch_name=$(git symbolic-ref -q HEAD)
         branch_name=${branch_name##refs/heads/}
-        branch_name=${branch_name:-HEAD}
+        branch_name=${branch_name:-$short_sha}
 
-        PS1+="$Magenta ["
+
+        PS1+=" $Violet["
+
 
         if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
-            PS1+="$Magenta→ $branch_name$Reset"
+            [[ $branch_name == $short_sha ]] &&
+                PS1+="${GrayBackground}${White}→ $branch_name$Reset" || # DETACHED HEAD
+                PS1+="$GreenLight→ $branch_name•$Reset"                  # normal stuff
+        elif [[ $(git status --porcelain --untracked-files=normal 2>/dev/null | grep "^\?\?") ]]; then
+            PS1+="$YellowB→ $branch_name*$Reset"
         elif [[ $(git status 2>/dev/null | head -n5) == *"Changes to be committed"* ]]; then
-            PS1+="$Blue→ $branch_name$Reset"
+            PS1+="$Blue→ $branch_name+$Reset"
         else
             PS1+="$YellowB→ $branch_name*$Reset"
         fi
-        PS1+="$Magenta]$Reset"
+        PS1+="$Violet]$Reset"
     fi
 
     PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
