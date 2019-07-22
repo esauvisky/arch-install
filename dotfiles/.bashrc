@@ -292,6 +292,16 @@ function _virtualenv_info() {
     [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
 }
 
+# Helper function that truncates $PWD depending on window width
+# Optionally specify maximum length as parameter (defaults to 1/3 of terminal)
+function _get_truncated_pwd() {
+    local tilde="~"
+    local newPWD="${PWD/#${HOME}/${tilde}}"
+    local pwdmaxlen="${1:-$((${COLUMNS:-80} / 3))}"
+    [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="…${newPWD:3-$pwdmaxlen}"
+    echo -n "${newPWD}"
+}
+
 #####################################
 ## The Divine and Beautiful Prompt ##
 #####################################
@@ -380,10 +390,23 @@ function _set_prompt() {
         PS1+=" $Magenta(venv:$(_virtualenv_info))"
     fi
 
-    # # TODO: Nicely shows you're in a git repository
-    # if [[ -e "$(git rev-parse --git-dir 2> /dev/null)" ]]; then
-    #     PS1+=" $Magenta[]"
-    # fi
+    ## Nicely shows you're in a git repository
+    if [[ -e "$(git rev-parse --git-dir 2> /dev/null)" ]]; then
+        branch_name=$(git symbolic-ref -q HEAD)
+        branch_name=${branch_name##refs/heads/}
+        branch_name=${branch_name:-HEAD}
+
+        PS1+="$Magenta ["
+
+        if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
+            PS1+="$Magenta→ $branch_name$Reset"
+        elif [[ $(git status 2>/dev/null | head -n5) == *"Changes to be committed"* ]]; then
+            PS1+="$Blue→ $branch_name$Reset"
+        else
+            PS1+="$YellowB→ $branch_name*$Reset"
+        fi
+        PS1+="$Magenta]$Reset"
+    fi
 
     PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
 
@@ -395,10 +418,9 @@ function _set_prompt() {
     # It works wonderfully if you copy this to the script and apply set -x there though.
     #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
 
-    # Changes the terminal window title to the current dir by default.
-    PS1="\033]0;\w\007${PS1}"
-
-    # If something is running, run set_title and change to the program name.
+    # Changes the terminal window title to the current dir by default, truncating if too long.
+    PS1="\033]0;$(_get_truncated_pwd)\007${PS1}"
+    # Otherwise, if something is currently running, run _pre_command and change title to the app's name.
     trap '_pre_command' DEBUG
 }
 
