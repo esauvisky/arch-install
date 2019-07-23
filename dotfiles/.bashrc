@@ -4,7 +4,7 @@
 ###########
 # CONFIGS #
 ###########
-_ENABLE_RANDOM_STUFF=0       # Check the big if block at the end of the file
+_ENABLE_RANDOM_STUFF=1       # Check the big if block at the end of the file
 _CDZEIRO_DIR="$HOME/Coding/" # Check CDZEIRO function below
 
 ############################################
@@ -211,12 +211,14 @@ fi
 
 ## Pacman
 if hash "pacman" >&/dev/null; then
+    alias aurs="aurget --sort votes -Ss"
     alias pacman="pacman"
     alias pacs="sudo pacman -S --needed"
     alias pacr="sudo pacman -Rs"
     alias pacss="pacman -Ss"
     alias paci="pacman -Qi"
     alias pacl="pacman -Ql"
+    complete -F _complete_alias aurs
     complete -F _complete_alias pacs
     complete -F _complete_alias pacr
     complete -F _complete_alias pacss
@@ -436,7 +438,8 @@ function _set_prompt() {
         PS1+="$Violet]$Reset"
     fi
 
-    PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
+    Time12a="\$(date +%H:%M)"
+    PS1+=" $Bluelly\\w\\n$YellowN$Time12a $YellowB\\\$ $YellowN"
 
     # Aligns stuff when you don't close quotes
     PS2=" | "

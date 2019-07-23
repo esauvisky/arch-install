@@ -48,7 +48,7 @@ export SSH_AUTH_SOCK
 # msgrs
 slack &
 telegram-desktop &
-keybase-gui &
+minetime &
 
 # Allows to lock the screen
 gnome-screensaver &
