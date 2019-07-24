@@ -243,41 +243,41 @@ function _clear() {
     echo -en "\033c"
 }
 
-# Leaves 3 lines of clearance at the bottom of the terminal
-function _set_bottom_padding() {
-    echo -e "\n\033[1;$((LINES - 3))r"
-}
+# # Leaves 3 lines of clearance at the bottom of the terminal
+# function _set_bottom_padding() {
+#     echo -e "\n\033[1;$((LINES - 3))r"
+# }
 
-# FIXME: Tries to fix the padding when resizing the terminal window
-function _fix_bottom_padding() {
-    # Saves current cursor position
-    tput sc
+# # FIXME: Tries to fix the padding when resizing the terminal window
+# function _fix_bottom_padding() {
+#     # Saves current cursor position
+#     tput sc
 
-    # Gets current cursor position
-    echo -en "\E[6n"
-    read -sdR CURPOS
-    CURPOS=${CURPOS#*;}
+#     # Gets current cursor position
+#     echo -en "\E[6n"
+#     read -sdR CURPOS
+#     CURPOS=${CURPOS#*;}
 
-    # Calculates difference between number of lines -3 and cursor position
-    DIFERENCE=$(($((LINES - 3)) - ${CURPOS%;*}))
+#     # Calculates difference between number of lines -3 and cursor position
+#     DIFERENCE=$(($((LINES - 3)) - ${CURPOS%;*}))
 
-    # Prints debug on first line
-    #tput cup 0 0
-    #echo "LINES=$LINES CURPOS=$CURPOS DIFERENCE=$((${CURPOS%;*}-$((LINES-3))))"
-    #tput rc
+#     # Prints debug on first line
+#     #tput cup 0 0
+#     #echo "LINES=$LINES CURPOS=$CURPOS DIFERENCE=$((${CURPOS%;*}-$((LINES-3))))"
+#     #tput rc
 
-    # Do the magic (except it doesn't work)
-    if [[ $DIFERENCE -ge 0 ]]; then
-        echo -e "\033[1;$((LINES - 3))r"
-        tput rc
-    elif [[ $DIFERENCE -eq -1 ]]; then
-        tput cup $LINES 0
-        #for ((i=-1; i>=$DIFERENCE; i--)); do echo -en '\n'; done
-        echo -e "\n\033[1;$((LINES - 3))r"
-        tput rc
-        tput cuu1
-    fi
-}
+#     # Do the magic (except it doesn't work)
+#     if [[ $DIFERENCE -ge 0 ]]; then
+#         echo -e "\033[1;$((LINES - 3))r"
+#         tput rc
+#     elif [[ $DIFERENCE -eq -1 ]]; then
+#         tput cup $LINES 0
+#         #for ((i=-1; i>=$DIFERENCE; i--)); do echo -en '\n'; done
+#         echo -e "\n\033[1;$((LINES - 3))r"
+#         tput rc
+#         tput cuu1
+#     fi
+# }
 # Runs _fix_bottom_padding each time the window is resized:
 # trap '_fix_bottom_padding' WINCH
 
@@ -420,9 +420,7 @@ function _set_prompt() {
         branch_name=${branch_name##refs/heads/}
         branch_name=${branch_name:-$short_sha}
 
-
         PS1+=" $Violet["
-
 
         if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
             [[ $branch_name == $short_sha ]] &&
@@ -439,7 +437,8 @@ function _set_prompt() {
     fi
 
     Time12a="\$(date +%H:%M)"
-    PS1+=" $Bluelly\\w\\n$YellowN$Time12a $YellowB\\\$ $YellowN"
+
+    PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
 
     # Aligns stuff when you don't close quotes
     PS2=" | "
@@ -448,6 +447,31 @@ function _set_prompt() {
     # ** Does not work if set -x is used outside an script :( **
     # It works wonderfully if you copy this to the script and apply set -x there though.
     #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
+
+
+    ## Time right aligned
+    ## @see: https://superuser.com/questions/187455/right-align-part-of-prompt
+    # Create a string like:  "[ Apr 25 16:06 ]" with time in RED.
+    printf -v PS1RHS "\e[0m[ \e[0;0;33m%(%b %d %H:%M:%S)T \e[0m]" -1 # -1 is current time
+
+    # Strip ANSI commands before counting length
+    # From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
+    PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
+
+    # Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
+    local Save='\e[s' # Save cursor position
+    local Rest='\e[u' # Restore cursor to save point
+
+    # Save cursor position, jump to right hand edge, then go left N columns where
+    # N is the length of the printable RHS string. Print the RHS string, then
+    # return to the saved position and print the LHS prompt.
+
+    # Note: "\[" and "\]" are used so that bash can calculate the number of
+    # printed characters so that the prompt doesn't do strange things when
+    # editing the entered text.
+
+    PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
+
 
     # Changes the terminal window title to the current dir by default, truncating if too long.
     PS1="\033]0;$(_get_truncated_pwd)\007${PS1}"
