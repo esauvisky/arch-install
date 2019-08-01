@@ -191,7 +191,7 @@ if hash "git" >&/dev/null; then
         git branch --delete ${1} && git push origin --delete ${1}
     }
     # Autocomplete local branches only
-    function_git_local_branches() {
+    function _git_local_branches() {
         __gitcomp_direct "$(__git_heads "" "$cur" " ")"
     }
     __git_complete gitdelbranch _git_local_branches
