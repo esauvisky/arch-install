@@ -46,9 +46,9 @@ export SSH_AUTH_SOCK
 /usr/lib/gnome-tweak-tool-lid-inhibitor &
 
 # msgrs
-slack &
+# slack &
 telegram-desktop &
-minetime &
+# minetime &
 
 # Allows to lock the screen
 gnome-screensaver &
@@ -67,4 +67,5 @@ sleep 5 && (
 
 exec gnome-session
 #exec twm
+# exec cinnamon-session
 
