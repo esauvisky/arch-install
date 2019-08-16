@@ -28,7 +28,7 @@ export HISTSIZE=500000
 # Maximum number of lines in HISTFILE (nothing is infinite).
 export HISTFILESIZE=1000000
 # Commands to ignore and skip saving
-export HISTIGNORE="clear:exit:history:cd .."
+export HISTIGNORE="clear:exit:history:cd ..:ls"
 # Ignores dupes and deletes old ones (latest doesn't work _quite_ properly, but does the trick)
 export HISTCONTROL=ignoredups:erasedups
 # Custom history time prefix format
@@ -108,6 +108,40 @@ fi
 # Amazing bash-only menu selector
 # Taken from http://tinyurl.com/y5vgfon7
 function select_option { ESC=$(printf "\033");cursor_blink_on(){ printf "$ESC[?25h";};cursor_blink_off(){ printf "$ESC[?25l";};cursor_to(){ printf "$ESC[$1;${2:-1}H";};print_option(){ printf "   $1 ";};print_selected(){ printf "  $ESC[7m $1 $ESC[27m";};get_cursor_row(){ IFS=';' read -sdR -p $'\E[6n' ROW COL;echo ${ROW#*[};};key_input(){ read -s -n3 key 2>/dev/null>&2;if [[ $key = $ESC[A ]];then echo up;fi;if [[ $key = $ESC[B ]];then echo down;fi;if [[ $key = "" ]];then echo enter;fi;};for opt;do printf "\n";done;local lastrow=`get_cursor_row`;local startrow=$(($lastrow - $#));trap "cursor_blink_on; stty echo; printf '\n'" 2;cursor_blink_off;local selected=0;while true;do local idx=0;for opt;do cursor_to $(($startrow + $idx));if [ $idx -eq $selected ];then print_selected "$opt";else print_option "$opt";fi;((idx++));done;case `key_input` in enter)break;;up)((selected--));if [ $selected -lt 0 ];then selected=$(($# - 1));fi;;down)((selected++));if [ $selected -ge $# ];then selected=0;fi;;esac;done;cursor_to $lastrow;printf "\n";cursor_blink_on;return $selected;}
+
+###########
+# Extract #
+###########
+# Extracts everything
+function extract {
+    for n in "$@"; do
+      if [ -f "$n" ] ; then
+          case "${n%,}" in
+            *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
+                         tar xvf "$n"       ;;
+            *.lzma)      unlzma ./"$n"      ;;
+            *.bz2)       bunzip2 ./"$n"     ;;
+            *.cbr|*.rar)       unrar x -ad ./"$n" ;;
+            *.gz)        gunzip ./"$n"      ;;
+            *.cbz|*.epub|*.zip)       unzip ./"$n"       ;;
+            *.z)         uncompress ./"$n"  ;;
+            *.7z|*.arj|*.cab|*.cb7|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar)
+                         7z x ./"$n"        ;;
+            *.xz)        unxz ./"$n"        ;;
+            *.exe)       cabextract ./"$n"  ;;
+            *.cpio)      cpio -id < ./"$n"  ;;
+            *.cba|*.ace)      unace x ./"$n"      ;;
+            *)
+                         echo "extract: '$n' - unknown archive method"
+                         return 1
+                         ;;
+          esac
+      else
+          echo "'$n' - file does not exist"
+          return 1
+      fi
+    done
+}
 
 ###########
 # CDZEIRO #
@@ -347,13 +381,6 @@ function _pre_command() {
     echo -ne "\e[0m"
 }
 
-# Helper function to read the first line of a file into a variable.
-# __git_eread requires 2 arguments, the file path and the name of the
-# variable, in that order.
-function __git_eread() {
-    test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
-}
-
 function _set_prompt() {
     # Must come first
     Last_Command=$?
@@ -532,6 +559,15 @@ if [[ $_ENABLE_RANDOM_STUFF ]]; then
 
     # TODO: check what is this for
     source /usr/share/nvm/init-nvm.sh
+
+    # Helper function to read the first line of a file into a variable.
+    # __git_eread requires 2 arguments, the file path and the name of the
+    # variable, in that order.
+    # function __git_eread() {
+    #     echo 'USING GIT EREAD'
+    #     test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
+    # }
+
 
     ## Dangerous stuff that interferes with scripts
     ## Put these at the end of your .bashrc preferably so it doesn't
