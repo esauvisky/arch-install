@@ -1,15 +1,15 @@
 # /dev/mapper/cryptroot
-UUID=0d73fd89-bc3b-4759-80eb-135ddbb33022   /        ext4     rw,noatime,discard                 0  1
+UUID=0d73fd89-bc3b-4759-80eb-135ddbb33022   /                ext4   rw,noatime,discard                                              0  1
 
 # /dev/sda1
-UUID=6BE1-2DC5                              /boot    vfat     rw,noatime,utf8                    0  2
+UUID=6BE1-2DC5                              /boot            vfat   rw,noatime,utf8                                                 0  2
 
 # /tmp
-tmpfs                                       /tmp     tmpfs    rw,nodev,nosuid,noatime,size=4G    0  0
+tmpfs                                       /tmp             tmpfs  rw,nodev,nosuid,noatime,size=8G                                 0  0
 
 # Swapfile
-/swapfile                                   none     swap     defaults,noatime,discard           0  0
+/swapfile                                   none             swap   defaults,noatime,discard                                        0  0
 
-# Caches /home/esauvisky/ (movidos para `asd`)
-#tmpfs        /home/esauvisky/.cache/spotify          tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
-#tmpfs        /home/esauvisky/.PlayOnLinux/tmp        tmpfs    rw,nodev,nosuid,noatime,size=1G    0  0
+# HD Antigo (via dock USB)
+#UUID=10aa17bb-47d2-46c0-8f01-1b030e0c0b9a   /mnt/OldArch     ext4   nosuid,nodev,nofail,x-gvfs-show,x-gvfs-name=OldArch,noauto      0  0
+#UUID=422892EE2892DFE9                       /mnt/OldWindows  ntfs   nosuid,nodev,nofail,x-gvfs-show,x-gvfs-name=OldWindows,noauto   0  0

@@ -67,5 +67,5 @@ sleep 5 && (
 
 exec gnome-session
 #exec twm
-# exec cinnamon-session
+#exec cinnamon-session
 
