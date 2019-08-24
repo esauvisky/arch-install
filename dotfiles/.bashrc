@@ -1,4 +1,4 @@
-# ~/.bashrc
+#!/usr/bin/env bash
 # Author: emi~ (@esauvisky)
 
 ###########
@@ -12,10 +12,6 @@ _CDZEIRO_DIR="$HOME/Coding/" # Check CDZEIRO function below
 ############################################
 ## Don't do anything if not running interactively
 [[ $- != *i* ]] && return
-
-## GPG Signing TTY
-# Has to be called at the very beggining
-GPG_TTY=$(tty)]
 
 #####################
 # HISTORY SETTINGS #
@@ -107,39 +103,85 @@ fi
 #################
 # Amazing bash-only menu selector
 # Taken from http://tinyurl.com/y5vgfon7
-function select_option { ESC=$(printf "\033");cursor_blink_on(){ printf "$ESC[?25h";};cursor_blink_off(){ printf "$ESC[?25l";};cursor_to(){ printf "$ESC[$1;${2:-1}H";};print_option(){ printf "   $1 ";};print_selected(){ printf "  $ESC[7m $1 $ESC[27m";};get_cursor_row(){ IFS=';' read -sdR -p $'\E[6n' ROW COL;echo ${ROW#*[};};key_input(){ read -s -n3 key 2>/dev/null>&2;if [[ $key = $ESC[A ]];then echo up;fi;if [[ $key = $ESC[B ]];then echo down;fi;if [[ $key = "" ]];then echo enter;fi;};for opt;do printf "\n";done;local lastrow=`get_cursor_row`;local startrow=$(($lastrow - $#));trap "cursor_blink_on; stty echo; printf '\n'" 2;cursor_blink_off;local selected=0;while true;do local idx=0;for opt;do cursor_to $(($startrow + $idx));if [ $idx -eq $selected ];then print_selected "$opt";else print_option "$opt";fi;((idx++));done;case `key_input` in enter)break;;up)((selected--));if [ $selected -lt 0 ];then selected=$(($# - 1));fi;;down)((selected++));if [ $selected -ge $# ];then selected=0;fi;;esac;done;cursor_to $lastrow;printf "\n";cursor_blink_on;return $selected;}
+function select_option() {
+    ESC=$(printf "\033")
+    cursor_blink_on() { printf "$ESC[?25h"; }
+    cursor_blink_off() { printf "$ESC[?25l"; }
+    cursor_to() { printf "$ESC[$1;${2:-1}H"; }
+    print_option() { printf "   $1 "; }
+    print_selected() { printf "  $ESC[7m $1 $ESC[27m"; }
+    get_cursor_row() {
+        IFS=';' read -sdR -p $'\E[6n' ROW COL
+        echo ${ROW#*[}
+    }
+    key_input() {
+        read -s -n3 key 2>/dev/null >&2
+        if [[ $key == $ESC[A ]]; then echo up; fi
+        if [[ $key == $ESC[B ]]; then echo down; fi
+        if [[ $key == "" ]]; then echo enter; fi
+    }
+    for opt; do printf "\n"; done
+    local lastrow=$(get_cursor_row)
+    local startrow=$(($lastrow - $#))
+    trap "cursor_blink_on; stty echo; printf '\n'" 2
+    cursor_blink_off
+    local selected=0
+    while true; do
+        local idx=0
+        for opt; do
+            cursor_to $(($startrow + $idx))
+            if [ $idx -eq $selected ]; then print_selected "$opt"; else print_option "$opt"; fi
+            ((idx++))
+        done
+        case $(key_input) in enter) break ;; up)
+            ((selected--))
+            if [ $selected -lt 0 ]; then selected=$(($# - 1)); fi
+            ;;
+        down)
+            ((selected++))
+            if [ $selected -ge $# ]; then selected=0; fi
+            ;;
+        esac
+    done
+    cursor_to $lastrow
+    printf "\n"
+    cursor_blink_on
+    return $selected
+}
 
 ###########
 # Extract #
 ###########
 # Extracts everything
-function extract {
+function extract() {
     for n in "$@"; do
-      if [ -f "$n" ] ; then
-          case "${n%,}" in
-            *.cbt|*.tar.bz2|*.tar.gz|*.tar.xz|*.tbz2|*.tgz|*.txz|*.tar)
-                         tar xvf "$n"       ;;
-            *.lzma)      unlzma ./"$n"      ;;
-            *.bz2)       bunzip2 ./"$n"     ;;
-            *.cbr|*.rar)       unrar x -ad ./"$n" ;;
-            *.gz)        gunzip ./"$n"      ;;
-            *.cbz|*.epub|*.zip)       unzip ./"$n"       ;;
-            *.z)         uncompress ./"$n"  ;;
-            *.7z|*.arj|*.cab|*.cb7|*.chm|*.deb|*.dmg|*.iso|*.lzh|*.msi|*.pkg|*.rpm|*.udf|*.wim|*.xar)
-                         7z x ./"$n"        ;;
-            *.xz)        unxz ./"$n"        ;;
-            *.exe)       cabextract ./"$n"  ;;
-            *.cpio)      cpio -id < ./"$n"  ;;
-            *.cba|*.ace)      unace x ./"$n"      ;;
+        if [ -f "$n" ]; then
+            case "${n%,}" in
+            *.cbt | *.tar.bz2 | *.tar.gz | *.tar.xz | *.tbz2 | *.tgz | *.txz | *.tar)
+                tar xvf "$n"
+                ;;
+            *.lzma) unlzma ./"$n" ;;
+            *.bz2) bunzip2 ./"$n" ;;
+            *.cbr | *.rar) unrar x -ad ./"$n" ;;
+            *.gz) gunzip ./"$n" ;;
+            *.cbz | *.epub | *.zip) unzip ./"$n" ;;
+            *.z) uncompress ./"$n" ;;
+            *.7z | *.arj | *.cab | *.cb7 | *.chm | *.deb | *.dmg | *.iso | *.lzh | *.msi | *.pkg | *.rpm | *.udf | *.wim | *.xar)
+                7z x ./"$n"
+                ;;
+            *.xz) unxz ./"$n" ;;
+            *.exe) cabextract ./"$n" ;;
+            *.cpio) cpio -id <./"$n" ;;
+            *.cba | *.ace) unace x ./"$n" ;;
             *)
-                         echo "extract: '$n' - unknown archive method"
-                         return 1
-                         ;;
-          esac
-      else
-          echo "'$n' - file does not exist"
-          return 1
-      fi
+                echo "extract: '$n' - unknown archive method"
+                return 1
+                ;;
+            esac
+        else
+            echo "'$n' - file does not exist"
+            return 1
+        fi
     done
 }
 
@@ -162,6 +204,8 @@ function cdp() {
     if [[ ${#results[@]} -eq 1 ]]; then
         # If there's an unique result for the argument, cd into it:
         cd "${results[0]}"
+    elif [[ ${#results[@]} -eq 0 || ${#results[@]} -gt 5 ]]; then
+        cd ${_CDZEIRO_DIR}
     else
         # Let the user choose
         select_option "${results[@]}"
@@ -175,7 +219,8 @@ function cdp() {
 # Spawns a process and closes the terminal, without killing the process.
 function e() {
     if [ -x "$(command -v ${1})" ] || alias ${1} &>/dev/null; then
-        eval ${@} & disown
+        eval ${@} &
+        disown
         exit 0
     else
         echo "Error: ${1} is not installed." >&2
@@ -350,7 +395,8 @@ function _get_truncated_pwd() {
 #####################################
 ## The Divine and Beautiful Prompt ##
 #####################################
-[[ "$PS1" ]] && hash "fortune" >&/dev/null && /usr/bin/fortune
+## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
+[[ "$PS1" ]] && hash "fortune" "cowsay" "lolcat" >&/dev/null && fortune -s -n 200 | cowsay | lolcat -a -F 0.2 -p 30 -t -d 1
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
@@ -363,18 +409,18 @@ function _pre_command() {
     # *see https://goo.gl/2ZFDfM
     local this_command=$(HISTTIMEFORMAT= history 1 | \sed -e "s/^[ ]*[0-9]*[ ]*//")
     case "$this_command" in
-        *\033]0* | set_prompt* | echo* | printf* | cd* | ls)
-            # The command is trying to set the title bar as well;
-            # this is most likely the execution of $PROMPT_COMMAND.
-            # In any case nested escapes confuse the terminal, so don't
-            # output them.
-            ;;
-        *)
-            # Changes the terminal title to the command that is going to be run
-            # uses printf in case there are scapes characters on the command, which
-            # would block the rendering.
-            printf "\033]0;${this_command%% *}\007"
-            ;;
+    *\033]0* | set_prompt* | echo* | printf* | cd* | ls)
+        # The command is trying to set the title bar as well;
+        # this is most likely the execution of $PROMPT_COMMAND.
+        # In any case nested escapes confuse the terminal, so don't
+        # output them.
+        ;;
+    *)
+        # Changes the terminal title to the command that is going to be run
+        # uses printf in case there are scapes characters on the command, which
+        # would block the rendering.
+        printf "\033]0;${this_command%% *}\007"
+        ;;
     esac
 
     # Small fix that clears up all prompt colors, so we don't colorize any output by mistake
@@ -405,7 +451,6 @@ function _set_prompt() {
     PinkLight='\[\e[01;91m\]'
     GrayBackground='\[\e[01;40m\]'
 
-
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
     if [ $(id -u) -eq 0 ]; then
@@ -433,7 +478,7 @@ function _set_prompt() {
         PS1+="$Green$Checkmark ${White}000 "
         PS1+="$Green\\u@\\h"
     else
-        PS1+="$Red$FancyX $White"$(printf "%03d" $Last_Command)" "
+        PS1+="$Red$FancyX $White$(printf "%03d" $Last_Command) "
         PS1+="$Red\\u@\\h"
     fi
 
@@ -447,7 +492,7 @@ function _set_prompt() {
     repo_info="$(git rev-parse --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
     rev_parse_exit_code="$?"
 
-    if [[ ! -z $repo_info ]]; then
+    if [[ -n $repo_info ]]; then
         if [ "$rev_parse_exit_code" = "0" ]; then
             short_sha="${repo_info##*$'\n'}"
             repo_info="${repo_info%$'\n'*}"
@@ -461,7 +506,7 @@ function _set_prompt() {
         if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
             [[ $branch_name == $short_sha ]] &&
                 PS1+="${GrayBackground}${White}→ $branch_name$Reset" || # DETACHED HEAD
-                PS1+="$GreenLight→ $branch_name•$Reset"                  # normal stuff
+                PS1+="$GreenLight→ $branch_name•$Reset" # normal stuff
         elif [[ $(git status --porcelain --untracked-files=normal 2>/dev/null | grep "^\?\?") ]]; then
             PS1+="$YellowB→ $branch_name*$Reset"
         elif [[ $(git status 2>/dev/null | head -n5) == *"Changes to be committed"* ]]; then
@@ -472,8 +517,6 @@ function _set_prompt() {
         PS1+="$Violet]$Reset"
     fi
 
-    Time12a="\$(date +%H:%M)"
-
     PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
 
     # Aligns stuff when you don't close quotes
@@ -483,7 +526,6 @@ function _set_prompt() {
     # ** Does not work if set -x is used outside an script :( **
     # It works wonderfully if you copy this to the script and apply set -x there though.
     #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
-
 
     ## Time right aligned
     ## @see: https://superuser.com/questions/187455/right-align-part-of-prompt
@@ -508,7 +550,6 @@ function _set_prompt() {
 
     PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
 
-
     # Changes the terminal window title to the current dir by default, truncating if too long.
     PS1="\033]0;$(_get_truncated_pwd)\007${PS1}"
     # Otherwise, if something is currently running, run _pre_command and change title to the app's name.
@@ -527,28 +568,39 @@ else
     PROMPT_COMMAND='_set_prompt'
 fi
 
-
 ## transfer.sh
 # TODO: refactor this, prettify and add auto copy to clipboard with xclip
-transfer() { if [ $# -eq 0 ]; then echo -e "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"; return 1; fi
-tmpfile=$( mktemp -t transferXXX ); if tty -s; then basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g'); curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile; else curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile; fi; cat $tmpfile <(echo); cat $tmpfile | xclip -selection clipboard -i; rm -f $tmpfile; }
+transfer() {
+    if [ $# -eq 0 ]; then
+        echo -e "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"
+        return 1
+    fi
+    tmpfile=$(mktemp -t transferXXX)
+    if tty -s; then
+        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')
+        curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >>$tmpfile
+    else curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >>$tmpfile; fi
+    cat $tmpfile <(echo)
+    cat $tmpfile | xclip -selection clipboard -i
+    rm -f $tmpfile
+}
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
 if [[ $_ENABLE_RANDOM_STUFF ]]; then
     ## Diretórios Prédefinidos
     # Entra no diretório de Projetos
-    alias cdb="cd $HOME/Bravi"
-    alias cdbp="cd $HOME/Bravi/portal"
-    alias cdbs="cd $HOME/Bravi/somos-ciee"
-    alias cdbc="cd $HOME/Bravi/ciee-meta"
-    alias cdpok="cd $HOME/Coding/Pokémon"
+    alias cdb="cd \$HOME/Bravi"
+    alias cdbp="cd \$HOME/Bravi/portal"
+    alias cdbs="cd \$HOME/Bravi/somos-ciee"
+    alias cdbc="cd \$HOME/Bravi/ciee-meta"
+    alias cdpok="cd \$HOME/Coding/Pokémon"
 
     ## Diretórios Prédefinidos
     # Entra no diretório de Projetos
-    alias cdb="cd $HOME/Bravi"
-    alias cdbp="cd $HOME/Bravi/portal"
-    alias cdbs="cd $HOME/Bravi/somos-ciee"
-    alias cdbc="cd $HOME/Bravi/ciee-meta"
+    alias cdb="cd \$HOME/Bravi"
+    alias cdbp="cd \$HOME/Bravi/portal"
+    alias cdbs="cd \$HOME/Bravi/somos-ciee"
+    alias cdbc="cd \$HOME/Bravi/ciee-meta"
 
     # Alias para usar open-subl3 no lugar de subl3
     alias subl3='open-subl3'
@@ -567,7 +619,6 @@ if [[ $_ENABLE_RANDOM_STUFF ]]; then
     #     echo 'USING GIT EREAD'
     #     test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
     # }
-
 
     ## Dangerous stuff that interferes with scripts
     ## Put these at the end of your .bashrc preferably so it doesn't
