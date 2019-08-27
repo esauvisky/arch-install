@@ -53,10 +53,10 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 # systemd-run --user --unit TitanIV
 
 ## Gnome-Tweak Ignore Lid Switch
-# /usr/lib/gnome-tweak-tool-lid-inhibitor &
+/usr/lib/gnome-tweak-tool-lid-inhibitor &
 
 ## Starts slack if it's job hours
-if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -le 18 ]]; then
+if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 ]]; then
     echo 'Starting slack application...'
     slack -u
 fi
@@ -84,8 +84,8 @@ gnome-screensaver &
 ###########
 # GNOME on Xorg
 export GDK_BACKEND=x11
-# exec xrdb .Xresources & gnome-session
 exec gnome-session
+# exec xrdb .Xresources & gnome-session
 
 # # Gnome Classic
 #export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME

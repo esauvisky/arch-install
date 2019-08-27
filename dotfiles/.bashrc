@@ -4,8 +4,7 @@
 ###########
 # CONFIGS #
 ###########
-_ENABLE_RANDOM_STUFF=1       # Check the big if block at the end of the file
-_CDZEIRO_DIR="$HOME/Coding/" # Check CDZEIRO function below
+_ENABLE_RANDOM_STUFF=1        # Check the big if block at the end of the file
 
 ############################################
 ## THIS IS CERTAINLY NOT POSIX COMPATIBLE ##
@@ -186,30 +185,35 @@ function extract() {
 }
 
 ###########
-# CDZEIRO #
+# magicCD #
 ###########
-# Searches for directories up to two depth levels
-# e.g.: `cdp Unik` would make it cd into ~/Coding/Android/MyUnikProject
-#       if that's the only directory with 'Unik' in it's name.
-function cdp() {
+# Searches for directories recursively and cds into them.
+function _magicCD() {
+    [[ ! -d $2 && ! ${1} -ge 2 ]] && echo "aw" && return 1
+
+    __MAGIC_CD_DIR="${2}"
+    __DEPTH="${1}"
+    shift
+    shift
+
     # Black magic ;)
     # results=()
     # while IFS=  read -r -d $'\0'; do
     #     results+=("$REPLY")
-    # done < <(find ${_CDZEIRO_DIR} -depth  -maxdepth 2 -type d -iname \*${*}\* -print0)
+    # done < <(find "${__MAGIC_CD_DIR}" -depth  -maxdepth 2 -type d -iname \*${*}\* -print0)
 
     # Neat black magic (bash 4.4 only)
-    readarray -d '' results < <(find ${_CDZEIRO_DIR} -maxdepth 2 -type d -iname \*${*}\* -print0)
+    readarray -d '' results < <(find ${__MAGIC_CD_DIR} -maxdepth ${__DEPTH} -type d -iname \*${*}\* -print0)
 
     if [[ ${#results[@]} -eq 1 ]]; then
         # If there's an unique result for the argument, cd into it:
         cd "${results[0]}"
-    elif [[ ${#results[@]} -eq 0 || ${#results[@]} -gt 5 ]]; then
-        cd ${_CDZEIRO_DIR}
+    elif [[ ${#results[@]} -eq 0 || ${#results[@]} -gt 10 ]]; then
+        cd "${__MAGIC_CD_DIR}"
     else
         # Let the user choose
         select_option "${results[@]}"
-        cd ${results[$?]}
+        cd "${results[$?]}"
     fi
 }
 
@@ -569,56 +573,58 @@ else
 fi
 
 ## transfer.sh
-# TODO: refactor this, prettify and add auto copy to clipboard with xclip
 transfer() {
-    if [ $# -eq 0 ]; then
-        echo -e "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"
+    if [[ $# -eq 0 ]]; then
+        echo -e "No arguments specified.\n\n  Usage:\n  transfer /tmp/test.md\n  cat /tmp/test.md | transfer test.md" >&2
         return 1
     fi
-    tmpfile=$(mktemp -t transferXXX)
-    if tty -s; then
+
+    if [[ "$1" == '-e' || "$1" == '--encrypt' ]]; then
+        shift
+        isEncrypted=1
+        tmpUpload=$(mktemp -t upload-XXX)
+        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')".enc"
+        echo "Encrypting file $basefile to $tmpUpload..." >&2
+        cat "$1" | gpg -ac -o- >> $tmpUpload
+    else
         basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')
-        curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >>$tmpfile
-    else curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >>$tmpfile; fi
-    cat $tmpfile <(echo)
-    cat $tmpfile | xclip -selection clipboard -i
-    rm -f $tmpfile
+        tmpUpload="$1"
+    fi
+
+    tmpResponse=$(mktemp -t transfer-XXX)
+
+    if tty -s; then
+        echo "Uploading file $tmpUpload to transfer.sh/$basefile..." >&2
+        curl --progress-bar --upload-file "$tmpUpload" "https://transfer.sh/$basefile" >> $tmpResponse
+    else
+        echo "Uploading file $tmpUpload to transfer.sh/$tmpUpload..." >&2
+        curl --progress-bar --upload-file "-" "https://transfer.sh/$tmpUpload" >> $tmpResponse
+    fi
+
+    # Copies URL to clipboard if 'xclip' exists.
+    if hash xclip; then cat $tmpResponse | xclip -selection clipboard -i; fi
+    echo -e '\nTransfer finished! URL was copied '
+    cat $tmpResponse <(echo)
+
+    if [[ ! -z $isEncrypted ]]; then
+        echo -e "Use gpg -o- to decrypt:\n  $ curl "$(cat $tmpResponse)" | gpg -o- > ./$basefile" >&2
+    fi
+    rm -f $tmpResponse
 }
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
-if [[ $_ENABLE_RANDOM_STUFF ]]; then
+if [[ $_ENABLE_RANDOM_STUFF -eq 1 ]]; then
     ## Diretórios Prédefinidos
-    # Entra no diretório de Projetos
-    alias cdb="cd \$HOME/Bravi"
-    alias cdbp="cd \$HOME/Bravi/portal"
-    alias cdbs="cd \$HOME/Bravi/somos-ciee"
-    alias cdbc="cd \$HOME/Bravi/ciee-meta"
-    alias cdpok="cd \$HOME/Coding/Pokémon"
+    # Opens Bravi's subprojects dirs up to two recursive nesting directories
+    alias cdb="_magicCD 2 $HOME/Bravi/"
+    alias cdp="_magicCD 3 $HOME/Coding/"
 
-    ## Diretórios Prédefinidos
-    # Entra no diretório de Projetos
-    alias cdb="cd \$HOME/Bravi"
-    alias cdbp="cd \$HOME/Bravi/portal"
-    alias cdbs="cd \$HOME/Bravi/somos-ciee"
-    alias cdbc="cd \$HOME/Bravi/ciee-meta"
-
-    # Alias para usar open-subl3 no lugar de subl3
+    # Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
     alias subl3='open-subl3'
     alias subl='open-subl3'
 
     # Uses perl-rename as default for rename
     alias rename='perl-rename'
-
-    # TODO: check what is this for
-    source /usr/share/nvm/init-nvm.sh
-
-    # Helper function to read the first line of a file into a variable.
-    # __git_eread requires 2 arguments, the file path and the name of the
-    # variable, in that order.
-    # function __git_eread() {
-    #     echo 'USING GIT EREAD'
-    #     test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
-    # }
 
     ## Dangerous stuff that interferes with scripts
     ## Put these at the end of your .bashrc preferably so it doesn't
@@ -630,11 +636,23 @@ if [[ $_ENABLE_RANDOM_STUFF ]]; then
     # Enables the ** glob
     shopt -s globstar
 
-    # In development:
-    # add these from above (and whatever else necessary) to this one and ditch it
+    ####################
+    ## In development ##
+    ####################
     # Use exit status from declare command to determine whether input argument is a
     # bash function
     function is_function() {
         declare -Ff "${1}" >/dev/null
+
+    # TODO: check what is this for
+    source /usr/share/nvm/init-nvm.sh
+
+    # Helper function to read the first line of a file into a variable.
+    # __git_eread requires 2 arguments, the file path and the name of the
+    # variable, in that order.
+    # function __git_eread() {
+    #     echo 'USING GIT EREAD'
+    #     test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
+    # }
     }
 fi
