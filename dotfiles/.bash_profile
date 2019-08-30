@@ -22,5 +22,9 @@ fi
 #     GDK_BACKEND=x11 startx
 # fi
 
+## GPG Signing TTY
+# Adds GPG key to bash profile, for git and stuff
+export GPG_TTY=$(tty)
+
 # Carrega o .bashrc
 [[ -f ~/.bashrc ]] && . ~/.bashrc

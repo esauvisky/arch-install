@@ -22,11 +22,6 @@ fi
 ###########
 # ENVVARS #
 ###########
-## GPG Signing TTY
-# Has to be called at the very beggining
-GPG_TTY=$(tty)
-export GPG_TTY
-
 ## Forces Radeon GPU for everything (don't. just don't do it unless you want your house in fire)
 #export DRI_PRIME=0
 
@@ -58,7 +53,7 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 ## Starts slack if it's job hours
 if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 ]]; then
     echo 'Starting slack application...'
-    slack -u
+    slack -u &
 fi
 
 ## Starts telegram

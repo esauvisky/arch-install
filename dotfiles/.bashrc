@@ -76,10 +76,6 @@ fi
 if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
 fi
-# Loads gits completion file for our custom completions
-if [ -f /usr/share/bash-completion/completions/git ]; then
-    . /usr/share/bash-completion/completions/git
-fi
 
 #####################
 # STDOUT Log Saving #
@@ -273,14 +269,20 @@ fi
 
 ## Git
 if hash "git" >&/dev/null; then
+    # Loads gits completion file for our custom completions
+    if [ -f /usr/share/bash-completion/completions/git ]; then
+        . /usr/share/bash-completion/completions/git
+    fi
     alias gitl='git log --all --decorate=full --oneline'
     alias gits='git status'
     alias gitcam='git commit -a -m '
+    alias gitcleanbranches='echo "Updating and pruning local copies of remote branches..." && git fetch --prune origin && echo "Removing refs about removed remote branches..." && git remote prune origin'
+
     function gitdelbranch() {
         # First command deletes local branch, but exits > 0 if not fully merged,
         # so the second command (which deletes the remote branch), will only run
         # if the first one suceeds, making it "safe".
-        git branch --delete ${1} && git push origin --delete ${1}
+        git branch --delete ${@} && git push origin --delete ${@}
     }
     # Autocomplete local branches only
     function _git_local_branches() {
