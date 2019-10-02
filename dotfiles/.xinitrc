@@ -48,19 +48,19 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 # systemd-run --user --unit TitanIV
 
 ## Gnome-Tweak Ignore Lid Switch
-/usr/lib/gnome-tweak-tool-lid-inhibitor &
+#/usr/lib/gnome-tweak-tool-lid-inhibitor &
 
 ## Starts slack if it's job hours
-if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 ]]; then
-    echo 'Starting slack application...'
-    slack -u &
+if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
+   echo 'Starting slack application...'
+   slack -u &
 fi
 
 ## Starts telegram
 telegram-desktop &
 
 # Allows to lock the screen
-gnome-screensaver &
+#gnome-screensaver &
 
 # Deluge
 # sleep 5 && (
@@ -87,4 +87,4 @@ exec gnome-session
 #export GNOME_SHELL_SESSION_MODE=classic
 #exec gnome-session --session=gnome-classic
 
-#exec cinnamon-session
+# exec cinnamon-session

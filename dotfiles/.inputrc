@@ -1,16 +1,17 @@
-# Carregar o inputrc do sistema, que é ignorado se exisitir um pessoal
-$include /etc/inputrc
-
 ##################
 ## AUTOCOMPLETE ##
 ##################
+# Allows readline to bind tty special chars, i.e.:
+# to override custom special key combinations that might
+# be controlled by the emulator.
+set bind-tty-special-chars off
+
 # Troca a ação padrão de TAB para menu-complete (ao invés de complete).
 # menu-complete é mais eficiente pois faz loop pelos autocompletes,
 # quando há uma lista de valores ambíguos.
 TAB: menu-complete
-
 # Faz a mesma coisa com Shift+TAB, só que faz o caminho inverso.
-# Comando encontrado na internet. Significa 'Shift+TAB: menu-complete-reverse'.
+# Means 'Shift+TAB: menu-complete-reverse': (don't ask)
 "\e[Z": "\e-1\C-i"
 
 # Não começa de primeira: exibe a lista antes, e depois faz o loop se apertar
@@ -85,8 +86,8 @@ set history-preserve-point on
 # org.gnome.desktop.wm.preferences.audible-bell false
 # org.gnome.desktop.wm.preferences visual-bell true
 # org.gnome.desktop.wm.preferences visual-bell-type 'frame-flash'
-set bell-style visible
-set prefer-visible-bell off
+#set bell-style audible
+#set prefer-visible-bell off
 
 ###############
 ## NAVEGAÇÃO ##
@@ -98,7 +99,7 @@ set prefer-visible-bell off
 "\C-d": shell-kill-word
 
 # Inicia programa dando 'disown' automaticamente se apertar Ctrl+Enter
-"\ed": '& disown\015'
+"\\C-M": '& disown\015'
 
 # Permite pesquisas no histórico.
 # Após digitar algum texto, ao usar as teclas para cima e para baixo
@@ -107,33 +108,13 @@ set prefer-visible-bell off
 "\e[B": history-search-forward
 "\e[A": history-search-backward
 
-################
-## UNBINDINGS ##
-################
-## Tira o binding de teclas para poder usá-las
-## como keyboard shortcuts de outros aplicativos.
-# Alt + Números:
-"\e-":
-"\e0":
-"\e1":
-"\e2":
-"\e3":
-"\e4":
-"\e5":
-"\e6":
-"\e7":
-"\e8":
-"\e9":
-# F1-F12 (menos F11)
-"\eOP":
-"\eOQ":
-"\eOR":
-"\eOS":
-"\e[15~":
-"\e[17~":
-"\e[18~":
-"\e[19~":
-"\e[20~":
-"\e[21~":
-"\e[24~":
-"\e[24~":
+# Arruma a tecla delete para Androids
+"\e[3~": delete-char
+
+# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+"\e[5C": forward-word
+"\e[5D": backward-word
+"\e\e[C": forward-word
+"\e\e[D": backward-word

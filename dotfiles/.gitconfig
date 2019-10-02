@@ -2,7 +2,7 @@
 	helper = /usr/lib/git-core/git-credential-libsecret
 [user]
 	email = esauvisky@gmail.com
-	name = Emiliano Sauvisky
+	name = emi~
 	signingKey = 4D3148580F63AE23
 [push]
 	default = current

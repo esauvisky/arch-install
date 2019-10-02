@@ -12,25 +12,6 @@ _ENABLE_RANDOM_STUFF=1        # Check the big if block at the end of the file
 ## Don't do anything if not running interactively
 [[ $- != *i* ]] && return
 
-#####################
-# HISTORY SETTINGS #
-####################
-## Bash's eternal history
-# Change the file location because certain bash sessions truncate .bash_history file upon close.
-export HISTFILE=~/.bash_eternal_history
-# Maximum number of entries on the current session (nothing is infinite).
-export HISTSIZE=500000
-# Maximum number of lines in HISTFILE (nothing is infinite).
-export HISTFILESIZE=1000000
-# Commands to ignore and skip saving
-export HISTIGNORE="clear:exit:history:cd ..:ls"
-# Ignores dupes and deletes old ones (latest doesn't work _quite_ properly, but does the trick)
-export HISTCONTROL=ignoredups:erasedups
-# Custom history time prefix format
-export HISTTIMEFORMAT='[%F %T] '
-# ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
-shopt -s histappend
-
 #########################
 # Environment Variables #
 #########################
@@ -50,6 +31,24 @@ else
     # if root use exclusively non-gui editors
     hash "nano" >&/dev/null && export EDITOR="nano" || export EDITOR="vi"
 fi
+
+## BASH ETERNAL HISTORY
+## Author: emi et al., took ages to figure something that worked.
+# Change the file location because certain bash sessions truncate .bash_history file upon close.
+export HISTFILE=~/.bash_eternal_history
+# Maximum number of entries on the current session (nothing is infinite).
+export HISTSIZE=500000
+# Maximum number of lines in HISTFILE (nothing is infinite).
+export HISTFILESIZE=1000000
+# Commands to ignore and skip saving
+export HISTIGNORE="clear:exit:history:cd ..:ls"
+# Ignores dupes and deletes old ones (latest doesn't work _quite_ properly, but does the trick)
+export HISTCONTROL=ignoredups:erasedups
+# Custom history time prefix format
+export HISTTIMEFORMAT='[%F %T] '
+# ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
+shopt -s histappend
+
 
 ###################
 ## COLORS, LOTS! ##
@@ -71,7 +70,6 @@ fi
 # 2. Run `complete -p command`
 # 3. The output is the hook that was used to complete it.
 # 4. Change it accordingly to apply it to your function.
-
 # Loads bash's system-wide installed completions
 if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
@@ -80,18 +78,20 @@ fi
 #####################
 # STDOUT Log Saving #
 #####################
-if [ -z "$UNDER_SCRIPT" ]; then
-    logdir=$HOME/.terminal-logs
-    if [ ! -d $logdir ]; then mkdir $logdir; fi
-    # Deletes all logs older than two weeks
-    find ~/.terminal-logs/ -type f -name '*.log' -mtime +14 -exec rm {} \;
-    # Compresses all logs older than one week
-    find ~/.terminal-logs/ -type f -name '*.log' -mtime +7 -exec gzip -q {} \;
-    logfile=$logdir/$(date +%F_%T).$$.log
-    export UNDER_SCRIPT=$logfile
-    script -f -q $logfile
-    exit
-fi
+# Author: Emi
+## TODO: Optimize speed for this or simply remove:
+# if [ -z "$UNDER_SCRIPT" ]; then
+#     logdir=$HOME/.terminal-logs
+#     if [ ! -d $logdir ]; then mkdir $logdir; fi
+#     # Deletes all logs older than two weeks
+#     find ~/.terminal-logs/ -type f -name '*.log' -mtime +14 -exec rm {} \;
+#     # Compresses all logs older than one week
+#     find ~/.terminal-logs/ -type f -name '*.log' -mtime +7 -exec gzip -q {} \;
+#     logfile=$logdir/$(date +%F_%T).$$.log
+#     export UNDER_SCRIPT=$logfile
+#     script -f -q $logfile
+#     exit
+# fi
 
 #################
 # select_option #
@@ -184,6 +184,7 @@ function extract() {
 # magicCD #
 ###########
 # Searches for directories recursively and cds into them.
+# Author: emi
 function _magicCD() {
     [[ ! -d $2 && ! ${1} -ge 2 ]] && echo "aw" && return 1
 
@@ -217,6 +218,7 @@ function _magicCD() {
 # COOL SPAWNER #
 ################
 # Spawns a process and closes the terminal, without killing the process.
+# Author: emi
 function e() {
     if [ -x "$(command -v ${1})" ] || alias ${1} &>/dev/null; then
         eval ${@} &
@@ -243,8 +245,8 @@ function findir() {
 ## Allows using aliases after sudo (the ending space is what does teh trick)
 alias sudo='sudo '
 
-## Navegação
-alias clear='_clear'
+## Navigationcdb
+alias clear='echo -en "\033c"'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
 alias ls=$_COLOURIFY_CMD" ls -oX --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
@@ -319,12 +321,45 @@ if hash "pacman" >&/dev/null; then
     complete -F _complete_alias paci
     complete -F _complete_alias pacl
 
+    # Deprecated (See Function Below) #
     # Updater (pacman + aurget + aurget dev packages):
-    alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
-    # pesquisa, pelo aurget, cada pacote da AUR instalado localmente (para verificar pacotes outdated)
+    # alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
+    # Search for outdated packages on AUR
     alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
-    # comandos para otimização do pacman
+    # Optimizes pacman stuff
     alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
+
+    function pacsyu() {
+        echo -e '\e[01;91m\nUpdating pacman...\e[00m'
+        sudo \pacman -Sy
+        echo -e '\e[01;91m\nSaving log of packages to upgrade...\e[00m'
+        mkdir "$HOME/.pacman"
+        LOG_FILE="$HOME/.pacman/pacmanQu-$(date -Iminutes)"
+        pacman -Qu > "$LOG_FILE"
+        echo -e '\e[01;91m\nPress Enter to update packages... (noconfirm)\e[00m'
+        read
+        sudo \pacman -Su
+        echo -e '\e[01;91m\nPress Enter to update AUR packages... (noconfirm)\e[00m'
+        read
+        aurget -Syu
+        echo -e '\e[01;91m\nPress Enter to update AUR devel (e.g.: -git) packages... (noconfirm)\e[00m'
+        read
+        aurget -Syu --devel --noconfirm
+    }
+
+    function pacman_revert_last_upgrade() {
+        # Yeah...
+        echo 'WARNING THIS IS INCOMPLETE. CHECK THE SOURCE FIRST'
+        return 1
+        _IFS="$IFS"
+        IFS=$'\n'
+        if [[ -f $1 ]]; then
+            for i in $(cat pacmanqu.txt);do
+                pkg=$(echo "$i" | sed 's/ -> .+//' | sed 's/ /-/')
+                sudo pacman --noconfirm --needed -U /var/cache/pacman/pkg/$pkg*
+            done
+        fi
+    }
 fi
 
 ############################
@@ -332,15 +367,15 @@ fi
 ############################
 ## Besides the first couple functions, this attempt
 ## was a major fail. Any resizing of the window screws things up.
-# True screen clearing
-function _clear() {
-    echo -en "\033c"
-}
 
-# # Leaves 3 lines of clearance at the bottom of the terminal
-# function _set_bottom_padding() {
-#     echo -e "\n\033[1;$((LINES - 3))r"
-# }
+## Leaves 3 lines of clearance at the bottom of the terminal
+function _set_bottom_padding() {
+    if $1; then
+        echo -e "\n\033[1;$((LINES - 3))r"
+    else
+        echo -e "\n\033[1;$((LINES - 3))r\033c"
+    fi
+}
 
 # # FIXME: Tries to fix the padding when resizing the terminal window
 # function _fix_bottom_padding() {
@@ -373,7 +408,7 @@ function _clear() {
 #     fi
 # }
 # Runs _fix_bottom_padding each time the window is resized:
-# trap '_fix_bottom_padding' WINCH
+# trap '_set_bottom_padding true' WINCH
 
 # Sets bottom padding and changes clear alias **only** in TTYs
 #if [[ ! $DISPLAY ]]; then
@@ -401,8 +436,8 @@ function _get_truncated_pwd() {
 #####################################
 ## The Divine and Beautiful Prompt ##
 #####################################
-## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
-[[ "$PS1" ]] && hash "fortune" "cowsay" "lolcat" >&/dev/null && fortune -s -n 200 | cowsay | lolcat -a -F 0.2 -p 30 -t -d 1
+## Install 'fortune', 'cowthink' and 'lolcat' and have fun every time you open up a terminal.
+[[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" >&/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
@@ -434,13 +469,12 @@ function _pre_command() {
 }
 
 function _set_prompt() {
-    # Must come first
+    # Must come first, the girl.
     Last_Command=$?
 
     # Saves on history after each command
     history -a
-    # Crazy shit that's supposed to actually erase previous dups (https://goo.gl/DXAcPO)
-    # doesn't work
+    # Not working crazy shit that's supposed to actually erase previous dups (https://goo.gl/DXAcPO)
     # history -n; history -w; history -c; history -r;
 
     # Colors
@@ -456,7 +490,6 @@ function _set_prompt() {
     VioletLight='\[\e[01;95m\]'
     PinkLight='\[\e[01;91m\]'
     GrayBackground='\[\e[01;40m\]'
-
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
     if [ $(id -u) -eq 0 ]; then
@@ -494,7 +527,7 @@ function _set_prompt() {
     fi
 
     ## Nicely shows you're in a git repository
-    ## @see: /usr/share/git/git-prompt.sh for more use cases and much more robust
+    ## TODO: @see: /usr/share/git/git-prompt.sh for more use cases and much more robust
     repo_info="$(git rev-parse --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
     rev_parse_exit_code="$?"
 
@@ -567,52 +600,14 @@ function _set_prompt() {
 # does not keep the current PWD, and defaults back to HOME (http://tinyurl.com/y7yknu3r).
 # vte.sh replaces your PROMPT_COMMAND, so just source it and add it's function '__vte_prompt_command'
 # to the end of your own PROMPT_COMMAND.
-if [[ ! -z $VTE_VERSION ]]; then
+if [[ ! -z $VTE_VERSION && -f /etc/profile.d/vte.sh ]]; then
     source /etc/profile.d/vte.sh
     PROMPT_COMMAND='_set_prompt;__vte_prompt_command'
 else
     PROMPT_COMMAND='_set_prompt'
 fi
 
-## transfer.sh
-transfer() {
-    if [[ $# -eq 0 ]]; then
-        echo -e "No arguments specified.\n\n  Usage:\n  transfer /tmp/test.md\n  cat /tmp/test.md | transfer test.md" >&2
-        return 1
-    fi
 
-    if [[ "$1" == '-e' || "$1" == '--encrypt' ]]; then
-        shift
-        isEncrypted=1
-        tmpUpload=$(mktemp -t upload-XXX)
-        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')".enc"
-        echo "Encrypting file $basefile to $tmpUpload..." >&2
-        cat "$1" | gpg -ac -o- >> $tmpUpload
-    else
-        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')
-        tmpUpload="$1"
-    fi
-
-    tmpResponse=$(mktemp -t transfer-XXX)
-
-    if tty -s; then
-        echo "Uploading file $tmpUpload to transfer.sh/$basefile..." >&2
-        curl --progress-bar --upload-file "$tmpUpload" "https://transfer.sh/$basefile" >> $tmpResponse
-    else
-        echo "Uploading file $tmpUpload to transfer.sh/$tmpUpload..." >&2
-        curl --progress-bar --upload-file "-" "https://transfer.sh/$tmpUpload" >> $tmpResponse
-    fi
-
-    # Copies URL to clipboard if 'xclip' exists.
-    if hash xclip; then cat $tmpResponse | xclip -selection clipboard -i; fi
-    echo -e '\nTransfer finished! URL was copied '
-    cat $tmpResponse <(echo)
-
-    if [[ ! -z $isEncrypted ]]; then
-        echo -e "Use gpg -o- to decrypt:\n  $ curl "$(cat $tmpResponse)" | gpg -o- > ./$basefile" >&2
-    fi
-    rm -f $tmpResponse
-}
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
 if [[ $_ENABLE_RANDOM_STUFF -eq 1 ]]; then
