@@ -29,7 +29,11 @@ if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
     done
 else
     # if root use exclusively non-gui editors
-    hash "nano" >&/dev/null && export EDITOR="nano" || export EDITOR="vi"
+    if hash "nano" >&/dev/null; then
+        export EDITOR="nano"
+    else
+        export EDITOR="vi"
+    fi
 fi
 
 ## BASH ETERNAL HISTORY
@@ -70,6 +74,7 @@ fi
 # 2. Run `complete -p command`
 # 3. The output is the hook that was used to complete it.
 # 4. Change it accordingly to apply it to your function.
+
 # Loads bash's system-wide installed completions
 if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
@@ -180,6 +185,48 @@ function extract() {
     done
 }
 
+################
+## transfer.sh #
+################
+transfer() {
+    if [[ $# -eq 0 ]]; then
+        echo -e "No arguments specified.\n\n  Arguments:\n  \t-e: Encrypts file before uploading.\n\n  Usage Examples:\n  \ttransfer /tmp/test.md\n  \tcat /tmp/test.md | transfer test.md\n  \ttransfer -e /tmp/test.md" >&2
+        return 1
+    fi
+
+    if [[ "$1" == '-e' || "$1" == '--encrypt' ]]; then
+        shift
+        isEncrypted=1
+        tmpUpload=$(mktemp -t upload-XXX)
+        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')".enc"
+        echo "Encrypting file $basefile to $tmpUpload..." >&2
+        cat "$1" | gpg -ac -o- >> "$tmpUpload"
+    else
+        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')
+        tmpUpload="$1"
+    fi
+
+    tmpResponse=$(mktemp -t transfer-XXX)
+
+    if tty -s; then
+        echo "Uploading file $tmpUpload to transfer.sh/$basefile..." >&2
+        curl --progress-bar --upload-file "$tmpUpload" "https://transfer.sh/$basefile" >> "$tmpResponse"
+    else
+        echo "Uploading file $tmpUpload to transfer.sh/$tmpUpload..." >&2
+        curl --progress-bar --upload-file "-" "https://transfer.sh/$tmpUpload" >> "$tmpResponse"
+    fi
+
+    # Copies URL to clipboard if 'xclip' exists.
+    if hash xclip; then cat "$tmpResponse" | xclip -selection clipboard -i; fi
+    echo -e '\nTransfer finished! URL was copied '
+    cat "$tmpResponse" <(echo)
+
+    if [[ ! -z $isEncrypted ]]; then
+        echo -e "Use gpg -o- to decrypt:\n  $ curl "$(cat "$tmpResponse")" | gpg -o- > ./$basefile" >&2
+    fi
+    rm -f "$tmpResponse"
+}
+
 ###########
 # magicCD #
 ###########
@@ -236,7 +283,7 @@ complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 # FIND DIRS #
 #############
 function findir() {
-    find -type d -iname *${@}* 2>/dev/null
+    find . -type d -iname *${@}* 2>/dev/null
 }
 
 ###########
@@ -245,24 +292,31 @@ function findir() {
 ## Allows using aliases after sudo (the ending space is what does teh trick)
 alias sudo='sudo '
 
-## Navigationcdb
-alias clear='echo -en "\033c"'
+## Navigation
+alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls=$_COLOURIFY_CMD" ls -oX --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+alias ls=$_COLOURIFY_CMD" ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 
 # Makes grep useful
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 # Makes sed useful
 alias sed="sed -E"
 # Makes diff decent
-alias diff="colordiff $_COLOR_ALWAYS_ARG -w -B -U 5 --suppress-common-lines"
+if hash colordiff >&/dev/null; then
+    alias diff="colordiff -w -B -U 5 --suppress-common-lines"
+else
+    alias diff="diff $_COLOR_ALWAYS_ARG -w -B -U 5 --suppress-common-lines"
+fi
 
 ## Logging
 alias watch="watch --color -n0.5"
+# Makes dmesg timestamps readable
 alias dmesg='dmesg --time-format ctime'
 # Makes dd pretty
 alias dd='dd status=progress oflag=sync'
+# Makes ccze not stupid (fast and no output clearing)
+alias ccze='ccze -A -o nolookups'
 # journalctl handy aliases
 if hash "journalctl" >&/dev/null; then
     alias je=$_COLOURIFY_CMD' journalctl -ef'
@@ -308,7 +362,7 @@ fi
 ## Pacman
 if hash "pacman" >&/dev/null; then
     alias aurs="aurget --sort votes -Ss"
-    alias pacman="pacman"
+    alias pacman="pacman "
     alias pacs="sudo pacman -S --needed"
     alias pacr="sudo pacman -Rs"
     alias pacss="pacman -Ss"
@@ -348,16 +402,15 @@ if hash "pacman" >&/dev/null; then
     }
 
     function pacman_revert_last_upgrade() {
-        # Yeah...
-        echo 'WARNING THIS IS INCOMPLETE. CHECK THE SOURCE FIRST'
+        # TODO: WIP
+        echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST.'
         return 1
-        _IFS="$IFS"
-        IFS=$'\n'
         if [[ -f $1 ]]; then
-            for i in $(cat pacmanqu.txt);do
+            while read line; do
                 pkg=$(echo "$i" | sed 's/ -> .+//' | sed 's/ /-/')
+                echo "Downgrading $pkg"
                 sudo pacman --noconfirm --needed -U /var/cache/pacman/pkg/$pkg*
-            done
+            done < <(cat pacmanqu.txt)
         fi
     }
 fi
@@ -367,6 +420,10 @@ fi
 ############################
 ## Besides the first couple functions, this attempt
 ## was a major fail. Any resizing of the window screws things up.
+# True screen clearing
+function _clear() {
+    echo -en "\033c"
+}
 
 ## Leaves 3 lines of clearance at the bottom of the terminal
 function _set_bottom_padding() {
@@ -376,6 +433,7 @@ function _set_bottom_padding() {
         echo -e "\n\033[1;$((LINES - 3))r\033c"
     fi
 }
+# _set_bottom_padding true
 
 # # FIXME: Tries to fix the padding when resizing the terminal window
 # function _fix_bottom_padding() {
@@ -408,7 +466,7 @@ function _set_bottom_padding() {
 #     fi
 # }
 # Runs _fix_bottom_padding each time the window is resized:
-# trap '_set_bottom_padding true' WINCH
+# trap '_fix_bottom_padding' WINCH
 
 # Sets bottom padding and changes clear alias **only** in TTYs
 #if [[ ! $DISPLAY ]]; then
@@ -540,7 +598,7 @@ function _set_prompt() {
         branch_name=${branch_name##refs/heads/}
         branch_name=${branch_name:-$short_sha}
 
-        PS1+=" $Violet["
+        PS1+=" ${Violet}["
 
         if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
             [[ $branch_name == $short_sha ]] &&
@@ -611,8 +669,7 @@ fi
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
 if [[ $_ENABLE_RANDOM_STUFF -eq 1 ]]; then
-    ## Diretórios Prédefinidos
-    # Opens Bravi's subprojects dirs up to two recursive nesting directories
+    # MagicCD
     alias cdb="_magicCD 2 $HOME/Bravi/"
     alias cdp="_magicCD 3 $HOME/Coding/"
 

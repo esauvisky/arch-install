@@ -89,17 +89,48 @@ set history-preserve-point on
 #set bell-style audible
 #set prefer-visible-bell off
 
-###############
-## NAVEGAÇÃO ##
-###############
+################
+## UNBINDINGS ##
+################
+## Removes some default bindings so we can use them
+# Alt + Digits:
+"\e-":
+"\e0":
+"\e1":
+"\e2":
+"\e3":
+"\e4":
+"\e5":
+"\e6":
+"\e7":
+"\e8":
+"\e9":
+# F1-F12 except F11
+"\eOP":
+"\eOQ":
+"\eOR":
+"\eOS":
+"\e[15~":
+"\e[17~":
+"\e[18~":
+"\e[19~":
+"\e[20~":
+"\e[21~":
+"\e[24~":
+"\e[24~":
+
+
+################
+## NAVIGATION ##
+################
 # Navega por argumentos, respeitando espaços dentro de aspas e tudo mais.
 "\C-g": shell-backward-word
 "\C-h": shell-forward-word
 "\C-w": shell-backward-kill-word
 "\C-d": shell-kill-word
 
-# Inicia programa dando 'disown' automaticamente se apertar Ctrl+Enter
-"\\C-M": '& disown\015'
+# Starts and automatically disowns a cmd (doesnt work)
+#"\\C-M": '& disown\015'
 
 # Permite pesquisas no histórico.
 # Após digitar algum texto, ao usar as teclas para cima e para baixo
@@ -111,7 +142,7 @@ set history-preserve-point on
 # Arruma a tecla delete para Androids
 "\e[3~": delete-char
 
-# mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+# Mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
 "\e[1;5C": forward-word
 "\e[1;5D": backward-word
 "\e[5C": forward-word
