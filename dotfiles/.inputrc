@@ -11,8 +11,7 @@ set bind-tty-special-chars off
 # quando há uma lista de valores ambíguos.
 TAB: menu-complete
 # Faz a mesma coisa com Shift+TAB, só que faz o caminho inverso.
-# Means 'Shift+TAB: menu-complete-reverse': (don't ask)
-"\e[Z": "\e-1\C-i"
+"\e[Z": menu-complete-backward
 
 # Não começa de primeira: exibe a lista antes, e depois faz o loop se apertar
 # TAB novamente. Desta forma permite dar uma "espiada" nos nomes dos arquivos
