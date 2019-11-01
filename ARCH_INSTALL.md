@@ -595,7 +595,7 @@ _Em função dos pontos decimais invertidos_
 
             $ aurget -S virtualbox-ext-oracle
 
-    - Depois instalar na máquina virtual o [driver USB 3.0 (xHCD) da Intel](https://goo.gl/NqkZ1U)
+    - Depois instalar na máquina virtual o [driver USB 3.0 (xHCD) da Intel](https://forums.virtualbox.org/viewtopic.php?f=6&t=76023&start=15)
 
 ### Mimetypes, associações, arquivos .desktop e [Default Applications](https://wiki.archlinux.org/index.php/Default_applications)
 
