@@ -56,11 +56,20 @@ if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
    slack -u &
 fi
 
-## Starts telegram
+## Starts Telegram and immediatly closes it
+xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
 telegram-desktop &
 
+## Starts WhatsApp and immediatly closes it
+xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp$|WhatsApp Web$)' windowminimize &
+whatsapp-nativefier &
+
+## Starts rclone and immediatly closes it (doesn't quite work)
+#xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
+#rclone-browser &
+
 # Allows to lock the screen
-#gnome-screensaver &
+gnome-screensaver &
 
 # Deluge
 # sleep 5 && (
@@ -77,6 +86,7 @@ telegram-desktop &
 ############
 # SESSION #
 ###########
+#exec twm
 # GNOME on Xorg
 export GDK_BACKEND=x11
 exec gnome-session

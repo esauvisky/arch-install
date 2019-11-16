@@ -1,0 +1,14 @@
+[Unit]
+Description=DiscoWatch
+Requires=tor.service
+After=network.target tor.service
+
+[Service]
+WorkingDirectory=/home/esauvisky/Coding/Projects/DiscoWatch/
+ExecStartPre=/bin/sleep 5
+ExecStart=/usr/bin/node /home/esauvisky/Coding/Projects/DiscoWatch/index.js
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=default.target

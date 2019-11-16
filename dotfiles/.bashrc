@@ -4,7 +4,8 @@
 ###########
 # CONFIGS #
 ###########
-_ENABLE_RANDOM_STUFF=1        # Check the big if block at the end of the file
+# Replace for your username if you want to run the big block at the end of this file
+_ENABLE_RANDOM_STUFF='esauvisky'
 
 ############################################
 ## THIS IS CERTAINLY NOT POSIX COMPATIBLE ##
@@ -36,7 +37,9 @@ else
     fi
 fi
 
-## BASH ETERNAL HISTORY
+##########################
+## BASH ETERNAL HISTORY ##
+##########################
 ## Author: emi et al., took ages to figure something that worked.
 # Change the file location because certain bash sessions truncate .bash_history file upon close.
 export HISTFILE=~/.bash_eternal_history
@@ -361,66 +364,79 @@ fi
 
 ## Pacman
 if hash "pacman" >&/dev/null; then
-    alias aurs="aurget --sort votes -Ss"
+    alias aurss="aurget --sort votes -Ss"
+    alias aurs="aurget -S --noconfirm"
     alias pacman="pacman "
-    alias pacs="sudo pacman -S --needed"
-    alias pacr="sudo pacman -Rs"
+    alias pacs="sudo pacman -S --needed --asdeps"
+    alias pacr="sudo pacman -R"
     alias pacss="pacman -Ss"
     alias paci="pacman -Qi"
     alias pacl="pacman -Ql"
     complete -F _complete_alias aurs
+    complete -F _complete_alias aurss
     complete -F _complete_alias pacs
     complete -F _complete_alias pacr
     complete -F _complete_alias pacss
     complete -F _complete_alias paci
     complete -F _complete_alias pacl
 
-    # Deprecated (See Function Below) #
-    # Updater (pacman + aurget + aurget dev packages):
-    # alias pacsyu="log=\$HOME/.logs/\$(date +pacsyu@%F~%H:%S); sudo unbuffer -p pacman -Syu |& tee -a \$log; echo 'Press Enter to update AUR packages...'; read; unbuffer -p aurget -Syu |& tee -a \$log; echo 'Press Enter to update AUR devel (e.g.: -git) packages...'; read; unbuffer -p aurget -Syu --devel --noconfirm; echo 'Done! Log saved at $log.'; read"
-    # Search for outdated packages on AUR
-    alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
-    # Optimizes pacman stuff
-    alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
-
+    ## Pacman Awesome Updater
     function pacsyu() {
         echo -e '\e[01;91m\nUpdating pacman...\e[00m'
         sudo \pacman -Sy
         echo -e '\e[01;91m\nSaving log of packages to upgrade...\e[00m'
-        mkdir "$HOME/.pacman"
+        mkdir -p "$HOME/.pacman"
+        # FIXME: add a conditioon that checks if any of the files inside .pacman already
+        #        contains exactly the same packages that pacman -Qu outputs, meaning that
+        #        it's useless to save it again.
+        # TODO: alternatively, save only when the update is finished?
         LOG_FILE="$HOME/.pacman/pacmanQu-$(date -Iminutes)"
-        pacman -Qu > "$LOG_FILE"
+        pacman -Qu --color never > "$LOG_FILE"
         echo -e '\e[01;91m\nPress Enter to update packages... (noconfirm)\e[00m'
         read
         sudo \pacman -Su
         echo -e '\e[01;91m\nPress Enter to update AUR packages... (noconfirm)\e[00m'
         read
-        aurget -Syu
+        aurget -Syu --noconfirm
         echo -e '\e[01;91m\nPress Enter to update AUR devel (e.g.: -git) packages... (noconfirm)\e[00m'
         read
         aurget -Syu --devel --noconfirm
     }
+    # Exports the function so every bash process sees it (http://tinyurl.com/y5bnarjm)
+    # This way we can call `gnome-terminal -- bash -c 'pacsyu; bash'`, for example,
+    # which is used on the Arch Linux Updates gnome extension.
+    export -f pacsyu
 
-    function pacman_revert_last_upgrade() {
-        # TODO: WIP
-        echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST.'
+    ## TODO: The Awesome Pacman RollerBack
+    function pacman_rollback() {
+        echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST AND RUN MANUALLY.'
         return 1
         if [[ -f $1 ]]; then
             while read line; do
                 pkg=$(echo "$i" | sed 's/ -> .+//' | sed 's/ /-/')
                 echo "Downgrading $pkg"
                 sudo pacman --noconfirm --needed -U /var/cache/pacman/pkg/$pkg*
-            done < <(cat pacmanqu.txt)
+            done < <(cat $1)
         fi
     }
+
+    # Search for outdated packages on AUR
+    alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
+
+    # Optimizes pacman stuff (does it?)
+    alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
+
+    # Logcat for adb devices
+    alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
 ############################
 # Bottom Padding (DECSTBM) #
 ############################
-## Besides the first couple functions, this attempt
-## was a major fail. Any resizing of the window screws things up.
-# True screen clearing
+# Besides the first couple functions, this attempt
+# was a major fail. Any resizing of the window screws things up.
+
+## True screen clearing
 function _clear() {
     echo -en "\033c"
 }
@@ -468,12 +484,12 @@ function _set_bottom_padding() {
 # Runs _fix_bottom_padding each time the window is resized:
 # trap '_fix_bottom_padding' WINCH
 
-# Sets bottom padding and changes clear alias **only** in TTYs
-#if [[ ! $DISPLAY ]]; then
-#   _clear
-#   _set_bottom_padding
-#   alias clear="_clear; _set_bottom_padding"
-#fi
+#Sets bottom padding and changes clear alias **only** in TTYs
+if [[ ! $DISPLAY ]]; then
+  _clear
+  _set_bottom_padding
+  alias clear="_clear; _set_bottom_padding"
+fi
 
 # Lets disable the embedded prompt and make our own :)
 export VIRTUAL_ENV_DISABLE_PROMPT=0
@@ -668,7 +684,7 @@ fi
 
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
-if [[ $_ENABLE_RANDOM_STUFF -eq 1 ]]; then
+if [[ $_ENABLE_RANDOM_STUFF == "$USER" ]]; then
     # MagicCD
     alias cdb="_magicCD 2 $HOME/Bravi/"
     alias cdp="_magicCD 3 $HOME/Coding/"

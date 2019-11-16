@@ -1,5 +1,5 @@
 top's Config File (Linux processes with windows)
-Id:i, Mode_altscr=0, Mode_irixps=1, Delay_time=0.500, Curwin=0
+Id:i, Mode_altscr=0, Mode_irixps=1, Delay_time=1.000, Curwin=0
 Def	fieldscur=¥¨³´;=@·º9ÅÄ&')*+,-./012568¼>?ABCFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghij
 	winflags=180028, sortindx=18, maxtasks=0, graph_cpus=1, graph_mems=0
 	summclr=3, msgsclr=6, headclr=3, taskclr=3
