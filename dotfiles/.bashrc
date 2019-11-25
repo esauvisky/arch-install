@@ -385,12 +385,12 @@ if hash "pacman" >&/dev/null; then
         echo -e '\e[01;91m\nUpdating pacman...\e[00m'
         sudo \pacman -Sy
         echo -e '\e[01;91m\nSaving log of packages to upgrade...\e[00m'
-        mkdir -p "$HOME/.pacman"
-        # FIXME: add a conditioon that checks if any of the files inside .pacman already
+        mkdir -p "$HOME/.pacman-updated"
+        # FIXME: add a conditioon that checks if any of the files inside .pacman-updated already
         #        contains exactly the same packages that pacman -Qu outputs, meaning that
         #        it's useless to save it again.
         # TODO: alternatively, save only when the update is finished?
-        LOG_FILE="$HOME/.pacman/pacmanQu-$(date -Iminutes)"
+        LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
         pacman -Qu --color never > "$LOG_FILE"
         echo -e '\e[01;91m\nPress Enter to update packages... (noconfirm)\e[00m'
         read
@@ -402,10 +402,13 @@ if hash "pacman" >&/dev/null; then
         read
         aurget -Syu --devel --noconfirm
     }
+
     # Exports the function so every bash process sees it (http://tinyurl.com/y5bnarjm)
     # This way we can call `gnome-terminal -- bash -c 'pacsyu; bash'`, for example,
     # which is used on the Arch Linux Updates gnome extension.
-    export -f pacsyu
+    # FIXME: doesn't work, so there's this workaround..... 🙄 have fun 😁
+    # gnome-terminal --profile="System Update" -- bash --rcfile /home/esauvisky/.bashrc -c "echo -e '\e[01;91m\nUpdating pacman...\e[00m';sudo \pacman -Sy;echo -e '\e[01;91m\nSaving log of packages to upgrade...\e[00m';mkdir -p \$HOME'/.pacman-updated';LOG_FILE=\$HOME'/.pacman-updated/pacmanQu-'\$(date -Iminutes);pacman -Qu --color never > \$LOG_FILE;echo -e '\e[01;91m\nPress Enter to update packages... (noconfirm)\e[00m';read;sudo \pacman -Su;echo -e '\e[01;91m\nPress Enter to update AUR packages... (noconfirm)\e[00m';read;aurget -Syu --noconfirm;echo -e '\e[01;91m\nPress Enter to update AUR devel (e.g.: -git) packages... (noconfirm)\e[00m';read;aurget -Syu --devel --noconfirm"
+    # export -f pacsyu
 
     ## TODO: The Awesome Pacman RollerBack
     function pacman_rollback() {
@@ -540,6 +543,9 @@ function _pre_command() {
 
     # Small fix that clears up all prompt colors, so we don't colorize any output by mistake
     echo -ne "\e[0m"
+
+    # Saves timestamp for the moment it began
+    CMD_START_TIMESTAMP=$(date +%s)
 }
 
 function _set_prompt() {
@@ -585,6 +591,28 @@ function _set_prompt() {
     # a newline after it, so you can actually easily notice
     # if it's output has an EOF linebreak.
     PS1="$YellowN---$Reset\\n\\n"
+
+    if [[ ! -z $CMD_START_TIMESTAMP ]]; then
+        CMD_END_TIMESTAMP=$(date +%s)
+        _time_taken_seconds=$(($CMD_END_TIMESTAMP - $CMD_START_TIMESTAMP))
+        if [[ $_time_taken_seconds -ge 60 ]]; then
+            # If took mroe than 60 seconds, notify
+            icon=dialog-information
+            urgency=low
+            if [[ $Last_Command != 0 ]]; then
+                # If didn't leave with error code 0, notify priority
+                icon=dialog-error
+                urgency=critical
+            fi
+            notify=$(command -v notify-send)
+            if [ -x "$notify" ]; then\
+                $notify \
+                -i $icon \
+                -u $urgency \
+                "Command completed in ${_time_taken_seconds}"
+            fi
+        fi
+    fi
 
     if [[ $Last_Command == 0 ]]; then
         # If last cmd didn't return an error (exit code == 0)
@@ -682,7 +710,6 @@ else
 fi
 
 
-
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
 if [[ $_ENABLE_RANDOM_STUFF == "$USER" ]]; then
     # MagicCD
@@ -713,16 +740,16 @@ if [[ $_ENABLE_RANDOM_STUFF == "$USER" ]]; then
     # bash function
     function is_function() {
         declare -Ff "${1}" >/dev/null
-
-    # TODO: check what is this for
-    source /usr/share/nvm/init-nvm.sh
+    }
 
     # Helper function to read the first line of a file into a variable.
     # __git_eread requires 2 arguments, the file path and the name of the
     # variable, in that order.
-    # function __git_eread() {
-    #     echo 'USING GIT EREAD'
-    #     test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
-    # }
+    function __git_eread() {
+        echo 'USING GIT EREAD'
+        test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
     }
+
+    # TODO: check what is this for
+    source /usr/share/nvm/init-nvm.sh
 fi

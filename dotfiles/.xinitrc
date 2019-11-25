@@ -19,6 +19,7 @@ if [ -d /etc/X11/xinit/xinitrc.d ]; then
     unset f
 fi
 
+
 ###########
 # ENVVARS #
 ###########
@@ -47,10 +48,7 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 # echo "Running Discord's Bot: TitanIV"
 # systemd-run --user --unit TitanIV
 
-## Gnome-Tweak Ignore Lid Switch
-#/usr/lib/gnome-tweak-tool-lid-inhibitor &
-
-## Starts slack if it's job hours
+# Starts slack if it's job hours
 if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
    echo 'Starting slack application...'
    slack -u &
@@ -61,15 +59,13 @@ xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
 telegram-desktop &
 
 ## Starts WhatsApp and immediatly closes it
-xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp$|WhatsApp Web$)' windowminimize &
+xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web|whats-app)' windowminimize &
 whatsapp-nativefier &
 
-## Starts rclone and immediatly closes it (doesn't quite work)
-#xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
-#rclone-browser &
-
-# Allows to lock the screen
-gnome-screensaver &
+# Starts rclone and immediatly closes it (doesn't quite work)
+# xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
+# xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
+# rclone-browser &
 
 # Deluge
 # sleep 5 && (
@@ -81,20 +77,31 @@ gnome-screensaver &
 #     fi) &
 
 #echo "Running electrum..."
-#sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
+# sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
+
 
 ############
-# SESSION #
-###########
-#exec twm
+# SESSIONS #
+############
+## Tests
+# exec xrdb .Xresources & gnome-session
+# exec twm
+# exec cinnamon-session
+
+## Gnome Tweaks
+# Ignore Lid Switch
+/usr/lib/gnome-tweak-tool-lid-inhibitor &
+# Allows to lock the screen
+gnome-screensaver &
+
+## Session
 # GNOME on Xorg
 export GDK_BACKEND=x11
-exec gnome-session
-# exec xrdb .Xresources & gnome-session
 
-# # Gnome Classic
-#export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
-#export GNOME_SHELL_SESSION_MODE=classic
-#exec gnome-session --session=gnome-classic
+## Gnome Classic
+export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
+export GNOME_SHELL_SESSION_MODE=classic
+exec gnome-session --session=gnome-classic --builtin
 
-# exec cinnamon-session
+## Gnome Shell
+# exec gnome-session
