@@ -256,7 +256,7 @@ function _magicCD() {
     if [[ ${#results[@]} -eq 1 ]]; then
         # If there's an unique result for the argument, cd into it:
         cd "${results[0]}"
-    elif [[ ${#results[@]} -eq 0 || ${#results[@]} -gt 10 ]]; then
+    elif [[ ${#results[@]} -eq 0 || ${#results[@]} -gt 20 ]]; then
         cd "${__MAGIC_CD_DIR}"
     else
         # Let the user choose

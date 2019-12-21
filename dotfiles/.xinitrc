@@ -37,37 +37,21 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 #############
 # AUTOSTART #
 #############
-## Trazer tudo de .config/autostart para aqui!
-## Para evitar programas de adicionar automaticamente autostarts em
-## .config/autostart (como o dropbox), adicionar o atributo immutable no diretório.
+## Do not use .config/autostart. Instead, add the immutable attribute on it,
+## and bring everything you want to automatically start to here.
+## This avoids random crap you do not want to autostart from autostarting, like
+## dropbox, which doesn't work if it starts too early, steam, and other bullshit.
 
-## Além disso, é melhor criar unidades do systemd em .config/systemd/user e dar enable
-## em vez de rodar como o exemplo abaixo, ou diretamente como o ignore-lid-switch abaixo.
+## Also, if no logic is needed, it's preferable to create systemd units into
+## .config/systemd/user and enable them manually, or even create on-the-go units.
 
-## Criando e rodando uma unidade do systemd on-the-go
-# echo "Running Discord's Bot: TitanIV"
-# systemd-run --user --unit TitanIV
 
-## Starts WhatsApp and immediatly closes it
-whatsapp-nativefier &
-sleep 10 && xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web|whats-app)' windowminimize &
-
-# Starts slack if it's job hours
-if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
-   echo 'Starting slack application...'
-   slack -u &
-fi
-
-## Starts Telegram and immediatly closes it
-xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
-telegram-desktop &
-
-# Starts rclone and immediatly closes it (doesn't quite work)
-# xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
+## Starts rclone and immediatly closes it (doesn't quite work)
 # xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
 # rclone-browser &
 
-# Deluge
+
+## Starts Deluge only if there's something to be downloaded
 # sleep 5 && (
 #     deluged && sleep 5 &&
 #     if [[ $(deluge-console info | egrep -c 'Error|Downloading') -eq 0 ]]; then
@@ -76,32 +60,49 @@ telegram-desktop &
 #         killall deluged && systemd-run --user --unit deluge deluge
 #     fi) &
 
-#echo "Running electrum..."
+
+## Starts electrum
 # sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
 
+
+## Starts WhatsApp and immediatly closes it
+whatsapp-nativefier &
+sleep 10 && xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web|whats-app)' windowminimize &
+
+
+## Starts Telegram and immediatly closes it
+xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
+telegram-desktop &
+
+
+## Starts slack if it's job hours
+if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
+   echo 'Starting slack application...'
+   slack -u &
+fi
+
+
+## Starts guake
+guake &
+
+
+## Gnome: Ignore Lid Switch
+# /usr/lib/gnome-tweak-tool-lid-inhibitor &
+## Gnome: Allows to lock the screen
+gnome-screensaver &
 
 ############
 # SESSIONS #
 ############
-## Tests
-# exec xrdb .Xresources & gnome-session
-# exec twm
-# exec cinnamon-session
-
-## Gnome Tweaks
-# Ignore Lid Switch
-/usr/lib/gnome-tweak-tool-lid-inhibitor &
-# Allows to lock the screen
-gnome-screensaver &
-
-## Session
-# GNOME on Xorg
+## Main Session
+# GNOME on Xorg, using Gnome-Classic:
 export GDK_BACKEND=x11
-
-## Gnome Classic
 export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
 export GNOME_SHELL_SESSION_MODE=classic
 exec gnome-session --session=gnome-classic --builtin
 
-## Gnome Shell
-# exec gnome-session
+## Crap! gnome-shell sucks ass!
+# exec twm
+# exec cinnamon-session
+# exec mate-session
+
