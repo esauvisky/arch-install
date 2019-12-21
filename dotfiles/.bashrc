@@ -106,6 +106,7 @@ fi
 #################
 # Amazing bash-only menu selector
 # Taken from http://tinyurl.com/y5vgfon7
+# TODO: needs a CTRL+C/SIGINT trap to allow exiting (also update on Tricks.sh)
 function select_option() {
     ESC=$(printf "\033")
     cursor_blink_on() { printf "$ESC[?25h"; }
@@ -225,7 +226,7 @@ transfer() {
     cat "$tmpResponse" <(echo)
 
     if [[ ! -z $isEncrypted ]]; then
-        echo -e "Use gpg -o- to decrypt:\n  $ curl "$(cat "$tmpResponse")" | gpg -o- > ./$basefile" >&2
+        echo -e "Use gpg -o- to decrypt:\n  $ curl "$(cat "$tmpResponse")" | gpg -o- > ./${basefile%%.enc}" >&2
     fi
     rm -f "$tmpResponse"
 }
@@ -307,9 +308,9 @@ alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 alias sed="sed -E"
 # Makes diff decent
 if hash colordiff >&/dev/null; then
-    alias diff="colordiff -w -B -U 5 --suppress-common-lines"
+    alias diff="colordiff -B -U 5 --suppress-common-lines"
 else
-    alias diff="diff $_COLOR_ALWAYS_ARG -w -B -U 5 --suppress-common-lines"
+    alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
 fi
 
 ## Logging
@@ -322,8 +323,8 @@ alias dd='dd status=progress oflag=sync'
 alias ccze='ccze -A -o nolookups'
 # journalctl handy aliases
 if hash "journalctl" >&/dev/null; then
-    alias je=$_COLOURIFY_CMD' journalctl -ef'
-    alias jb=$_COLOURIFY_CMD' journalctl -b'
+    alias je='journalctl -efn 60 | \ccze -A'
+    alias jb='journalctl -b | ccze -A'
 fi
 
 ## Git
@@ -382,35 +383,36 @@ if hash "pacman" >&/dev/null; then
 
     ## Pacman Awesome Updater
     function pacsyu() {
-        echo -e '\e[01;91m\nUpdating pacman...\e[00m'
+        echo -e '\e[00;91m\nUpdating pacman repositories...\e[00m'
         sudo \pacman -Sy
-        echo -e '\e[01;91m\nSaving log of packages to upgrade...\e[00m'
+        echo -e '\e[00;91m\nSaving log of packages to upgrade...\e[00m'
         mkdir -p "$HOME/.pacman-updated"
-        # FIXME: add a conditioon that checks if any of the files inside .pacman-updated already
-        #        contains exactly the same packages that pacman -Qu outputs, meaning that
-        #        it's useless to save it again.
-        # TODO: alternatively, save only when the update is finished?
+        # TODO: add a condition that checks if any of the files inside .pacman-updated already
+        #       contains exactly the same packages that pacman -Qu outputs, meaning that
+        #       it's useless to save it again.
+        #       Alternatively, save only when the update is finished? Nope. If SIGTERM'd then
+        #       no log will be saved, unless we trapped it and ... too much trouble.
         LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
-        pacman -Qu --color never > "$LOG_FILE"
-        echo -e '\e[01;91m\nPress Enter to update packages... (noconfirm)\e[00m'
+        \pacman -Qu --color never > "$LOG_FILE"
+        echo -e '\e[00;91m\nPress Enter to update pacman packages.\e[00m'
         read
-        sudo \pacman -Su
-        echo -e '\e[01;91m\nPress Enter to update AUR packages... (noconfirm)\e[00m'
+        sudo \pacman -Su --noconfirm
+        echo -e '\e[00;91m\nPress Enter to update AUR packages.\e[00m'
         read
         aurget -Syu --noconfirm
-        echo -e '\e[01;91m\nPress Enter to update AUR devel (e.g.: -git) packages... (noconfirm)\e[00m'
+        echo -e '\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m'
         read
         aurget -Syu --devel --noconfirm
     }
 
     # Exports the function so every bash process sees it (http://tinyurl.com/y5bnarjm)
-    # This way we can call `gnome-terminal -- bash -c 'pacsyu; bash'`, for example,
-    # which is used on the Arch Linux Updates gnome extension.
-    # FIXME: doesn't work, so there's this workaround..... 🙄 have fun 😁
-    # gnome-terminal --profile="System Update" -- bash --rcfile /home/esauvisky/.bashrc -c "echo -e '\e[01;91m\nUpdating pacman...\e[00m';sudo \pacman -Sy;echo -e '\e[01;91m\nSaving log of packages to upgrade...\e[00m';mkdir -p \$HOME'/.pacman-updated';LOG_FILE=\$HOME'/.pacman-updated/pacmanQu-'\$(date -Iminutes);pacman -Qu --color never > \$LOG_FILE;echo -e '\e[01;91m\nPress Enter to update packages... (noconfirm)\e[00m';read;sudo \pacman -Su;echo -e '\e[01;91m\nPress Enter to update AUR packages... (noconfirm)\e[00m';read;aurget -Syu --noconfirm;echo -e '\e[01;91m\nPress Enter to update AUR devel (e.g.: -git) packages... (noconfirm)\e[00m';read;aurget -Syu --devel --noconfirm"
+    # This way we can call `gnome-terminal -- bash -c 'pacsyu; bash'` and use it in,
+    # for example, the 'Arch Linux Updates' gnome extension.
     # export -f pacsyu
+    # FIXME: doesn't work, so concatenating it all is the current workaround... 🙄:
+    # gnome-terminal --profile="System Update" -- bash --rcfile /home/esauvisky/.bashrc -c "echo -e '\e[00;91m\nUpdating pacman repositories...\e[00m';sudo \pacman -Sy;echo -e '\e[00;91m\nSaving log of packages to upgrade...\e[00m';mkdir -p "$HOME/.pacman-updated";LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)";\pacman -Qu --color never > "$LOG_FILE";echo -e '\e[00;91m\nPress Enter to update pacman packages.\e[00m';read;sudo \pacman -Su --noconfirm;echo -e '\e[00;91m\nPress Enter to update AUR packages.\e[00m';read;aurget -Syu --noconfirm;echo -e '\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m';read;aurget -Syu --devel --noconfirm"
 
-    ## TODO: The Awesome Pacman RollerBack
+    ## TODO: The Awesome WIP Pacman RollerBack
     function pacman_rollback() {
         echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST AND RUN MANUALLY.'
         return 1
@@ -426,12 +428,37 @@ if hash "pacman" >&/dev/null; then
     # Search for outdated packages on AUR
     alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
 
-    # Optimizes pacman stuff (does it?)
+    # Optimizes pacman stuff (TODO: does it?)
     alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
+fi
 
-    # Logcat for adb devices
+if hash adb >&/dev/null; then
+    # Pretty colorful and super verbose logcat for adb devices
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
+
+if hash mdless >&/dev/null; then
+    function md() {
+        if [[ ! -f $1 ]]; then
+            readarray -d '' __md_files < <(find -iname '*.md' -print0)
+            if [[ ${#__md_files[@]} -eq 1 ]]; then
+                mdless --width $COLUMNS ${__md_files[0]}
+            else
+                __readme=$(find -iname 'readme.md')
+                if [[ -f $__readme ]]; then
+                    mdless --width $COLUMNS $__readme
+                else
+                    echo "There's more than one Markdown file. Please choose one."
+                    return 1
+                fi
+            fi
+        else
+            mdless --width $COLUMNS $1
+        fi
+    }
+    complete -f -X '!*.md' md
+fi
+
 
 ############################
 # Bottom Padding (DECSTBM) #

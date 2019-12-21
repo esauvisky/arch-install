@@ -48,6 +48,10 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 # echo "Running Discord's Bot: TitanIV"
 # systemd-run --user --unit TitanIV
 
+## Starts WhatsApp and immediatly closes it
+whatsapp-nativefier &
+sleep 10 && xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web|whats-app)' windowminimize &
+
 # Starts slack if it's job hours
 if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
    echo 'Starting slack application...'
@@ -57,10 +61,6 @@ fi
 ## Starts Telegram and immediatly closes it
 xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
 telegram-desktop &
-
-## Starts WhatsApp and immediatly closes it
-xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web|whats-app)' windowminimize &
-whatsapp-nativefier &
 
 # Starts rclone and immediatly closes it (doesn't quite work)
 # xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
