@@ -1,17 +1,22 @@
 #!/usr/bin/env bash
-# Author: emi~ (@esauvisky)
+##############################################
+######### Author: emi~ (@esauvisky) ##########
+## THIS IS CERTAINLY NOT POSIX COMPATIBLE!! ##
+##############################################
+###### Also requires bash 4.4 or higher ######
+
+## Enable for debugging:
+#PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
+# set -o xtrace
+
+## Don't do anything if not running interactively
+[[ $- != *i* ]] && exit
 
 ###########
 # CONFIGS #
 ###########
-# Replace for your username if you want to run the big block at the end of this file
+## Replace withyour username if you want to run the big block at the end of this file
 _ENABLE_RANDOM_STUFF='esauvisky'
-
-############################################
-## THIS IS CERTAINLY NOT POSIX COMPATIBLE ##
-############################################
-## Don't do anything if not running interactively
-[[ $- != *i* ]] && return
 
 #########################
 # Environment Variables #
@@ -41,33 +46,20 @@ fi
 ## BASH ETERNAL HISTORY ##
 ##########################
 ## Author: emi et al., took ages to figure something that worked.
-# Change the file location because certain bash sessions truncate .bash_history file upon close.
+# Change the file location because certain bash sessions truncate .bash_history file upon close:
 export HISTFILE=~/.bash_eternal_history
-# Maximum number of entries on the current session (nothing is infinite).
-export HISTSIZE=500000
+# Maximum number of entries on the current session (nothing is infinite):
+export HISTSIZE=5000000
 # Maximum number of lines in HISTFILE (nothing is infinite).
-export HISTFILESIZE=1000000
+export HISTFILESIZE=10000000
 # Commands to ignore and skip saving
-export HISTIGNORE="clear:exit:history:cd ..:ls"
+export HISTIGNORE="clear:exit:history:ls"
 # Ignores dupes and deletes old ones (latest doesn't work _quite_ properly, but does the trick)
 export HISTCONTROL=ignoredups:erasedups
 # Custom history time prefix format
 export HISTTIMEFORMAT='[%F %T] '
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
-
-
-###################
-## COLORS, LOTS! ##
-###################
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    _COLOR_ALWAYS_ARG='--color=always'
-fi
-if [[ -f /etc/profile.d/grc.bashrc ]]; then
-    source /etc/profile.d/grc.bashrc # grc/colourify
-    _COLOURIFY_CMD='colourify'       # enables colourify dinamycally
-fi
 
 ##################
 # AUTOCOMPLETION #
@@ -77,29 +69,10 @@ fi
 # 2. Run `complete -p command`
 # 3. The output is the hook that was used to complete it.
 # 4. Change it accordingly to apply it to your function.
-
-# Loads bash's system-wide installed completions
-if [ -f /usr/share/bash-completion/bash_completion ]; then
+## Loads bash's system-wide installed completions
+if [[ -f /usr/share/bash-completion/bash_completion ]]; then
     . /usr/share/bash-completion/bash_completion
 fi
-
-#####################
-# STDOUT Log Saving #
-#####################
-# Author: Emi
-## TODO: Optimize speed for this or simply remove:
-# if [ -z "$UNDER_SCRIPT" ]; then
-#     logdir=$HOME/.terminal-logs
-#     if [ ! -d $logdir ]; then mkdir $logdir; fi
-#     # Deletes all logs older than two weeks
-#     find ~/.terminal-logs/ -type f -name '*.log' -mtime +14 -exec rm {} \;
-#     # Compresses all logs older than one week
-#     find ~/.terminal-logs/ -type f -name '*.log' -mtime +7 -exec gzip -q {} \;
-#     logfile=$logdir/$(date +%F_%T).$$.log
-#     export UNDER_SCRIPT=$logfile
-#     script -f -q $logfile
-#     exit
-# fi
 
 #################
 # select_option #
@@ -156,7 +129,7 @@ function select_option() {
 ###########
 # Extract #
 ###########
-# Extracts everything
+# Extracts anything
 function extract() {
     for n in "$@"; do
         if [ -f "$n" ]; then
@@ -192,6 +165,7 @@ function extract() {
 ################
 ## transfer.sh #
 ################
+# Transfer any file to transfer.sh with a couple tweaks.
 transfer() {
     if [[ $# -eq 0 ]]; then
         echo -e "No arguments specified.\n\n  Arguments:\n  \t-e: Encrypts file before uploading.\n\n  Usage Examples:\n  \ttransfer /tmp/test.md\n  \tcat /tmp/test.md | transfer test.md\n  \ttransfer -e /tmp/test.md" >&2
@@ -235,9 +209,12 @@ transfer() {
 # magicCD #
 ###########
 # Searches for directories recursively and cds into them.
-# Author: emi
+# Author: emi~
 function _magicCD() {
-    [[ ! -d $2 && ! ${1} -ge 2 ]] && echo "aw" && return 1
+    if [[ ! -d $2 && ! ${1} -ge 2 ]]; then
+        echo "Error in the syntax."
+        return 1
+    fi
 
     __MAGIC_CD_DIR="${2}"
     __DEPTH="${1}"
@@ -265,11 +242,11 @@ function _magicCD() {
     fi
 }
 
-################
-# COOL SPAWNER #
-################
+###############
+# Quick Spawn #
+###############
 # Spawns a process and closes the terminal, without killing the process.
-# Author: emi
+# Author: emi~
 function e() {
     if [ -x "$(command -v ${1})" ] || alias ${1} &>/dev/null; then
         eval ${@} &
@@ -287,8 +264,24 @@ complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 # FIND DIRS #
 #############
 function findir() {
-    find . -type d -iname *${@}* 2>/dev/null
+    find . -type d -iname \*${@}\* 2>/dev/null
 }
+
+###################
+## COLORS, LOTS! ##
+###################
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    _COLOR_ALWAYS_ARG='--color=always'
+fi
+if hash grc; then
+    # See section at the end of aliases for all the other
+    # remaining aliases. Sourcing profile.d/grc.bashrc was
+    # deprecated in favor of this (more) dynamic approach.
+    alias colourify="grc -es --colour=auto"
+    _COLOURIFY_CMD='colourify'
+fi
+
 
 ###########
 # Aliases #
@@ -342,7 +335,24 @@ if hash "git" >&/dev/null; then
         # First command deletes local branch, but exits > 0 if not fully merged,
         # so the second command (which deletes the remote branch), will only run
         # if the first one suceeds, making it "safe".
-        git branch --delete ${@} && git push origin --delete ${@}
+        if [[ $(git symbolic-ref --short -q HEAD) =~ "${@}" ]]; then
+            echo -e "\E[01mYou should leave the branch you're trying to delete first.\E[0m"
+        else
+            if ! git branch --delete ${@}; then
+                echo "The local repository ${@} does not exist. Do you want to delete the remote one anyway? [y/N]"
+                if [[ $(read yN) =~ 'n|N' ]]; then
+                    echo 'Deleting remote repo'
+                    git push origin --delete ${@}
+                else
+                    echo "Ok, bye!"
+                fi
+            else
+                echo 'Deleting local repo...'
+                git branch --delete ${@}
+                echo 'Deleting remote repo'
+                git push origin --delete ${@}
+            fi
+        fi
     }
     # Autocomplete local branches only
     function _git_local_branches() {
@@ -458,6 +468,36 @@ if hash mdless >&/dev/null; then
     }
     complete -f -X '!*.md' md
 fi
+
+
+#################3########
+## Colorizes Everything ##
+##########################
+## This only colourizes commands that
+## **were not** aliased before, so to
+## not overwrite them. If you want to
+## colourize those as well, add it manually.
+## Author: Emi
+if [[ ! -z $_COLOURIFY_CMD ]]; then
+    shopt -s nullglob
+    readarray -d '\n' _raw_cmds < <(find /usr/local/share/grc/* /usr/share/grc/* ~/.grc/* -execdir echo {} \;)
+    shopt -u nullglob
+
+    for _raw_cmd in $_raw_cmds; do
+        cmd=${_raw_cmd##*.}
+        # echo "Working with $cmd"
+        case "$cmd" in
+            configure )
+                alias "${cmd}=colourify ./${cmd}";;
+            *)
+                if ! alias "$cmd" &>/dev/null; then
+                    alias "${cmd}=colourify ${cmd}"
+                fi
+                ;;
+        esac
+    done
+fi
+
 
 
 ############################
@@ -778,5 +818,5 @@ if [[ $_ENABLE_RANDOM_STUFF == "$USER" ]]; then
     }
 
     # TODO: check what is this for
-    source /usr/share/nvm/init-nvm.sh
+    # source /usr/share/nvm/init-nvm.sh
 fi

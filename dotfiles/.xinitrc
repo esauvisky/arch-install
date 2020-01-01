@@ -65,14 +65,14 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 # sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
 
 
-## Starts WhatsApp and immediatly closes it
-whatsapp-nativefier &
-sleep 10 && xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web|whats-app)' windowminimize &
+# ## Starts WhatsApp and immediatly closes it
+xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web)' windowminimize &
+sleep 5 && whatsapp-nativefier &
 
 
-## Starts Telegram and immediatly closes it
-xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
-telegram-desktop &
+# ## Starts Telegram and immediatly closes it
+# xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
+# telegram-desktop &
 
 
 ## Starts slack if it's job hours
@@ -82,14 +82,14 @@ if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
 fi
 
 
-## Starts guake
+# ## Starts guake
 guake &
 
 
-## Gnome: Ignore Lid Switch
-# /usr/lib/gnome-tweak-tool-lid-inhibitor &
-## Gnome: Allows to lock the screen
-gnome-screensaver &
+# ## Gnome: Ignore Lid Switch
+/usr/lib/gnome-tweak-tool-lid-inhibitor &
+# ## Gnome: Allows to lock the screen
+# gnome-screensaver &
 
 ############
 # SESSIONS #
@@ -98,7 +98,7 @@ gnome-screensaver &
 # GNOME on Xorg, using Gnome-Classic:
 export GDK_BACKEND=x11
 export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
-export GNOME_SHELL_SESSION_MODE=classic
+# export GNOME_SHELL_SESSION_MODE=classic
 exec gnome-session --session=gnome-classic --builtin
 
 ## Crap! gnome-shell sucks ass!
