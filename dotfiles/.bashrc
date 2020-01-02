@@ -310,6 +310,18 @@ function findir() {
     find . -type d -iname \*${@}\* 2>/dev/null
 }
 
+##############
+# QUICK SUDO #
+##############
+s() {
+    # do sudo, or sudo the last command if no argument given
+    if [[ $# == 0 ]]; then
+        sudo $(history -p '!!')
+    else
+        sudo "$@"
+    fi
+}
+
 ###################
 ## COLORS, LOTS! ##
 ###################
