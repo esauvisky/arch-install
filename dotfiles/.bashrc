@@ -219,6 +219,35 @@ transfer() {
     rm -f "$tmpResponse"
 }
 
+
+#############################
+# "SECURE" FTP TLS Transfer #
+#############################
+## Sets a password via the keyring:
+## If you see a dialog when running this, function, run the command below with your credentials:
+# python -c "import keyring; keyring.set_password('name', 'username', '$PASSWORD')"
+function emibemol_ftp() {
+    USER='u373108367'
+    HOST='ftp.emibemol.com'
+    PASS=$(python -c "import keyring; print(keyring.get_password('${HOST}', '${USER}'))")
+    if [[ $# == 1 ]]; then
+        TARGET='/public_html'
+    elif [[ $# == 2 ]]; then
+        TARGET="${2}"
+    elif ! hash ncftpput || [[ ! -f "${1}" ]]; then
+        echo 'Usage: emibemol_ftp local_file_or_dir [remote_dir]'
+        echo
+        echo '[remote_dir] defaults to /public_html. You also need ncftp.'
+        return 1
+    fi
+
+    ncftpput -vRm -u "${USER}" -p "${PASS}" "${HOST}" "${TARGET}" "$1"
+    URL="${HOST##ftp\.}/${TARGET%%public_html}/${1##\./}"
+    URL="${URL/\/\//}"
+    echo "Uploaded to $URL. Copied to clipboard."
+    if hash xclip; then echo "$URL" | xclip -selection clipboard -i; fi
+}
+
 ###########
 # magicCD #
 ###########
