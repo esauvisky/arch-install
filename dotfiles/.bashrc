@@ -18,6 +18,9 @@
 ## Replace withyour username if you want to run the big block at the end of this file
 _ENABLE_RANDOM_STUFF='esauvisky'
 
+## Writes multiline commands on the history as one line
+shopt -s cmdhist
+
 #########################
 # Environment Variables #
 #########################
