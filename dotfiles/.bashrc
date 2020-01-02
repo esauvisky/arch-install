@@ -24,6 +24,17 @@ _ENABLE_RANDOM_STUFF='esauvisky'
 ## Magic with `less` (like colors and other cool stuff)
 export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
 
+## Magic with man pages (colors mainly)
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+## Alternatively, install `most` and change PAGER variable
+# export PAGER="/usr/bin/most -s"
+
 ## Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
 
