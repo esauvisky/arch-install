@@ -5,9 +5,6 @@
 ##############################################
 ###### Also requires bash 4.4 or higher ######
 
-## Enable for debugging:
-#PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
-# set -o xtrace
 
 ## Don't do anything if not running interactively
 [[ $- != *i* ]] && exit
@@ -15,11 +12,15 @@
 ###########
 # CONFIGS #
 ###########
-## Replace withyour username if you want to run the big block at the end of this file
-_ENABLE_RANDOM_STUFF='esauvisky'
+## Replace with your username if you want to run the big block at the end of this file
+ENABLE_RANDOM_STUFF='esauvisky'
 
-## Writes multiline commands on the history as one line
-shopt -s cmdhist
+## Enable for debugging:
+# PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
+# set -o xtrace
+
+## Notifies commands that take longer than 60 seconds via notify-send
+hash notify-send &>/dev/null && NOTIFY_SLOW_COMMANDS=1
 
 #########################
 # Environment Variables #
@@ -40,16 +41,18 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 
 ## Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
+## Writes multiline commands on the history as one line
+shopt -s cmdhist
 
 ## Sets default EDITOR environment variable
+## If logged as root use exclusively term editors
 if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
     for editor in "subl3" "gedit"; do
-        hash "$editor" >&/dev/null && export EDITOR=$editor && break || continue
+        hash "$editor" &>/dev/null && export EDITOR=$editor && break || continue
         export EDITOR="vi"
     done
 else
-    # if root use exclusively non-gui editors
-    if hash "nano" >&/dev/null; then
+    if hash "nano" &>/dev/null; then
         export EDITOR="nano"
     else
         export EDITOR="vi"
@@ -213,8 +216,8 @@ transfer() {
     echo -e '\nTransfer finished! URL was copied '
     cat "$tmpResponse" <(echo)
 
-    if [[ ! -z $isEncrypted ]]; then
-        echo -e "Use gpg -o- to decrypt:\n  $ curl "$(cat "$tmpResponse")" | gpg -o- > ./${basefile%%.enc}" >&2
+    if [[ -n $isEncrypted ]]; then
+        echo -e "Use gpg -o- to decrypt:\n  $ curl $(cat "$tmpResponse") | gpg -o- > ./${basefile%%.enc}" >&2
     fi
     rm -f "$tmpResponse"
 }
@@ -291,8 +294,8 @@ function _magicCD() {
 # Spawns a process and closes the terminal, without killing the process.
 # Author: emi~
 function e() {
-    if [ -x "$(command -v ${1})" ] || alias ${1} &>/dev/null; then
-        eval ${@} &
+    if [ -x "$(command -v "${1}")" ] || alias "${1}" &>/dev/null; then
+        eval "${@}" &
         disown
         exit 0
     else
@@ -318,7 +321,7 @@ s() {
     if [[ $# == 0 ]]; then
         sudo $(history -p '!!')
     else
-        sudo "$@"
+        sudo $@
     fi
 }
 
@@ -329,13 +332,12 @@ if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     _COLOR_ALWAYS_ARG='--color=always'
 fi
-if hash grc; then
-    # See section at the end of aliases for all the other
-    # remaining aliases. Sourcing profile.d/grc.bashrc was
-    # deprecated in favor of this (more) dynamic approach.
-    alias colourify="grc -es --colour=auto"
-    _COLOURIFY_CMD='colourify'
+
+if [[ -f /etc/profile.d/grc.bashrc ]]; then
+    source /etc/profile.d/grc.bashrc # grc/colourify
+    _COLOURIFY_CMD='colourify'       # enables colourify dinamycally
 fi
+
 
 
 ###########
@@ -348,14 +350,14 @@ alias sudo='sudo '
 alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls=$_COLOURIFY_CMD" ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+alias ls=$_COLOURIFY_CMD' ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso'
 
 # Makes grep useful
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 # Makes sed useful
 alias sed="sed -E"
 # Makes diff decent
-if hash colordiff >&/dev/null; then
+if hash colordiff &>/dev/null; then
     alias diff="colordiff -B -U 5 --suppress-common-lines"
 else
     alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
@@ -370,13 +372,13 @@ alias dd='dd status=progress oflag=sync'
 # Makes ccze not stupid (fast and no output clearing)
 alias ccze='ccze -A -o nolookups'
 # journalctl handy aliases
-if hash "journalctl" >&/dev/null; then
+if hash "journalctl" &>/dev/null; then
     alias je='journalctl -efn 60 | \ccze -A'
     alias jb='journalctl -b | ccze -A'
 fi
 
 ## Git
-if hash "git" >&/dev/null; then
+if hash "git" &>/dev/null; then
     # Loads gits completion file for our custom completions
     if [ -f /usr/share/bash-completion/completions/git ]; then
         . /usr/share/bash-completion/completions/git
@@ -390,12 +392,12 @@ if hash "git" >&/dev/null; then
         # First command deletes local branch, but exits > 0 if not fully merged,
         # so the second command (which deletes the remote branch), will only run
         # if the first one suceeds, making it "safe".
-        if [[ $(git symbolic-ref --short -q HEAD) =~ "${@}" ]]; then
+        if [[ $(git symbolic-ref --short -q HEAD) =~ ${@} ]]; then
             echo -e "\E[01mYou should leave the branch you're trying to delete first.\E[0m"
         else
             if ! git branch --delete ${@}; then
                 echo "The local repository ${@} does not exist. Do you want to delete the remote one anyway? [y/N]"
-                if [[ $(read yN) =~ 'n|N' ]]; then
+                if [[ $(read -r yN) =~ n|N ]]; then
                     echo 'Deleting remote repo'
                     git push origin --delete ${@}
                 else
@@ -417,7 +419,7 @@ if hash "git" >&/dev/null; then
 fi
 
 ## Systemctl
-if hash "systemctl" >&/dev/null; then
+if hash "systemctl" &>/dev/null; then
     alias start="systemctl start"
     alias stop="systemctl stop"
     alias restart="systemctl restart"
@@ -429,7 +431,7 @@ if hash "systemctl" >&/dev/null; then
 fi
 
 ## Pacman
-if hash "pacman" >&/dev/null; then
+if hash "pacman" &>/dev/null; then
     alias aurss="aurget --sort votes -Ss"
     alias aurs="aurget -S --noconfirm"
     alias pacman="pacman "
@@ -497,12 +499,12 @@ if hash "pacman" >&/dev/null; then
     alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
 fi
 
-if hash adb >&/dev/null; then
+if hash adb &>/dev/null; then
     # Pretty colorful and super verbose logcat for adb devices
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
-if hash mdless >&/dev/null; then
+if hash mdless &>/dev/null; then
     function md() {
         if [[ ! -f $1 ]]; then
             readarray -d '' __md_files < <(find -iname '*.md' -print0)
@@ -525,33 +527,43 @@ if hash mdless >&/dev/null; then
 fi
 
 
-#################3########
-## Colorizes Everything ##
-##########################
-## This only colourizes commands that
-## **were not** aliased before, so to
-## not overwrite them. If you want to
-## colourize those as well, add it manually.
-## Author: Emi
-if [[ ! -z $_COLOURIFY_CMD ]]; then
-    shopt -s nullglob
-    readarray -d '\n' _raw_cmds < <(find /usr/local/share/grc/* /usr/share/grc/* ~/.grc/* -execdir echo {} \;)
-    shopt -u nullglob
+# #################3########
+# ## Colorizes Everything ##
+# ##########################
+# ## FIXME!
+# ## This only colourizes commands that
+# ## **were not** aliased before, so to
+# ## not overwrite them. If you want to
+# ## colourize those as well, add it manually.
+# ## Author: Emi
+# if [[ -n $GRC ]]; then
+#     shopt -s nullglob
 
-    for _raw_cmd in $_raw_cmds; do
-        cmd=${_raw_cmd##*.}
-        # echo "Working with $cmd"
-        case "$cmd" in
-            configure )
-                alias "${cmd}=colourify ./${cmd}";;
-            *)
-                if ! alias "$cmd" &>/dev/null; then
-                    alias "${cmd}=colourify ${cmd}"
-                fi
-                ;;
-        esac
-    done
-fi
+#     ## This has a problem:
+#     # 1 - It's very slow
+#     # 2 - Commands with spaces (like `docker info` get merged into dockerinfo)
+#     #     so we should grep the conf.dockerinfo file and somehow grab from the regexp
+#     readarray -d '\n' _raw_cmds < <(find /usr/local/share/grc/* /usr/share/grc/* $HOME/.grc/* -execdir sh -c 'basename {} | sed -E "s/^conf\.(.+$)/\1/"' \;)
+
+#     shopt -u nullglob
+
+#     for cmd in ${_raw_cmds[@]}; do
+#         case "${cmd}" in
+#             configure )
+#                 alias "${cmd}=colourify ./configure"
+#                 ;;
+#             docker )
+#                 alias docker='colourify docker'
+#                 ;;
+#             *)
+#                 if ! alias "${cmd}" &>/dev/null && hash  "${cmd}" &>/dev/null; then
+#                     echo  "${cmd}=colourify ${cmd}.conf"
+#                     alias "${cmd}=colourify ${cmd}.conf"
+#                 fi
+#                 ;;
+#         esac
+#     done
+# fi
 
 
 
@@ -636,7 +648,7 @@ function _get_truncated_pwd() {
 ## The Divine and Beautiful Prompt ##
 #####################################
 ## Install 'fortune', 'cowthink' and 'lolcat' and have fun every time you open up a terminal.
-[[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" >&/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
+[[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" &>/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
@@ -665,14 +677,11 @@ function _pre_command() {
 
     # Small fix that clears up all prompt colors, so we don't colorize any output by mistake
     echo -ne "\e[0m"
-
-    # Saves timestamp for the moment it began
-    CMD_START_TIMESTAMP=$(date +%s)
 }
 
 function _set_prompt() {
     # Must come first, the girl.
-    Last_Command=$?
+    _last_command=$?
 
     # Saves on history after each command
     history -a
@@ -690,10 +699,13 @@ function _set_prompt() {
     GreenLight='\[\e[01;92m\]'
     YellowLight='\[\e[01;93m\]'
     VioletLight='\[\e[01;95m\]'
-    PinkLight='\[\e[01;91m\]'
+    PinkLight='\[\e[00;91m\]'
     GrayBackground='\[\e[01;40m\]'
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
+
+    # TODO: fix this shit, do not set the color according to the user
+    #       actually, set global colors to be used all along this file
     if [ $(id -u) -eq 0 ]; then
         YellowB='\[\e[01;31m\]'
         YellowN='\[\e[00;31m\]'
@@ -714,39 +726,38 @@ function _set_prompt() {
     # if it's output has an EOF linebreak.
     PS1="$YellowN---$Reset\\n\\n"
 
-    if [[ ! -z $CMD_START_TIMESTAMP ]]; then
-        CMD_END_TIMESTAMP=$(date +%s)
-        _time_taken_seconds=$(($CMD_END_TIMESTAMP - $CMD_START_TIMESTAMP))
-        if [[ $_time_taken_seconds -ge 60 ]]; then
-            # If took mroe than 60 seconds, notify
-            icon=dialog-information
-            urgency=low
-            if [[ $Last_Command != 0 ]]; then
-                # If didn't leave with error code 0, notify priority
-                icon=dialog-error
-                urgency=critical
-            fi
-            notify=$(command -v notify-send)
-            if [ -x "$notify" ]; then\
-                $notify \
-                -i $icon \
-                -u $urgency \
-                "Command completed in ${_time_taken_seconds}"
-            fi
-        fi
-    fi
 
-    if [[ $Last_Command == 0 ]]; then
+    ## FIXME: fix this shit. maybe this? http://tinyurl.com/yfa8cwam
+    ## Sends a notification if command took longer than 60 seconds and finished
+    ## Good for when updating and when you forget you had something running.
+    # if [[ -n $NOTIFY_SLOW_COMMANDS && -n $_cmd_starttime ]]; then
+    #     _cmd_endtime=$(date +%s)
+    #     _time_taken_seconds=$((_cmd_endtime - _cmd_starttime))
+    #     if [[ $_time_taken_seconds -ge 60 ]]; then
+    #         # If cmd took more than 60 seconds to finish, notify
+    #         icon=dialog-information
+    #         urgency=low
+    #         if [[ $_last_command != 0 ]]; then
+    #             # high priority for error codes > 0
+    #             icon=dialog-error
+    #             urgency=critical
+    #         fi
+    #         notify-send -i $icon -u $urgency "$(fc -ln -1) completed in $_time_taken_seconds"
+    #     fi
+    # fi
+
+
+    if [[ $_last_command == 0 ]]; then
         # If last cmd didn't return an error (exit code == 0)
         PS1+="$Green$Checkmark ${White}000 "
         PS1+="$Green\\u@\\h"
     else
-        PS1+="$Red$FancyX $White$(printf "%03d" $Last_Command) "
+        PS1+="$Red$FancyX $White$(printf "%03d" $_last_command) "
         PS1+="$Red\\u@\\h"
     fi
 
     # Nicely shows you're in a python virtual environment
-    if [[ ! -z $VIRTUAL_ENV ]]; then
+    if [[ -n $VIRTUAL_ENV ]]; then
         PS1+=" $Magenta(venv:$(_virtualenv_info))"
     fi
 
@@ -766,16 +777,20 @@ function _set_prompt() {
 
         PS1+=" ${Violet}["
 
+        # TODO: do not repeat yourself yourself
+        #       use git status once, save its output and fix this crappy code
         if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
-            [[ $branch_name == $short_sha ]] &&
-                PS1+="${GrayBackground}${White}→ $branch_name$Reset" || # DETACHED HEAD
-                PS1+="$GreenLight→ $branch_name•$Reset" # normal stuff
-        elif [[ $(git status --porcelain --untracked-files=normal 2>/dev/null | grep "^\?\?") ]]; then
-            PS1+="$YellowB→ $branch_name*$Reset"
+            if [[ $branch_name == "$short_sha" ]]; then
+                PS1+="${GrayBackground}${White}→ $branch_name$Reset" # DETACHED HEAD
+            else
+                PS1+="$GreenLight→ $branch_name•$Reset"
+            fi
         elif [[ $(git status 2>/dev/null | head -n5) == *"Changes to be committed"* ]]; then
-            PS1+="$Blue→ $branch_name+$Reset"
+            PS1+="$Bluelly→ $branch_name+$Reset"
+        elif git status --porcelain --untracked-files=normal 2>/dev/null | grep -q "^\?\?"; then
+            PS1+="$Magenta• $branch_name?$Reset"
         else
-            PS1+="$YellowB→ $branch_name*$Reset"
+            PS1+="$YellowB✔ $branch_name*$Reset"
         fi
         PS1+="$Violet]$Reset"
     fi
@@ -815,7 +830,9 @@ function _set_prompt() {
 
     # Changes the terminal window title to the current dir by default, truncating if too long.
     PS1="\033]0;$(_get_truncated_pwd)\007${PS1}"
+
     # Otherwise, if something is currently running, run _pre_command and change title to the app's name.
+    _cmd_starttime="$(date +%s)"
     trap '_pre_command' DEBUG
 }
 
@@ -833,10 +850,10 @@ fi
 
 
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
-if [[ $_ENABLE_RANDOM_STUFF == "$USER" ]]; then
+if [[ $ENABLE_RANDOM_STUFF == "$USER" ]]; then
     # MagicCD
-    alias cdb="_magicCD 2 $HOME/Bravi/"
-    alias cdp="_magicCD 3 $HOME/Coding/"
+    alias cdb='_magicCD 2 $HOME/Bravi/'
+    alias cdp='_magicCD 3 $HOME/Coding/'
 
     # Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
     alias subl3='open-subl3'
