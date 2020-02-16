@@ -20,7 +20,7 @@ ENABLE_RANDOM_STUFF='esauvisky'
 # set -o xtrace
 
 ## Notifies commands that take longer than 60 seconds via notify-send
-hash notify-send &>/dev/null && NOTIFY_SLOW_COMMANDS=1
+hash notify-send >&/dev/null && NOTIFY_SLOW_COMMANDS=1
 
 #########################
 # Environment Variables #
@@ -48,11 +48,11 @@ shopt -s cmdhist
 ## If logged as root use exclusively term editors
 if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
     for editor in "subl3" "gedit"; do
-        hash "$editor" &>/dev/null && export EDITOR=$editor && break || continue
+        hash "$editor" >&/dev/null && export EDITOR=$editor && break || continue
         export EDITOR="vi"
     done
 else
-    if hash "nano" &>/dev/null; then
+    if hash "nano" >&/dev/null; then
         export EDITOR="nano"
     else
         export EDITOR="vi"
@@ -96,7 +96,7 @@ fi
 #################
 # Amazing bash-only menu selector
 # Taken from http://tinyurl.com/y5vgfon7
-# TODO: needs a CTRL+C/SIGINT trap to allow exiting (also update on Tricks.sh)
+# Further edits by @emi
 function select_option() {
     ESC=$(printf "\033")
     cursor_blink_on() { printf "$ESC[?25h"; }
@@ -106,18 +106,18 @@ function select_option() {
     print_selected() { printf "  $ESC[7m $1 $ESC[27m"; }
     get_cursor_row() {
         IFS=';' read -sdR -p $'\E[6n' ROW COL
-        echo ${ROW#*[}
+        echo ${ROW#*\[}
     }
     key_input() {
         read -s -n3 key 2>/dev/null >&2
-        if [[ $key == $ESC[A ]]; then echo up; fi
-        if [[ $key == $ESC[B ]]; then echo down; fi
+        if [[ $key == $ESC\[A ]]; then echo up; fi
+        if [[ $key == $ESC\[B ]]; then echo down; fi
         if [[ $key == "" ]]; then echo enter; fi
     }
     for opt; do printf "\n"; done
     local lastrow=$(get_cursor_row)
     local startrow=$(($lastrow - $#))
-    trap "cursor_blink_on; stty echo; printf '\n'" 2
+    trap "cursor_blink_on; stty echo; printf '\n'; return 255" 2    # returns 255 when exit or sigint
     cursor_blink_off
     local selected=0
     while true; do
@@ -127,14 +127,15 @@ function select_option() {
             if [ $idx -eq $selected ]; then print_selected "$opt"; else print_option "$opt"; fi
             ((idx++))
         done
-        case $(key_input) in enter) break ;; up)
-            ((selected--))
-            if [ $selected -lt 0 ]; then selected=$(($# - 1)); fi
-            ;;
-        down)
-            ((selected++))
-            if [ $selected -ge $# ]; then selected=0; fi
-            ;;
+        case $(key_input) in
+            enter)
+                break ;;
+            up)
+                ((selected--))
+                if [ $selected -lt 0 ]; then selected=$(($# - 1)); fi ;;
+            down)
+                ((selected++))
+                if [ $selected -ge $# ]; then selected=0; fi ;;
         esac
     done
     cursor_to $lastrow
@@ -294,7 +295,7 @@ function _magicCD() {
 # Spawns a process and closes the terminal, without killing the process.
 # Author: emi~
 function e() {
-    if [ -x "$(command -v "${1}")" ] || alias "${1}" &>/dev/null; then
+    if [ -x "$(command -v "${1}")" ] || alias "${1}" >&/dev/null; then
         eval "${@}" &
         disown
         exit 0
@@ -309,8 +310,21 @@ complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 #############
 # FIND DIRS #
 #############
+# Finds directories recursively, and shows select_option
+# afterwards if less than 20 results.
 function findir() {
-    find . -type d -iname \*${@}\* 2>/dev/null
+    readarray -d '' results < <(find . -type d -iname \*${1}\* -print0)
+
+    if [[ ${#results[@]} -eq 1 ]]; then
+        # If there's an unique result for the argument, cd into it:
+        cd "${results[0]}"
+    elif [[ ${#results[@]} -eq 0 || ${#results[@]} -gt 20 ]]; then
+        printf '%s\n' "${results[@]}"
+    else
+        # Let the user choose
+        select_option "${results[@]}"
+        cd "${results[$?]}"
+    fi
 }
 
 ##############
@@ -357,7 +371,7 @@ alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 # Makes sed useful
 alias sed="sed -E"
 # Makes diff decent
-if hash colordiff &>/dev/null; then
+if hash colordiff >&/dev/null; then
     alias diff="colordiff -B -U 5 --suppress-common-lines"
 else
     alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
@@ -372,13 +386,13 @@ alias dd='dd status=progress oflag=sync'
 # Makes ccze not stupid (fast and no output clearing)
 alias ccze='ccze -A -o nolookups'
 # journalctl handy aliases
-if hash "journalctl" &>/dev/null; then
+if hash "journalctl" >&/dev/null; then
     alias je='journalctl -efn 60 | \ccze -A'
     alias jb='journalctl -b | ccze -A'
 fi
 
 ## Git
-if hash "git" &>/dev/null; then
+if hash "git" >&/dev/null; then
     # Loads gits completion file for our custom completions
     if [ -f /usr/share/bash-completion/completions/git ]; then
         . /usr/share/bash-completion/completions/git
@@ -419,7 +433,7 @@ if hash "git" &>/dev/null; then
 fi
 
 ## Systemctl
-if hash "systemctl" &>/dev/null; then
+if hash "systemctl" >&/dev/null; then
     alias start="systemctl start"
     alias stop="systemctl stop"
     alias restart="systemctl restart"
@@ -431,7 +445,7 @@ if hash "systemctl" &>/dev/null; then
 fi
 
 ## Pacman
-if hash "pacman" &>/dev/null; then
+if hash "pacman" >&/dev/null; then
     alias aurss="aurget --sort votes -Ss"
     alias aurs="aurget -S --noconfirm"
     alias pacman="pacman "
@@ -499,12 +513,12 @@ if hash "pacman" &>/dev/null; then
     alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
 fi
 
-if hash adb &>/dev/null; then
+if hash adb >&/dev/null; then
     # Pretty colorful and super verbose logcat for adb devices
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
-if hash mdless &>/dev/null; then
+if hash mdless >&/dev/null; then
     function md() {
         if [[ ! -f $1 ]]; then
             readarray -d '' __md_files < <(find -iname '*.md' -print0)
@@ -556,7 +570,7 @@ fi
 #                 alias docker='colourify docker'
 #                 ;;
 #             *)
-#                 if ! alias "${cmd}" &>/dev/null && hash  "${cmd}" &>/dev/null; then
+#                 if ! alias "${cmd}" >&/dev/null && hash  "${cmd}" >&/dev/null; then
 #                     echo  "${cmd}=colourify ${cmd}.conf"
 #                     alias "${cmd}=colourify ${cmd}.conf"
 #                 fi
@@ -648,7 +662,7 @@ function _get_truncated_pwd() {
 ## The Divine and Beautiful Prompt ##
 #####################################
 ## Install 'fortune', 'cowthink' and 'lolcat' and have fun every time you open up a terminal.
-[[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" &>/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
+[[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" >&/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
