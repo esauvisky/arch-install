@@ -66,28 +66,28 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 
 
 # ## Starts WhatsApp and immediatly closes it
-xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(WhatsApp|WhatsApp Web)' windowminimize &
-sleep 5 && whatsapp-nativefier &
+sleep 15s && xdotool search --sync --onlyvisible --name '.*WhatsApp|WhatsApp Web)' windowminimize &
+sleep 10s && whatsapp-nativefier &
 
 
 # ## Starts Telegram and immediatly closes it
-# xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
-# telegram-desktop &
+sleep 5s && xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
+sleep 10s && telegram-desktop &
 
 
 ## Starts slack if it's job hours
 if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
    echo 'Starting slack application...'
-   slack -u &
+   sleep 10s && slack -u &
 fi
 
 
 # ## Starts guake
-guake &
+sleep 5s && guake &
 
 
 # ## Gnome: Ignore Lid Switch
-/usr/lib/gnome-tweak-tool-lid-inhibitor &
+sleep 5s && /usr/lib/gnome-tweak-tool-lid-inhibitor &
 # ## Gnome: Allows to lock the screen
 # gnome-screensaver &
 
@@ -99,10 +99,10 @@ guake &
 export GDK_BACKEND=x11
 export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
 # export GNOME_SHELL_SESSION_MODE=classic
-exec gnome-session --session=gnome-classic --builtin
+# exec gnome-session --session=gnome-classic --builtin
+exec gnome-session --session=gnome-classic --systemd --debug
 
 ## Crap! gnome-shell sucks ass!
 # exec twm
 # exec cinnamon-session
 # exec mate-session
-

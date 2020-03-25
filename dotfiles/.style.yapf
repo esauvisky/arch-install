@@ -1,7 +1,7 @@
 [style]
 based_on_style = google
 # Align closing bracket with visual indentation.
-align_closing_bracket_with_visual_indent=False
+align_closing_bracket_with_visual_indent=True
 
 # Allow dictionary keys to exist on multiple lines. For example:
 #
@@ -19,7 +19,7 @@ allow_multiline_lambdas=False
 allow_split_before_default_or_named_assigns=False
 
 # Allow splits before the dictionary value.
-allow_split_before_dict_value=True
+allow_split_before_dict_value=False
 
 #   Let spacing indicate operator precedence. For example:
 #
@@ -118,7 +118,7 @@ dedent_closing_brackets=False
 
 # Disable the heuristic which places each list element on a separate line
 # if the list is comma-terminated.
-disable_ending_comma_heuristic=True
+disable_ending_comma_heuristic=False
 
 # Place each dictionary entry onto its own line.
 each_dict_entry_on_separate_line=True
@@ -145,7 +145,7 @@ indent_blank_lines=False
 #       'key2': value1 +
 #               value2,
 #   }
-indent_dictionary_value=False
+indent_dictionary_value=True
 
 # The number of columns to use for indentation.
 indent_width=4
