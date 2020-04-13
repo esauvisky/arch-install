@@ -66,8 +66,8 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 
 
 # ## Starts WhatsApp and immediatly closes it
-sleep 15s && xdotool search --sync --onlyvisible --name '.*WhatsApp|WhatsApp Web)' windowminimize &
-sleep 10s && whatsapp-nativefier &
+# sleep 15s && xdotool search --sync --onlyvisible --name '.*WhatsApp|WhatsApp Web)' windowminimize &
+# sleep 10s && whatsapp-nativefier &
 
 
 # ## Starts Telegram and immediatly closes it
@@ -96,13 +96,18 @@ sleep 5s && /usr/lib/gnome-tweak-tool-lid-inhibitor &
 ############
 ## Main Session
 # GNOME on Xorg, using Gnome-Classic:
-export GDK_BACKEND=x11
-export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
+# export GDK_BACKEND=x11
+# export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
 # export GNOME_SHELL_SESSION_MODE=classic
-# exec gnome-session --session=gnome-classic --builtin
-exec gnome-session --session=gnome-classic --systemd --debug
+# #exec gnome-session --session=gnome-flashback --builtin
+# exec gnome-session --session=gnome-classic --systemd --debug
+
+export XDG_SESSION_TYPE=x11
+export GDK_BACKEND=x11
+exec gnome-session --systemd
 
 ## Crap! gnome-shell sucks ass!
 # exec twm
 # exec cinnamon-session
-# exec mate-session
+#exec mate-session
+

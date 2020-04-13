@@ -160,7 +160,7 @@ join_multiple_lines=True
 # will be formatted as follows when configured with "*,/":
 #
 #   1 + 2*3 - 4/5
-no_spaces_around_selected_binary_operators=False
+no_spaces_around_selected_binary_operators=True
 
 # Use spaces around default or named assigns.
 spaces_around_default_or_named_assign=False
@@ -237,7 +237,7 @@ split_before_closing_bracket=False
 #       variable: 'Hello world, have a nice day!'
 #       for variable in bar if variable != 42
 #   }
-split_before_dict_set_generator=False
+split_before_dict_set_generator=True
 
 # Split before the '.' if we need to split a longer expression:
 #
@@ -247,7 +247,7 @@ split_before_dict_set_generator=False
 #
 #   foo = ('This is a really long string: {}, {}, {}, {}'
 #          .format(a, b, c, d))
-split_before_dot=False
+split_before_dot=True
 
 # Split after the opening paren which surrounds an expression if it doesn't
 # fit on a single line.
@@ -255,7 +255,7 @@ split_before_expression_after_opening_paren=False
 
 # If an argument / parameter list is going to be split, then split before
 # the first argument.
-split_before_first_argument=True
+split_before_first_argument=False
 
 # Set to True to prefer splitting before 'and' or 'or' rather than
 # after.
@@ -281,7 +281,7 @@ split_before_named_assigns=False
 split_complex_comprehension=True
 
 # The penalty for splitting right after the opening bracket.
-split_penalty_after_opening_bracket=3000
+split_penalty_after_opening_bracket=10000
 
 # The penalty for splitting the line after a unary operator.
 split_penalty_after_unary_operator=10000

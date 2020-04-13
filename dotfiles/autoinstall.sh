@@ -16,7 +16,7 @@ if gio trash $(mktemp -p .); then
     for dep in ${dotfiles[@]}; do
         echo "Downloading script $dep from esauvisky/arch-install/master/dotfiles"
         url="https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/$dep"
-        wget "$url" || curl -o "$dep.1" "$url"
+        wget -q "$url" -O "$dep.1" || curl -o "$dep.1" "$url"
         gio trash "./$dep"
         mv "./$dep.1" "./$dep"
         if [[ -f "./$dep" ]]; then
@@ -29,7 +29,7 @@ else
     for dep in ${dotfiles[@]}; do
         echo "Downloading script $dep from esauvisky/arch-install/master/dotfiles"
         url="https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/$dep"
-        wget "$url" || curl -o "$dep.1" "$url"
+        wget -q "$url" -O "$dep.1" || curl -o "$dep.1" "$url"
         mv "./$dep" "./$dep.bak"
         mv "./$dep.1" "./$dep"
         if [[ -f "./$dep" ]]; then

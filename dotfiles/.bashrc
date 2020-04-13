@@ -117,7 +117,7 @@ function select_option() {
     for opt; do printf "\n"; done
     local lastrow=$(get_cursor_row)
     local startrow=$(($lastrow - $#))
-    trap "cursor_blink_on; stty echo; printf '\n'; return 255" 2    # returns 255 when exit or sigint
+    trap "cursor_blink_on; stty echo; printf '\n'; trap - SIGINT; return 255;" SIGINT
     cursor_blink_off
     local selected=0
     while true; do
@@ -141,6 +141,7 @@ function select_option() {
     cursor_to $lastrow
     printf "\n"
     cursor_blink_on
+    trap - SIGINT
     return $selected
 }
 
@@ -397,7 +398,8 @@ if hash "git" >&/dev/null; then
     if [ -f /usr/share/bash-completion/completions/git ]; then
         . /usr/share/bash-completion/completions/git
     fi
-    alias gitl='git log --all --decorate=full --oneline'
+    # alias gitl='git log --all --decorate=full --oneline'
+    alias gitl="git log --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gits='git status'
     alias gitcam='git commit -a -m '
     alias gitcleanbranches='echo "Updating and pruning local copies of remote branches..." && git fetch --prune origin && echo "Removing refs about removed remote branches..." && git remote prune origin'
@@ -454,6 +456,7 @@ if hash "pacman" >&/dev/null; then
     alias pacss="pacman -Ss"
     alias paci="pacman -Qi"
     alias pacl="pacman -Ql"
+    alias paccache_safedelete="sudo paccache -r && sudo paccache -ruk1"
     complete -F _complete_alias aurs
     complete -F _complete_alias aurss
     complete -F _complete_alias pacs
@@ -461,27 +464,28 @@ if hash "pacman" >&/dev/null; then
     complete -F _complete_alias pacss
     complete -F _complete_alias paci
     complete -F _complete_alias pacl
+    complete -F _complete_alias paccache_safedelete
 
     ## Pacman Awesome Updater
     function pacsyu() {
-        echo -e '\e[00;91m\nUpdating pacman repositories...\e[00m'
+        echo -e "\e[00;91m\nUpdating pacman repositories...\e[00m"
         sudo \pacman -Sy
-        echo -e '\e[00;91m\nSaving log of packages to upgrade...\e[00m'
+        echo -e "\e[00;91m\nSaving log of packages to upgrade...\e[00m"
         mkdir -p "$HOME/.pacman-updated"
         # TODO: add a condition that checks if any of the files inside .pacman-updated already
         #       contains exactly the same packages that pacman -Qu outputs, meaning that
-        #       it's useless to save it again.
-        #       Alternatively, save only when the update is finished? Nope. If SIGTERM'd then
+        #       it"s useless to save it again.
+        #       Alternatively, save only when the update is finished? Nope. If SIGTERM"d then
         #       no log will be saved, unless we trapped it and ... too much trouble.
         LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
         \pacman -Qu --color never > "$LOG_FILE"
-        echo -e '\e[00;91m\nPress Enter to update pacman packages.\e[00m'
+        echo -e "\e[00;91m\nPress Enter to update pacman packages.\e[00m"
         read
         sudo \pacman -Su --noconfirm
-        echo -e '\e[00;91m\nPress Enter to update AUR packages.\e[00m'
+        echo -e "\e[00;91m\nPress Enter to update AUR packages.\e[00m"
         read
         aurget -Syu --noconfirm
-        echo -e '\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m'
+        echo -e "\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m"
         read
         aurget -Syu --devel --noconfirm
     }
@@ -490,8 +494,8 @@ if hash "pacman" >&/dev/null; then
     # This way we can call `gnome-terminal -- bash -c 'pacsyu; bash'` and use it in,
     # for example, the 'Arch Linux Updates' gnome extension.
     # export -f pacsyu
-    # FIXME: doesn't work, so concatenating it all is the current workaround... 🙄:
-    # gnome-terminal --profile="System Update" -- bash --rcfile /home/esauvisky/.bashrc -c "echo -e '\e[00;91m\nUpdating pacman repositories...\e[00m';sudo \pacman -Sy;echo -e '\e[00;91m\nSaving log of packages to upgrade...\e[00m';mkdir -p "$HOME/.pacman-updated";LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)";\pacman -Qu --color never > "$LOG_FILE";echo -e '\e[00;91m\nPress Enter to update pacman packages.\e[00m';read;sudo \pacman -Su --noconfirm;echo -e '\e[00;91m\nPress Enter to update AUR packages.\e[00m';read;aurget -Syu --noconfirm;echo -e '\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m';read;aurget -Syu --devel --noconfirm"
+    # FIXME: doesn't work, so concatenating it all is the current workaround (watchout for quotes!)... 🙄:
+    # gnome-terminal --profile="System Update" -- bash --rcfile /home/esauvisky/.bashrc -c 'echo -e "\e[00;91m\nUpdating pacman repositories...\e[00m";sudo \pacman -Sy;echo -e "\e[00;91m\nSaving log of packages to upgrade...\e[00m";mkdir -p "$HOME/.pacman-updated";LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)";\pacman -Qu --color never > "$LOG_FILE";echo -e "\e[00;91m\nPress Enter to update pacman packages.\e[00m";read;sudo \pacman -Su --noconfirm;echo -e "\e[00;91m\nPress Enter to update AUR packages.\e[00m";read;aurget -Syu --noconfirm;echo -e "\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m";read;aurget -Syu --devel --noconfirm'
 
     ## TODO: The Awesome WIP Pacman RollerBack
     function pacman_rollback() {
@@ -518,27 +522,32 @@ if hash adb >&/dev/null; then
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
-if hash mdless >&/dev/null; then
-    function md() {
-        if [[ ! -f $1 ]]; then
-            readarray -d '' __md_files < <(find -iname '*.md' -print0)
-            if [[ ${#__md_files[@]} -eq 1 ]]; then
-                mdless --width $COLUMNS ${__md_files[0]}
-            else
-                __readme=$(find -iname 'readme.md')
-                if [[ -f $__readme ]]; then
-                    mdless --width $COLUMNS $__readme
-                else
-                    echo "There's more than one Markdown file. Please choose one."
-                    return 1
-                fi
-            fi
-        else
-            mdless --width $COLUMNS $1
-        fi
-    }
-    complete -f -X '!*.md' md
-fi
+
+##       Deprecated
+## Replaced by bat below
+# if hash mdless >&/dev/null; then
+#     function md() {
+#         if [[ ! -f $1 ]]; then
+#             readarray -d '' __md_files < <(find -iname '*.md' -print0)
+#             if [[ ${#__md_files[@]} -eq 1 ]]; then
+#                 mdless --width $COLUMNS ${__md_files[0]}
+#             else
+#                 __readme=$(find -iname 'readme.md')
+#                 if [[ -f $__readme ]]; then
+#                     mdless --width $COLUMNS $__readme
+#                 else
+#                     echo "There's more than one Markdown file. Please choose one."
+#                     return 1
+#                 fi
+#             fi
+#         else
+#             mdless --width $COLUMNS $1
+#         fi
+#     }
+#     complete -f -X '!*.md' md
+# fi
+export BAT_THEME="Monokai Extended Bright"
+alias bat="bat --italic-text=always --decorations=always --color=always"
 
 
 # #################3########
