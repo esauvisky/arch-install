@@ -15,3 +15,8 @@
 	all = "!f() { find -mindepth 1 -maxdepth 3 -name .git -type d | xargs -I{} bash -c \"echo -e \\\"\\E[1m\\E[34m\\n\\n----- Working with \\\"{}\\\"\\E[0m\\\"; git -C \\\"{}/../\\\" ${*}\"; }; f"
 [commit]
 	gpgsign = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

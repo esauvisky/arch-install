@@ -13,6 +13,13 @@ TAB: menu-complete
 # Faz a mesma coisa com Shift+TAB, só que faz o caminho inverso.
 "\e[Z": menu-complete-backward
 
+# Troca a ação padrão de TAB para menu-complete (ao invés de complete).
+# menu-complete é mais eficiente pois faz loop pelos autocompletes,
+# quando há uma lista de valores ambíguos.
+TAB: menu-complete
+# Faz a mesma coisa com Shift+TAB, só que faz o caminho inverso.
+"\e[Z": menu-complete-backward
+
 # Não começa de primeira: exibe a lista antes, e depois faz o loop se apertar
 # TAB novamente. Desta forma permite dar uma "espiada" nos nomes dos arquivos
 # ou termos a completar antes de começar a preencher.
@@ -20,6 +27,9 @@ set menu-complete-display-prefix on
 
 # Remove as páginas de autocompletação de aspecto igual a 'more' ou 'less'
 set page-completions off
+
+# display one column with matches
+set completion-display-width 1
 
 # Ignora maiúsculas e minúsculas quando autocompletando.
 set completion-ignore-case on
@@ -29,7 +39,7 @@ set completion-map-case on
 
 # Se o tamanho do prefixo comum entre items de autocomplete for maior do que 10,
 # ocultar o prefixo na lista de autocomplete.
-set completion-prefix-display-length 10
+set completion-prefix-display-length 20
 
 # Não autocompleta dot-files a não ser que o padrão comece explicitamente com um ponto
 set match-hidden-files off
@@ -48,7 +58,7 @@ set visible-stats on
 # Não adiciona barras no final de nomes de diretórios quando autocompletando
 # P.S.: se TAB está associado a menu-complete, é recomendado deixar esta
 # variável off, pois pode-se apertar / para autocompletar o diretório escolhido.
-set mark-directories on
+set mark-directories off
 # Faz o mesmo para symlinks. Do contrário ele não adicionaria a barra pois
 # teoricamente o synlink é somente um arquivo.
 set mark-symlinked-directories on
@@ -123,8 +133,6 @@ set history-preserve-point on
 ## NAVIGATION ##
 ################
 # Navega por argumentos, respeitando espaços dentro de aspas e tudo mais.
-"\C-g": shell-backward-word
-"\C-h": shell-forward-word
 "\C-w": shell-backward-kill-word
 "\C-d": shell-kill-word
 
@@ -148,3 +156,7 @@ set history-preserve-point on
 "\e[5D": backward-word
 "\e\e[C": forward-word
 "\e\e[D": backward-word
+
+# Mappings for Alt+Arrows
+"\e[1;3D": shell-backward-word
+"\e[1;3C": shell-forward-word

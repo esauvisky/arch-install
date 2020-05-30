@@ -70,10 +70,13 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 # sleep 10s && whatsapp-nativefier &
 
 
-# ## Starts Telegram and immediatly closes it
+## Starts Telegram and immediatly closes it
 sleep 5s && xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
 sleep 10s && telegram-desktop &
 
+## Starts discord
+sleep 6s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
+sleep 12s && discord-open &
 
 ## Starts slack if it's job hours
 if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then

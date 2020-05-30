@@ -59,6 +59,10 @@ else
     fi
 fi
 
+## Node
+export NODE_PATH=/usr/lib/node_modules
+. ~/.nvm/nvm.sh
+
 ##########################
 ## BASH ETERNAL HISTORY ##
 ##########################
@@ -276,7 +280,7 @@ function _magicCD() {
     # done < <(find "${__MAGIC_CD_DIR}" -depth  -maxdepth 2 -type d -iname \*${*}\* -print0)
 
     # Neat black magic (bash 4.4 only)
-    readarray -d '' results < <(find ${__MAGIC_CD_DIR} -maxdepth ${__DEPTH} -type d -iname \*${*}\* -print0)
+    readarray -d '' results < <(find ${__MAGIC_CD_DIR} -maxdepth ${__DEPTH} -path "*node_modules*" -prune -o -type d -iname \*${*}\* -print0)
 
     if [[ ${#results[@]} -eq 1 ]]; then
         # If there's an unique result for the argument, cd into it:
@@ -402,7 +406,17 @@ if hash "git" >&/dev/null; then
     alias gitl="git log --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gits='git status'
     alias gitcam='git commit -a -m '
-    alias gitcleanbranches='echo "Updating and pruning local copies of remote branches..." && git fetch --prune origin && echo "Removing refs about removed remote branches..." && git remote prune origin'
+    function gitcleanbranches() {
+        git fetch --prune
+        git checkout master
+        for r in $(git for-each-ref refs/heads --format='%(refname:short)'); do
+            if [ x$(git merge-base master "$r") = x$(git rev-parse --verify "$r") ]; then
+                if [ "$r" != "master" ]; then
+                    git branch -d "$r"
+                fi
+            fi
+        done
+    }
 
     function gitdelbranch() {
         # First command deletes local branch, but exits > 0 if not fully merged,
@@ -876,7 +890,7 @@ fi
 if [[ $ENABLE_RANDOM_STUFF == "$USER" ]]; then
     # MagicCD
     alias cdb='_magicCD 2 $HOME/Bravi/'
-    alias cdp='_magicCD 3 $HOME/Coding/'
+    alias cdp='_magicCD 2 $HOME/Coding/'
 
     # Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
     alias subl3='open-subl3'
