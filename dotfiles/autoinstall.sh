@@ -17,7 +17,7 @@ if gio trash $(mktemp -p .); then
         echo "Downloading script $dep from esauvisky/arch-install/master/dotfiles"
         url="https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/$dep"
         wget -q "$url" -O "$dep.1" || curl -o "$dep.1" "$url"
-        gio trash "./$dep"
+        gio trash -f "./$dep"
         mv "./$dep.1" "./$dep"
         if [[ -f "./$dep" ]]; then
             echo -e "All good! Moving on...\n"
