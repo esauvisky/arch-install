@@ -156,7 +156,7 @@
 
     - Criar entrada UEFI na placa mãe:
 
-            # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux" --loader /vmlinuz-linux --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=/intel-ucode.img initrd=/initramfs-linux.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
+            # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux" --loader /vmlinuz-linux --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=\intel-ucode.img initrd=\initramfs-linux.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
 
     - *Dica: após, apertar seta para cima, adicionar aspas simples no comando inteiro, echo na frente e redirecionar para /boot/efi-params.txt*
 
@@ -650,10 +650,10 @@ _Em função dos pontos decimais invertidos_
     1. [Criar swapfile](https://wiki.archlinux.org/index.php/Swap#Swap_file_creation)
 
             # cat /proc/meminfo | grep MemTotal
-            # fallocate -l [MAX-MEM] /swapfile
+            # dd if=/dev/zero of=/swapfile bs=1M count=[MemTotal/1000] status=progress
             # chmod 600 /swapfile
             # mkswap /swapfile
-            # swapon /swapfile
+            # swapon -f /swapfile
 
     2. Adicionar entrada no fstab
 

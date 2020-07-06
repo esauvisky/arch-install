@@ -5,9 +5,12 @@
 ##############################################
 ###### Also requires bash 4.4 or higher ######
 
+## Enable for debugging:
+# PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
+# set -o xtrace
 
 ## Don't do anything if not running interactively
-[[ $- != *i* ]] && exit
+#[[ $- != *i* ]] && exit
 
 ###########
 # CONFIGS #
@@ -15,12 +18,8 @@
 ## Replace with your username if you want to run the big block at the end of this file
 ENABLE_RANDOM_STUFF='esauvisky'
 
-## Enable for debugging:
-# PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
-# set -o xtrace
-
 ## Notifies commands that take longer than 60 seconds via notify-send
-hash notify-send >&/dev/null && NOTIFY_SLOW_COMMANDS=1
+# hash notify-send >&/dev/null && NOTIFY_SLOW_COMMANDS=1
 
 #########################
 # Environment Variables #
@@ -36,19 +35,20 @@ export LESS_TERMCAP_se=$'\E[0m'
 export LESS_TERMCAP_so=$'\E[01;44;33m'
 export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
-## Alternatively, install `most` and change PAGER variable
-# export PAGER="/usr/bin/most -s"
 
 ## Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
-## Writes multiline commands on the history as one line
-shopt -s cmdhist
 
 ## Sets default EDITOR environment variable
 ## If logged as root use exclusively term editors
 if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
     for editor in "subl3" "gedit"; do
-        hash "$editor" >&/dev/null && export EDITOR=$editor && break || continue
+        if hash "$editor" >&/dev/null; then
+            export EDITOR=$editor
+            break
+        else
+            continue
+        fi
         export EDITOR="vi"
     done
 else
@@ -59,9 +59,6 @@ else
     fi
 fi
 
-## Node
-export NODE_PATH=/usr/lib/node_modules
-. ~/.nvm/nvm.sh
 
 ##########################
 ## BASH ETERNAL HISTORY ##
@@ -79,6 +76,8 @@ export HISTIGNORE="clear:exit:history:ls"
 export HISTCONTROL=ignoredups:erasedups
 # Custom history time prefix format
 export HISTTIMEFORMAT='[%F %T] '
+# Writes multiline commands on the history as one line
+shopt -s cmdhist
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
 
@@ -92,7 +91,7 @@ shopt -s histappend
 # 4. Change it accordingly to apply it to your function.
 ## Loads bash's system-wide installed completions
 if [[ -f /usr/share/bash-completion/bash_completion ]]; then
-    . /usr/share/bash-completion/bash_completion
+    source /usr/share/bash-completion/bash_completion
 fi
 
 #################
@@ -229,34 +228,6 @@ transfer() {
 }
 
 
-#############################
-# "SECURE" FTP TLS Transfer #
-#############################
-## Sets a password via the keyring:
-## If you see a dialog when running this, function, run the command below with your credentials:
-# python -c "import keyring; keyring.set_password('name', 'username', '$PASSWORD')"
-function emibemol_ftp() {
-    USER='u373108367'
-    HOST='ftp.emibemol.com'
-    PASS=$(python -c "import keyring; print(keyring.get_password('${HOST}', '${USER}'))")
-    if [[ $# == 1 ]]; then
-        TARGET='/public_html'
-    elif [[ $# == 2 ]]; then
-        TARGET="${2}"
-    elif ! hash ncftpput || [[ ! -f "${1}" ]]; then
-        echo 'Usage: emibemol_ftp local_file_or_dir [remote_dir]'
-        echo
-        echo '[remote_dir] defaults to /public_html. You also need ncftp.'
-        return 1
-    fi
-
-    ncftpput -vRm -u "${USER}" -p "${PASS}" "${HOST}" "${TARGET}" "$1"
-    URL="${HOST##ftp\.}/${TARGET%%public_html}/${1##\./}"
-    URL="${URL/\/\//}"
-    echo "Uploaded to $URL. Copied to clipboard."
-    if hash xclip; then echo "$URL" | xclip -selection clipboard -i; fi
-}
-
 ###########
 # magicCD #
 ###########
@@ -318,7 +289,7 @@ complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 # Finds directories recursively, and shows select_option
 # afterwards if less than 20 results.
 function findir() {
-    readarray -d '' results < <(find . -type d -iname \*${1}\* -print0)
+    readarray -d '' results < <(find . -type d -iname \*"${1}"\* -print0)
 
     if [[ ${#results[@]} -eq 1 ]]; then
         # If there's an unique result for the argument, cd into it:
@@ -332,22 +303,10 @@ function findir() {
     fi
 }
 
-##############
-# QUICK SUDO #
-##############
-s() {
-    # do sudo, or sudo the last command if no argument given
-    if [[ $# == 0 ]]; then
-        sudo $(history -p '!!')
-    else
-        sudo $@
-    fi
-}
-
 ###################
 ## COLORS, LOTS! ##
 ###################
-if [ -x /usr/bin/dircolors ]; then
+if [[ -x /usr/bin/dircolors ]]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     _COLOR_ALWAYS_ARG='--color=always'
 fi
@@ -400,7 +359,7 @@ fi
 if hash "git" >&/dev/null; then
     # Loads gits completion file for our custom completions
     if [ -f /usr/share/bash-completion/completions/git ]; then
-        . /usr/share/bash-completion/completions/git
+        source /usr/share/bash-completion/completions/git
     fi
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
@@ -410,9 +369,9 @@ if hash "git" >&/dev/null; then
         git fetch --prune
         git checkout master
         for r in $(git for-each-ref refs/heads --format='%(refname:short)'); do
-            if [ x$(git merge-base master "$r") = x$(git rev-parse --verify "$r") ]; then
+            if [[ "$(git merge-base master "$r")" == "$(git rev-parse --verify "$r")" ]]; then
                 if [ "$r" != "master" ]; then
-                    git branch -d "$r"
+                    git branch --delete "$r"
                 fi
             fi
         done
@@ -422,28 +381,31 @@ if hash "git" >&/dev/null; then
         # First command deletes local branch, but exits > 0 if not fully merged,
         # so the second command (which deletes the remote branch), will only run
         # if the first one suceeds, making it "safe".
-        if [[ $(git symbolic-ref --short -q HEAD) =~ ${@} ]]; then
-            echo -e "\E[01mYou should leave the branch you're trying to delete first.\E[0m"
+        if [[ $(git symbolic-ref --short -q HEAD) == "${1}" ]]; then
+            echo -e "You should leave the branch you're trying to delete first.}"
         else
-            if ! git branch --delete ${@}; then
-                echo "The local repository ${@} does not exist. Do you want to delete the remote one anyway? [y/N]"
-                if [[ $(read -r yN) =~ n|N ]]; then
-                    echo 'Deleting remote repo'
-                    git push origin --delete ${@}
+            if ! git rev-parse --verify --quiet "${1}" && git ls-remote --quiet --exit-code --heads origin "${1}"; then
+                echo -en "The local repository ${1} does not exist. Do you want to delete the remote one anyway? "
+                read -p "[y/N] " -r
+                if [[ $REPLY =~ ^[Yy]$ ]]; then
+                    echo "Deleting remote repo"
+                    git push origin --delete "${1}"
                 else
                     echo "Ok, bye!"
                 fi
-            else
-                echo 'Deleting local repo...'
-                git branch --delete ${@}
+            elif git ls-remote --exit-code --heads origin "${1}"; then
+                echo 'Deleting local repo'
+                git branch --delete "${1}"
                 echo 'Deleting remote repo'
-                git push origin --delete ${@}
+                git push origin --delete "${1}"
+            else
+                echo "It seems that there is no branch called ${1} neither locally or in the remote"
             fi
         fi
     }
     # Autocomplete local branches only
     function _git_local_branches() {
-        __gitcomp_direct "$(__git_heads "" "$cur" " ")"
+        __gitcomp_direct "$(__git_heads)"
     }
     __git_complete gitdelbranch _git_local_branches
 fi
@@ -483,7 +445,7 @@ if hash "pacman" >&/dev/null; then
     ## Pacman Awesome Updater
     function pacsyu() {
         echo -e "\e[00;91m\nUpdating pacman repositories...\e[00m"
-        sudo \pacman -Sy
+        sudo pacman -Sy
         echo -e "\e[00;91m\nSaving log of packages to upgrade...\e[00m"
         mkdir -p "$HOME/.pacman-updated"
         # TODO: add a condition that checks if any of the files inside .pacman-updated already
@@ -528,7 +490,7 @@ if hash "pacman" >&/dev/null; then
     alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
 
     # Optimizes pacman stuff (TODO: does it?)
-    alias pacfix="sudo pacman-optimize; sudo pacman -Sc; sudo pacman -Syy; echo 'Verificando arquivos de pacotes faltantes no sistema...'; sudo pacman -Qk | grep -v 'Faltando 0'; sudo abs"
+    alias pacfix='sudo pacman-optimize; sudo pacman -S $(pacman -Qkqn | sed -E "s/ .+$//" | uniq | xargs); paccache -k2 --min-mtime "60 days ago" -rv'
 fi
 
 if hash adb >&/dev/null; then
@@ -717,7 +679,7 @@ function _pre_command() {
 }
 
 function _set_prompt() {
-    # Must come first, the girl.
+    # Must come first
     _last_command=$?
 
     # Saves on history after each command
@@ -726,34 +688,34 @@ function _set_prompt() {
     # history -n; history -w; history -c; history -r;
 
     # Colors
-    Blue='\[\e[01;34m\]'
-    Bluelly='\[\e[38;5;31;1m\]'
-    White='\[\e[01;37m\]'
-    Violet='\[\e[01;35m\]'
-    Magenta='\[\e[01;36m\]'
-    Red='\[\e[01;31m\]'
-    Green='\[\e[01;32m\]'
-    GreenLight='\[\e[01;92m\]'
-    YellowLight='\[\e[01;93m\]'
-    VioletLight='\[\e[01;95m\]'
-    PinkLight='\[\e[00;91m\]'
-    GrayBackground='\[\e[01;40m\]'
+    local Blue='\[\e[01;34m\]'
+    local Bluelly='\[\e[38;5;31;1m\]'
+    local White='\[\e[01;37m\]'
+    local Violet='\[\e[01;35m\]'
+    local Magenta='\[\e[01;36m\]'
+    local Red='\[\e[01;31m\]'
+    local Green='\[\e[01;32m\]'
+    local GreenLight='\[\e[01;92m\]'
+    local YellowLight='\[\e[01;93m\]'
+    local VioletLight='\[\e[01;95m\]'
+    local PinkLight='\[\e[00;91m\]'
+    local GrayBackground='\[\e[01;40m\]'
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
 
     # TODO: fix this shit, do not set the color according to the user
     #       actually, set global colors to be used all along this file
     if [ $(id -u) -eq 0 ]; then
-        YellowB='\[\e[01;31m\]'
-        YellowN='\[\e[00;31m\]'
+        local YellowB='\[\e[01;31m\]'
+        local YellowN='\[\e[00;31m\]'
     else
-        YellowB='\[\e[01;33m\]'
-        YellowN='\[\e[00;33m\]'
+        local YellowB='\[\e[01;33m\]'
+        local YellowN='\[\e[00;33m\]'
     fi
 
-    Reset='\[\e[00m\]'
-    FancyX='\342\234\227'
-    Checkmark='\342\234\223'
+    local Reset='\[\e[00m\]'
+    local FancyX='\342\234\227'
+    local Checkmark='\342\234\223'
 
     ######################
     ## Teh Prompt (PS1) ##
@@ -878,16 +840,21 @@ function _set_prompt() {
 # does not keep the current PWD, and defaults back to HOME (http://tinyurl.com/y7yknu3r).
 # vte.sh replaces your PROMPT_COMMAND, so just source it and add it's function '__vte_prompt_command'
 # to the end of your own PROMPT_COMMAND.
-if [[ ! -z $VTE_VERSION && -f /etc/profile.d/vte.sh ]]; then
+if [[ -n $VTE_VERSION && -f /etc/profile.d/vte.sh ]]; then
     source /etc/profile.d/vte.sh
     PROMPT_COMMAND='_set_prompt;__vte_prompt_command'
 else
     PROMPT_COMMAND='_set_prompt'
 fi
 
-
 ## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
 if [[ $ENABLE_RANDOM_STUFF == "$USER" ]]; then
+    ## Node Versioning Manager
+    if [[ $PWD =~ .*[sS]pongy-{0,1}[eE]lephant.* ]]; then
+        source ~/.nvm/nvm.sh
+        nvm use lts/carbon
+    fi
+
     # MagicCD
     alias cdb='_magicCD 2 $HOME/Bravi/'
     alias cdp='_magicCD 2 $HOME/Coding/'
@@ -898,6 +865,35 @@ if [[ $ENABLE_RANDOM_STUFF == "$USER" ]]; then
 
     # Uses perl-rename as default for rename
     alias rename='perl-rename'
+
+
+    #############################
+    # "SECURE" FTP TLS Transfer #
+    #############################
+    ## Sets a password via the keyring:
+    ## If you see a dialog when running this, function, run the command below with your credentials:
+    # python -c "import keyring; keyring.set_password('name', 'username', '$PASSWORD')"
+    function emibemol_ftp() {
+        USER='u373108367'
+        HOST='ftp.emibemol.com'
+        PASS=$(python -c "import keyring; print(keyring.get_password('${HOST}', '${USER}'))")
+        if [[ $# == 1 ]]; then
+            TARGET='/public_html'
+        elif [[ $# == 2 ]]; then
+            TARGET="${2}"
+        elif ! hash ncftpput || [[ ! -f "${1}" ]]; then
+            echo 'Usage: emibemol_ftp local_file_or_dir [remote_dir]'
+            echo
+            echo '[remote_dir] defaults to /public_html. You also need ncftp.'
+            return 1
+        fi
+
+        ncftpput -vRm -u "${USER}" -p "${PASS}" "${HOST}" "${TARGET}" "$1"
+        URL="${HOST##ftp\.}/${TARGET%%public_html}/${1##\./}"
+        URL="${URL/\/\//}"
+        echo "Uploaded to $URL. Copied to clipboard."
+        if hash xclip; then echo "$URL" | xclip -selection clipboard -i; fi
+    }
 
     ## Dangerous stuff that interferes with scripts
     ## Put these at the end of your .bashrc preferably so it doesn't
@@ -925,7 +921,4 @@ if [[ $ENABLE_RANDOM_STUFF == "$USER" ]]; then
         echo 'USING GIT EREAD'
         test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
     }
-
-    # TODO: check what is this for
-    # source /usr/share/nvm/init-nvm.sh
 fi

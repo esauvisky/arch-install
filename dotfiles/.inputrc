@@ -58,7 +58,8 @@ set visible-stats on
 # Não adiciona barras no final de nomes de diretórios quando autocompletando
 # P.S.: se TAB está associado a menu-complete, é recomendado deixar esta
 # variável off, pois pode-se apertar / para autocompletar o diretório escolhido.
-set mark-directories off
+set mark-directories on
+
 # Faz o mesmo para symlinks. Do contrário ele não adicionaria a barra pois
 # teoricamente o synlink é somente um arquivo.
 set mark-symlinked-directories on

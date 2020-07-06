@@ -78,11 +78,11 @@ sleep 10s && telegram-desktop &
 sleep 6s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
 sleep 12s && discord-open &
 
-## Starts slack if it's job hours
-if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
-   echo 'Starting slack application...'
-   sleep 10s && slack -u &
-fi
+# ## Starts slack if it's job hours
+# if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
+#    echo 'Starting slack application...'
+#    sleep 10s && slack -u &
+# fi
 
 
 # ## Starts guake
