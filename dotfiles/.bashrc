@@ -93,6 +93,12 @@ shopt -s histappend
 if [[ -f /usr/share/bash-completion/bash_completion ]]; then
     source /usr/share/bash-completion/bash_completion
 fi
+# Loads gits completion file for our custom completions
+if [ -f /usr/share/bash-completion/completions/git ]; then
+    # the STDERR redirection is to not print an annoying bug on
+    # GCP VMs that make sed error out for some stupid reason and bad coding
+    . /usr/share/bash-completion/completions/git 2>/dev/null
+fi
 
 #################
 # select_option #
@@ -357,10 +363,6 @@ fi
 
 ## Git
 if hash "git" >&/dev/null; then
-    # Loads gits completion file for our custom completions
-    if [ -f /usr/share/bash-completion/completions/git ]; then
-        source /usr/share/bash-completion/completions/git
-    fi
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gits='git status'
@@ -658,7 +660,7 @@ function _pre_command() {
     # Instead of using $BASH_COMMAND, which doesn't deals with aliases,
     # uses an awesome tip by @zeroimpl. It's scary, touch it and it breaks!!!
     # *see https://goo.gl/2ZFDfM
-    local this_command=$(HISTTIMEFORMAT= history 1 | \sed -e "s/^[ ]*[0-9]*[ ]*//")
+    local this_command="$(HISTTIMEFORMAT= history 1 | \sed -e 's/^[ ]*[0-9]*[ ]*//')"
     case "$this_command" in
     *\033]0* | set_prompt* | echo* | printf* | cd* | ls)
         # The command is trying to set the title bar as well;

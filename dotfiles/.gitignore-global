@@ -3,13 +3,24 @@
 ############################################################
 # This thing
 .DS_Store
-
 # This other thing
 MANIFEST
 
-# vscode Stuff
-.vscode/*
+# IDE Rubbish
+.vscode
+.idea
 
-# Virtual Environments
-.env
+# Virtual environments and envvars
 .venv
+.env
+
+# Node/NPM
+node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build

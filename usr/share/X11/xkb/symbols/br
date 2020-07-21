@@ -52,6 +52,7 @@ xkb_symbols "abnt2" {
     key <BKSL> { [ bracketright,     braceright,        degree,           U207e ] }; // U207e is superscript right parenthesis
 
     key <AC01> { [            a,              A,   Greek_alpha,     Greek_ALPHA ] };
+    key <AC02> { [            s,              S,   Greek_sigma,     Greek_SIGMA ] };
     key <AC03> { [            d,              D,   Greek_delta,     Greek_DELTA ] };
     key <AC10> { [     ccedilla,       Ccedilla                                 ] };
     key <AC11> { [   dead_tilde,dead_circumflex,    asciitilde,     asciicircum ] };
