@@ -14,13 +14,7 @@ MANIFEST
 .venv
 .env
 
-# Node/NPM
-node_modules
+# Node NPM
+node_modules/
 /.pnp
 .pnp.js
-
-# testing
-/coverage
-
-# production
-/build
