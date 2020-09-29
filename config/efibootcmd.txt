@@ -1,0 +1,1 @@
+efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux MuQSS+BFQ" --loader /vmlinuz-linux-ck-haswell --unicode "cryptdevice=UUID=81f38daa-9632-4817-b237-0de941cafff8:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=\intel-ucode.img initrd=\initramfs-linux-ck-haswell.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"

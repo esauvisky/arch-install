@@ -349,7 +349,20 @@ alias go="xdg-open"
 alias ls=$_COLOURIFY_CMD' ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso'
 
 # Makes grep useful
+# grep() {
+#     # WIP:
+#     # This makes it only actually grep if it's not being piped
+#     # so it works for <(grep ..) or var=$(grep ..) or echo '' | grep
+#     #
+#     # Another way is using [ -t 1 ] and [ -t 0 ]
+#     if { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 || [ "$(LC_ALL=C stat -c %F -)" = fifo ]; then
+#         command grep "$@"
+#     else
+#         command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
+#   fi
+# }
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
+
 # Makes sed useful
 alias sed="sed -E"
 # Makes diff decent
@@ -458,24 +471,25 @@ if hash "pacman" >&/dev/null; then
 
     ## Pacman Awesome Updater
     function pacsyu() {
-        echo -e "\e[00;91m\nUpdating pacman repositories...\e[00m"
+        echo -e "\e[01;93mUpdating pacman repositories...\e[00m"
         sudo pacman -Sy
-        echo -e "\e[00;91m\nSaving log of packages to upgrade...\e[00m"
+
         mkdir -p "$HOME/.pacman-updated"
-        # TODO: add a condition that checks if any of the files inside .pacman-updated already
-        #       contains exactly the same packages that pacman -Qu outputs, meaning that
-        #       it"s useless to save it again.
-        #       Alternatively, save only when the update is finished? Nope. If SIGTERM"d then
-        #       no log will be saved, unless we trapped it and ... too much trouble.
-        LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
-        \pacman -Qu --color never > "$LOG_FILE"
-        echo -e "\e[00;91m\nPress Enter to update pacman packages.\e[00m"
-        read
+        currentUpdatePkgs=$(\pacman -Qu --color never)
+        previousUpdatePkgs=$(cat .pacman-updated/$(\ls -L .pacman-updated/ | tail -n1))
+        if [[ "$currentUpdatePkgs" == "$previousUpdatePkgs" ]]; then
+            echo -e "\e[00;92\nThis is the same list that was previously saved, not saving again.\e[00m"
+        else
+            echo -e "\e[01;93m\nSaving log of packages to upgrade...\e[00m"
+            echo "$currentUpdatePkgs" > "$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
+        fi
+
+        echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
         sudo \pacman -Su --noconfirm
-        echo -e "\e[00;91m\nPress Enter to update AUR packages.\e[00m"
+        echo -e "\e[01;91m\nPress Enter to update AUR packages.\e[00m"
         read
         aurget -Syu --noconfirm
-        echo -e "\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m"
+        echo -e "\e[01;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m"
         read
         aurget -Syu --devel --noconfirm
     }
@@ -512,30 +526,6 @@ if hash adb >&/dev/null; then
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
-
-##       Deprecated
-## Replaced by bat below
-# if hash mdless >&/dev/null; then
-#     function md() {
-#         if [[ ! -f $1 ]]; then
-#             readarray -d '' __md_files < <(find -iname '*.md' -print0)
-#             if [[ ${#__md_files[@]} -eq 1 ]]; then
-#                 mdless --width $COLUMNS ${__md_files[0]}
-#             else
-#                 __readme=$(find -iname 'readme.md')
-#                 if [[ -f $__readme ]]; then
-#                     mdless --width $COLUMNS $__readme
-#                 else
-#                     echo "There's more than one Markdown file. Please choose one."
-#                     return 1
-#                 fi
-#             fi
-#         else
-#             mdless --width $COLUMNS $1
-#         fi
-#     }
-#     complete -f -X '!*.md' md
-# fi
 export BAT_THEME="Monokai Extended Bright"
 alias bat="bat --italic-text=always --decorations=always --color=always"
 
@@ -660,7 +650,7 @@ function _get_truncated_pwd() {
 #####################################
 ## The Divine and Beautiful Prompt ##
 #####################################
-## Install 'fortune', 'cowthink' and 'lolcat' and have fun every time you open up a terminal.
+## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
 [[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" >&/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
 
 function _pre_command() {

@@ -1,0 +1,13 @@
+[Unit]
+Description=bangItGood
+After=network.target
+
+[Service]
+WorkingDirectory=/home/esauvisky/Coding/Projects/bangItGood/
+ExecStart=/usr/bin/bangItGood -q
+RemainAfterExit=no
+Restart=no
+
+
+[Install]
+WantedBy=default.target

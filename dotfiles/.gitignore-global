@@ -6,15 +6,16 @@
 # This other thing
 MANIFEST
 
-# IDE Rubbish
+# IDE rubbish
 .vscode
 .idea
 
 # Virtual environments and envvars
-.venv
+.venv/
 .env
 
 # Node NPM
 node_modules/
-/.pnp
-.pnp.js
+
+# Python rubbish
+__pycache__/

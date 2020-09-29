@@ -46,16 +46,25 @@
 
 - Encriptar Partição #2 [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Preparing_non-boot_partitions)
 
+        # ext4:
         # cryptsetup -y -v luksFormat --type luks2 /dev/sda2
+        # btrfs:
+        # cryptsetup -y -v luksFormat --type luks1 /dev/sda2
 
 - Abrir Partição Encriptada (e ativar discards permanentemente)
 
+        # ext4:
         # cryptsetup --allow-discards --persistent open --type luks2 /dev/sda2 cryptroot
+        # btrfs:
+        # cryptsetup --allow-discards --type luks1 /dev/sda2 cryptroot
 
 - Formatar as partições
 
-        # mkfs.ext4 /dev/mapper/cryptroot
         # mkfs.fat -F32 /dev/sda1
+
+        # mkfs.ext4 /dev/mapper/cryptroot
+        # or:
+        # mkfs.btrfs -L label /dev/mapper/cryptroot
 
 - Montar as partições
 
@@ -71,7 +80,7 @@
 
 - Instalar o sistema base
 
-        # pacstrap /mnt base base-devel efibootmgr
+        # pacstrap /mnt base base-devel efibootmgr linux linux-firmware nano btrfs-progs
 
 - Gerar o FSTAB
 
@@ -138,7 +147,7 @@
 
     - Regerar mkinitcpio
 
-            # mkinitcpio -p linux
+            # Configuring_mkinitcpiopio -p linux
 
 - Setar senha do root
 
@@ -154,9 +163,13 @@
 
             # blkid
 
+    - Pegar ID do subvolume @:
+
+            btrfs subvolume list /dev/sda
+
     - Criar entrada UEFI na placa mãe:
 
-            # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux" --loader /vmlinuz-linux --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rw initrd=\intel-ucode.img initrd=\initramfs-linux.img fbcon=scrollback:2048k scsi_mod.use_blk_mq=1"
+            # efibootmgr --disk /dev/sda --part 1 --create --gpt --label "Arch Linux" --loader /vmlinuz-linux --unicode "cryptdevice=UUID=[UUID-ACIMA]:cryptroot:allow-discards root=/dev/mapper/cryptroot rootflags=subvolid=[###] rw initrd=\intel-ucode.img initrd=\initramfs-linux.img"
 
     - *Dica: após, apertar seta para cima, adicionar aspas simples no comando inteiro, echo na frente e redirecionar para /boot/efi-params.txt*
 
@@ -178,16 +191,15 @@
         # systemctl enable NetworkManager
         # systemctl start NetworkManager
 
-    - Se precisar de WiFi, usar `wifi-menu`
-
 - Instalar algumas coisas:
 
-        # pacman -S bash-completion xorg-xinit fortune-mod wget
+        # pacman -S bash-completion xorg-xinit fortune-mod wget git
 
-- Copiar backup das configurações do bash para /root
+- Copiar backup das configurações do bash para /etc/skel e /root
 
-        # mount [device] /mnt
-        # cp /mnt/arch-install/bash-conf/.* /root/
+        # git clone https://github.com/esauvisky/arch-install.git
+        # cp /mnt/arch-install/dotfiles/.* /etc/skel
+        # cp /mnt/arch-install/dotfiles/.* /root
 
     - Copiar regra udev para usar BFQ como I/O scheduler
 
