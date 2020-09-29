@@ -16,7 +16,7 @@
 # CONFIGS #
 ###########
 ## Replace with your username if you want to run the big block at the end of this file
-ENABLE_RANDOM_STUFF='esauvisky'
+ENABLE_RANDOM_STUFF='emi'
 
 ## Notifies commands that take longer than 60 seconds via notify-send
 # hash notify-send >&/dev/null && NOTIFY_SLOW_COMMANDS=1
@@ -90,8 +90,16 @@ export HISTCONTROL=ignoredups:erasedups
 export HISTTIMEFORMAT='[%F %T] '
 # Writes multiline commands on the history as one line
 shopt -s cmdhist
+# Do not enable this or it's gonna duplicate the last command if it's multiline
+# shopt -s lithist
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
+
+# Erases history dups on EXIT
+function historymerge {
+    history -n; history -w; history -c; history -r;
+}
+trap historymerge EXIT
 
 ##################
 # AUTOCOMPLETION #
@@ -703,6 +711,7 @@ function _set_prompt() {
     local YellowLight='\[\e[01;93m\]'
     local VioletLight='\[\e[01;95m\]'
     local PinkLight='\[\e[00;91m\]'
+    local GrayBold='\[\e[01;98m\]'
     local GrayBackground='\[\e[01;40m\]'
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
@@ -782,18 +791,22 @@ function _set_prompt() {
 
         # TODO: do not repeat yourself yourself
         #       use git status once, save its output and fix this crappy code
-        if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
+        local git_status=$(git status 2>&1)
+        if echo "${git_status}" | grep -qm1 'nothing to commit'; then
             if [[ $branch_name == "$short_sha" ]]; then
-                PS1+="${GrayBackground}${White}→ $branch_name$Reset" # DETACHED HEAD
+                PS1+="${GrayBackground}${White}• $branch_name•$Reset" # DETACHED HEAD
             else
-                PS1+="$GreenLight→ $branch_name•$Reset"
+                PS1+="$GreenLight✔ $branch_name•$Reset"
             fi
-        elif [[ $(git status 2>/dev/null | head -n5) == *"Changes to be committed"* ]]; then
-            PS1+="$Bluelly→ $branch_name+$Reset"
-        elif git status --porcelain --untracked-files=normal 2>/dev/null | grep -q "^\?\?"; then
-            PS1+="$Magenta• $branch_name?$Reset"
+        elif echo "${git_status}" | grep -qm1 'Changes not staged'; then
+            PS1+="$YellowB→ $branch_name!$Reset"
+        elif echo "${git_status}" | grep -qm1 'Changes to be committed'; then
+            PS1+="$Violet→ $branch_name+$Reset"
         else
-            PS1+="$YellowB✔ $branch_name*$Reset"
+            PS1+="$Blue→ $branch_name*$Reset"
+        fi
+        if echo "${git_status}" | grep -qm1 'Untracked files'; then
+            PS1+="$GrayBold?$Reset"
         fi
         PS1+="$Violet]$Reset"
     fi
