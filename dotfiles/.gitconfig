@@ -3,12 +3,12 @@
 [user]
 	email = esauvisky@gmail.com
 	name = emi~
-	signingKey = 4D3148580F63AE23
+	signingKey = 48BB2CE13A282092
 [push]
 	default = current
 [core]
-	filemode = false
-	excludesfile = /home/esauvisky/.gitignore-global
+	fileMode = false
+	excludesfile = /home/emi/.gitignore-global
 	autocrlf = input
 	editor = open-subl3 -w
 [alias]
