@@ -147,7 +147,7 @@
 
     - Regerar mkinitcpio
 
-            # Configuring_mkinitcpiopio -p linux
+            # mkinitcpio -p linux
 
 - Setar senha do root
 
@@ -193,26 +193,20 @@
 
 - Instalar algumas coisas:
 
-        # pacman -S bash-completion xorg-xinit fortune-mod wget git
-
-- Copiar backup das configurações do bash para /etc/skel e /root
-
-        # git clone https://github.com/esauvisky/arch-install.git
-        # cp /mnt/arch-install/dotfiles/.* /etc/skel
-        # cp /mnt/arch-install/dotfiles/.* /root
+        # pacman -S bash-completion xorg-xinit fortune-mod lolcat cowsay wget git
 
     - Copiar regra udev para usar BFQ como I/O scheduler
 
             # cp /mnt/arch-install/etc/udev/rules.d/60-ioscheduler.rules /etc/udev/rules.d/
-
+ -->
     - Importar /etc/pacman.conf
 
             # cp /mnt/arch-install/etc/pacman.conf /etc/pacman.conf
 
-    - Importar módulo snd_hda_intel (para evitar power-saving e ruídos):
+<!--     - Importar módulo snd_hda_intel (para evitar power-saving e ruídos):
 
             # cp /mnt/arch-install/etc/modprobe.d/snd-hda-intel.conf /etc/modprobe.d/snd-hda-intel.conf
-
+ -->
     - Desmontar, sair e logar novamente
 
             # sync && umount /mnt
@@ -298,79 +292,48 @@
             ExecStart=-/usr/bin/agetty --autologin esauvisky --noclear %I $TERM
             TTYVTDisallocate=no
 
-- Instalar gnome, gnome-extra e xorg
-
-        # pacman -S gnome gnome-extra xorg
-
-    - Usar `^13 ^43` e assim por diante para selecionar tudo menos alguns
-
-        - *Atenção: não recomendo mais porque ele instala anyways e é necessário desinstalar manualmente as coisas depois*
-
-        - Exclusões recomendadas:
-
-                gnome:       ^13 ^43 ^45 ^50 ^51 ^52 (gnome-dictionary, rygel, totem, yelp, gnome-software, simple-scan)
-                gnome-extra: ^2 ^3 ^4 ^5 ^6 ^10 ^12 ^13 ^16 ^17 ^19 ^23 ^24 ^26 ^29 ^31 ^33 ^34 ^35 ^39 ^40 ^42 ^44 ^45 ^46 ^48 ^49 ^50
+- Install gnome, gnome-extra e xorg
 
 - Trocar para tty2, fazer login com o novo usuário e trocar de volta para tty1
 
     - **Atenção: .bash_profile irá executar startx imediatamente assim que for feito login com o usuário não-root em tty2! Portanto, faça login antes de copiar o arquivo ou use outro tty**
 
-- Copiar os arquivos de configuração do bash para o usuário, apagar os em /root, criar links simbólicos e arrumar permissões
+- Clone arch-install repo.
 
-        # cd ~
-        # cp .toprc .inputrc .bashrc .bash_profile /home/esauvisky
-        # touch /home/esauvisky/.bash_eternal_history
-        # chown esauvisky:esauvisky /home/esauvisky/.*
-        # rm .toprc .inputrc .bashrc .bash_profile
-        # ln -s /home/esauvisky/.bashrc /home/esauvisky/.inputrc /home/esauvisky/.toprc /home/esauvisky/.bash_profile /root/
-        # chmod 664 .bashrc .inputrc .toprc .bash_profile .bash_eternal_history
+    - Copy over all dotfiles from dotfiles/ to ~
 
-- Com o usuário, copiar esqueleto do .xinitrc
+    - Copy over your previous .bash_eternal_history or create a blank one
 
-        $ cp /etc/X11/xinit/xinitrc ~/.xinitrc
+    - Link yours, root, and any other user (including /etc/skel), to your own files:
 
-- Editar .xinitrc
+            # ./checkandfix.sh
 
-        $ nano .xinitrc
-            - Apagar de 'twm' em diante e substituir por:
-            exec gnome-session
+- Switch to tty1 and reboot.
 
-- Trocar para tty1 e reiniciar o sistema
+**If everything went well, you'll be popped out into Gnome Shell on TTY2 after typing your LUKS password.**
 
-        # reboot
+- Make a LUKS header backup.
 
-- Fazer um backup do header luks
+        # cryptsetup luksHeaderBackup /dev/nvme0n1p2 --header-backup-file luksHeaderJessie.img
 
-        # cryptsetup luksHeaderBackup /dev/sda2 --header-backup-file <file>.img
-
-**Se tudo der certo, o sistema será reiniciado e o gnome iniciará automaticamente após digitar a senha do HD!!!11UM**
 
 # CONFIGURAÇÕES
 *aaanndd heeere ve go!*
 
-- Configuração Básica Terminal
+- Install `yay`
 
-    - Configurar perfil do terminal
-        - Tamanho: 100x30
-        - Cores: Solarized Dark
-        - Etc...
+- Configure userdirs `~/.config/user-dirs.dirs`
 
-    - Instalar aurget (usar o epiphany para baixar o pkgbuild e não precisar instalar o Firefox)
-
-        - Importar `~/.config/aurgetrc`
-
-- Configurar userdirs `~/.config/user-dirs.dirs`
-
-        XDG_DESKTOP_DIR="$HOME/Desktop/"
-        XDG_DOWNLOAD_DIR="$HOME/Desktop/Downloads"
+        XDG_DOWNLOAD_DIR="$HOME/Waste"
         XDG_TEMPLATES_DIR="$HOME/.local/share/nautilus/templates"
-        XDG_PUBLICSHARE_DIR="$HOME/Files/Public"
+        XDG_PUBLICSHARE_DIR="$HOME/.Public
         XDG_DOCUMENTS_DIR="$HOME/Documents"
         XDG_MUSIC_DIR="$HOME/Media"
         XDG_PICTURES_DIR="$HOME/Media"
         XDG_VIDEOS_DIR="$HOME/Media"
+        XDG_DESKTOP_DIR="$HOME/Waste"
 
-- Configurar Gnome
+- Gnome
 
     - Gnome: Region & Language:
 
