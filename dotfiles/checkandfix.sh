@@ -3,12 +3,17 @@ set -o errexit
 set -o errtrace
 set -o pipefail # Exit on errors
 
+#TODO: fix perms after copying to the dir owner:group
+
+
 # cd into this script dir
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "${DIR}"
 
-echo "I need permissions to sync for everyone!"
-sudo test true
+if [[ $(echo $UID) -ne 0 ]]; then
+    echo "I need permissions to sync for everyone!"
+    exit 1
+fi
 
 for dir in /home/* "/etc/skel" "/root"; do
     if [[ ! -d "$dir" ]]; then
@@ -20,6 +25,12 @@ for dir in /home/* "/etc/skel" "/root"; do
     for i in ./.*; do
         if [[ -d ${i//\.\//} && (${i//\.\//} == '.' || ${i//\.\//} == '..') ]]; then
             # echo "Skipping $i"
+            continue
+        fi
+
+        if [[ ! -e ${dir}/"${i//\.\//}" ]]; then
+            echo "The file doesn't exist! Creating symlink."
+            ln -s "$PWD/${i//\.\//}" ${dir}/"${i//\.\//}"
             continue
         fi
 
