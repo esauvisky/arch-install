@@ -409,12 +409,22 @@ alias watch="watch --color -n0.5"
 alias dmesg='dmesg --time-format ctime'
 # Makes dd pretty
 alias dd='dd status=progress oflag=sync'
+# Makes df pretty
+alias df='df -h'
+
+if hash btrfs >&/dev/null; then
+    alias df-btrfs="${_COLOURIFY_CMD} btrfs filesystem usage /"
+fi
+
 # Makes ccze not stupid (fast and no output clearing)
-alias ccze='ccze -A -o nolookups'
+if hash "ccze" >&/dev/null; then
+    alias ccze='ccze -A -o nolookups'
+fi
+
 # journalctl handy aliases
 if hash "journalctl" >&/dev/null; then
     alias je='journalctl -efn 60 | \ccze -A'
-    alias jb='journalctl -b | ccze -A'
+    alias jb='journalctl -b'
 fi
 
 ## Git
