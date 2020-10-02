@@ -88,14 +88,12 @@ export HISTIGNORE="clear:exit:history:ls"
 export HISTCONTROL=ignoredups:erasedups
 # Custom history time prefix format
 export HISTTIMEFORMAT='[%F %T] '
-# Writes multiline commands on the history as one line
-shopt -s cmdhist
-# Do not enable this or it's gonna duplicate the last command if it's multiline
-# shopt -s lithist
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
-
-# Erases history dups on EXIT
+# Writes multiline commands on the history as one line
+shopt -s cmdhist
+# shopt -s lithist # Do not enable this or it's gonna duplicate the last command if it's multiline
+# Erases dups on EXIT
 function historymerge {
     history -n; history -w; history -c; history -r;
 }
@@ -356,6 +354,30 @@ alias mkdir="mkdir -p"
 alias go="xdg-open"
 alias ls=$_COLOURIFY_CMD' ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso'
 
+
+# WIP:
+# function cd() {
+#     # readarray -d '' results < <(find . -maxdepth 1 -path "*node_modules*" -prune -o -type d -print0)
+#     # readarray results < <(ls -x -w1)
+#     readarray -d '' results < <(find "${1}/" -maxdepth 1 -path "*node_modules*" -prune -o -type d -print0)
+
+#     # echo "${results[@]}"
+#     if [[ ${#results[@]} -ge 2 && ${#results[@]} -lt 20 ]]; then
+#         # Let the user choose
+#         select_option "${results[@]}"
+#         local option="${results[$?]}"
+#         if [[ "$option" != '.' ]]; then
+#             echo "$option"
+#             cd "$option"
+#             # cd "${results[$?]}"
+#         else
+#             echo "$option"
+#             builtin cd "${1}"
+#         fi
+#     fi
+#     builtin cd "${1}"
+# }
+
 # Makes grep useful
 # grep() {
 #     # WIP:
@@ -369,6 +391,7 @@ alias ls=$_COLOURIFY_CMD' ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS
 #         command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
 #   fi
 # }
+
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 
 # Makes sed useful
@@ -459,8 +482,6 @@ fi
 
 ## Pacman
 if hash "pacman" >&/dev/null; then
-    alias aurss="aurget --sort votes -Ss"
-    alias aurs="aurget -S --noconfirm"
     alias pacman="pacman "
     alias pacs="sudo pacman -S --needed --asdeps"
     alias pacr="sudo pacman -R"
@@ -468,8 +489,6 @@ if hash "pacman" >&/dev/null; then
     alias paci="pacman -Qi"
     alias pacl="pacman -Ql"
     alias paccache_safedelete="sudo paccache -r && sudo paccache -ruk1"
-    complete -F _complete_alias aurs
-    complete -F _complete_alias aurss
     complete -F _complete_alias pacs
     complete -F _complete_alias pacr
     complete -F _complete_alias pacss
@@ -494,12 +513,6 @@ if hash "pacman" >&/dev/null; then
 
         echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
         sudo \pacman -Su --noconfirm
-        echo -e "\e[01;91m\nPress Enter to update AUR packages.\e[00m"
-        read
-        aurget -Syu --noconfirm
-        echo -e "\e[01;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m"
-        read
-        aurget -Syu --devel --noconfirm
     }
 
     # Exports the function so every bash process sees it (http://tinyurl.com/y5bnarjm)
@@ -522,9 +535,6 @@ if hash "pacman" >&/dev/null; then
         fi
     }
 
-    # Search for outdated packages on AUR
-    alias aurcheck="\pacman -Qm | \sed 's/ .*$//' | while read line; do echo -e \"\e[01;37m\$line:\"; aurget -Ss \$line | grep aur\/\$line; read; done"
-
     # Optimizes pacman stuff (TODO: does it?)
     alias pacfix='sudo pacman-optimize; sudo pacman -S $(pacman -Qkqn | sed -E "s/ .+$//" | uniq | xargs); paccache -k2 --min-mtime "60 days ago" -rv'
 fi
@@ -534,9 +544,10 @@ if hash adb >&/dev/null; then
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
-export BAT_THEME="Monokai Extended Bright"
-alias bat="bat --italic-text=always --decorations=always --color=always"
-
+if hash bat >&/dev/null; then
+    export BAT_THEME="Monokai Extended Bright"
+    alias bat="bat --italic-text=always --decorations=always --color=always"
+fi
 
 # #################3########
 # ## Colorizes Everything ##
@@ -711,7 +722,6 @@ function _set_prompt() {
     local YellowLight='\[\e[01;93m\]'
     local VioletLight='\[\e[01;95m\]'
     local PinkLight='\[\e[00;91m\]'
-    local GrayBold='\[\e[01;98m\]'
     local GrayBackground='\[\e[01;40m\]'
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
@@ -791,22 +801,18 @@ function _set_prompt() {
 
         # TODO: do not repeat yourself yourself
         #       use git status once, save its output and fix this crappy code
-        local git_status=$(git status 2>&1)
-        if echo "${git_status}" | grep -qm1 'nothing to commit'; then
+        if [[ $(git status 2>/dev/null | tail -n1) == *"nothing to commit"* ]]; then
             if [[ $branch_name == "$short_sha" ]]; then
-                PS1+="${GrayBackground}${White}• $branch_name•$Reset" # DETACHED HEAD
+                PS1+="${GrayBackground}${White}→ $branch_name$Reset" # DETACHED HEAD
             else
-                PS1+="$GreenLight✔ $branch_name•$Reset"
+                PS1+="$GreenLight→ $branch_name•$Reset"
             fi
-        elif echo "${git_status}" | grep -qm1 'Changes not staged'; then
-            PS1+="$YellowB→ $branch_name!$Reset"
-        elif echo "${git_status}" | grep -qm1 'Changes to be committed'; then
-            PS1+="$Violet→ $branch_name+$Reset"
+        elif [[ $(git status 2>/dev/null | head -n5) == *"Changes to be committed"* ]]; then
+            PS1+="$Bluelly→ $branch_name+$Reset"
+        elif git status --porcelain --untracked-files=normal 2>/dev/null | grep -q "^\?\?"; then
+            PS1+="$Magenta• $branch_name?$Reset"
         else
-            PS1+="$Blue→ $branch_name*$Reset"
-        fi
-        if echo "${git_status}" | grep -qm1 'Untracked files'; then
-            PS1+="$GrayBold?$Reset"
+            PS1+="$YellowB✔ $branch_name*$Reset"
         fi
         PS1+="$Violet]$Reset"
     fi
