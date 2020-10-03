@@ -26,9 +26,6 @@ fi
 ## Forces Radeon GPU for everything (don't. just don't do it unless you want your house in fire)
 #export DRI_PRIME=0
 
-## Default gimp config directory
-export GIMP2_DIRECTORY="/home/esauvisky/.config/gimp-2.8"
-
 ## Links bash to gnome-keyring-daemon
 eval "$(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh)"
 dbus-update-activation-environment --systemd DISPLAY

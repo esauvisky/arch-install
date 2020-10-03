@@ -67,7 +67,7 @@ export GPG_TTY=$(tty)
 # inside a SSH shell that keeps loginctl envvars
 # making some commands not work.
 # @see: https://unix.stackexchange.com/questions/346841/why-does-sudo-i-not-set-xdg-runtime-dir-for-the-target-user
-if [[ -z $XDG_RUNTIME_DIR && ( -n "$SSH_CLIENT" || -n "$SSH_TTY" ) ]]; then
+if [[ -z $XDG_RUNTIME_DIR ]]; then
     export XDG_RUNTIME_DIR=/run/user/$UID
 fi
 
