@@ -343,7 +343,6 @@ if [[ -f /etc/profile.d/grc.bashrc ]]; then
 fi
 
 
-
 ###########
 # Aliases #
 ###########
@@ -354,7 +353,7 @@ alias sudo='sudo '
 alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls=$_COLOURIFY_CMD' ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso'
+alias ls=$_COLOURIFY_CMD" ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 
 
 # WIP:
@@ -410,12 +409,13 @@ alias watch="watch --color -n0.5"
 # Makes dmesg timestamps readable
 alias dmesg='dmesg --time-format ctime'
 # Makes dd pretty
-alias dd='dd status=progress oflag=sync'
+alias dd="dd status=progress oflag=sync"
 # Makes df pretty
-alias df='df -h'
+alias df="${_COLOURIFY_CMD} df -H"
 
 if hash btrfs >&/dev/null; then
-    alias df-btrfs="${_COLOURIFY_CMD} btrfs filesystem usage /"
+    alias bdf="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem df /"
+    alias busage="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem usage -H /"
 fi
 
 # Makes ccze not stupid (fast and no output clearing)
@@ -882,7 +882,7 @@ function _set_prompt() {
 # to the end of your own PROMPT_COMMAND.
 if [[ -n $VTE_VERSION && -f /etc/profile.d/vte.sh ]]; then
     source /etc/profile.d/vte.sh
-    PROMPT_COMMAND='_set_prompt;__vte_prompt_command'
+    PROMPT_COMMAND='_set_prompt; __vte_prompt_command'
 else
     PROMPT_COMMAND='_set_prompt'
 fi
