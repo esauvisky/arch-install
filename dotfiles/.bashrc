@@ -355,12 +355,18 @@ if [[ -x /usr/bin/dircolors ]]; then
     _COLOR_ALWAYS_ARG='--color=always'
 fi
 
-if [[ -f /etc/profile.d/grc.bashrc ]]; then
-    source /etc/profile.d/grc.bashrc # grc/colourify
-    if alias colourify >&/dev/null; then
-        # enables colourify dinamycally, if the above
-        # didn't fail for some reason
-        _COLOURIFY_CMD='colourify'
+if hash "grc" >&/dev/null; then
+    if [[ -f /etc/profile.d/grc.bashrc ]]; then
+        source /etc/profile.d/grc.bashrc # grc/colourify
+        if alias colourify >&/dev/null; then
+            # enables colourify dinamycally, if the above
+            # didn't fail for some reason
+            _COLOURIFY_CMD='colourify'
+        else
+            _COLOURIFY_CMD='grc'
+        fi
+    else
+        _COLOURIFY_CMD='grc'
     fi
 fi
 
