@@ -39,6 +39,9 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 ## Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
 
+## Hostname for SSH stuff
+_HOSTNAME="$(hostname -f)"
+
 ## Sets default EDITOR environment variable
 ## If logged as root use exclusively term editors
 if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
@@ -119,6 +122,21 @@ if [ -f /usr/share/bash-completion/completions/git ]; then
     # GCP VMs that make sed error out for some stupid reason and bad coding
     . /usr/share/bash-completion/completions/git 2>/dev/null
 fi
+
+#################
+#    is_ssh     #
+#################
+# Returns if the current shell is running inside a SSH
+# Works with sudo su, also works if running local sshd.
+# Taken from: https://unix.stackexchange.com/a/12761
+function is_ssh() {
+  p=${1:-$PPID}
+  read pid name x ppid y < <( cat /proc/$p/stat )
+  # or: read pid name ppid < <(ps -o pid= -o comm= -o ppid= -p $p)
+  [[ "$name" =~ sshd ]] && { return 0; }
+  [ "$ppid" -le 1 ]     && { return 1; }
+  is_ssh $ppid
+}
 
 #################
 # select_option #
@@ -339,7 +357,11 @@ fi
 
 if [[ -f /etc/profile.d/grc.bashrc ]]; then
     source /etc/profile.d/grc.bashrc # grc/colourify
-    _COLOURIFY_CMD='colourify'       # enables colourify dinamycally
+    if alias colourify >&/dev/null; then
+        # enables colourify dinamycally, if the above
+        # didn't fail for some reason
+        _COLOURIFY_CMD='colourify'
+    fi
 fi
 
 
@@ -353,7 +375,7 @@ alias sudo='sudo '
 alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls=$_COLOURIFY_CMD" ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+alias ls="${_COLOURIFY_CMD} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 
 
 # WIP:
@@ -785,10 +807,18 @@ function _set_prompt() {
     if [[ $_last_command == 0 ]]; then
         # If last cmd didn't return an error (exit code == 0)
         PS1+="$Green$Checkmark ${White}000 "
-        PS1+="$Green\\u@\\h"
+        if is_ssh; then
+            PS1+="$YellowB\\u@$_HOSTNAME"
+        else
+            PS1+="$Green\\u@\\h"
+        fi
     else
         PS1+="$Red$FancyX $White$(printf "%03d" $_last_command) "
-        PS1+="$Red\\u@\\h"
+        if is_ssh; then
+            PS1+="$YellowB\\u@$_HOSTNAME"
+        else
+            PS1+="$Red\\u@\\h"
+        fi
     fi
 
     # Nicely shows you're in a python virtual environment
