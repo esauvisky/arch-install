@@ -357,7 +357,7 @@ fi
 
 if hash "grc" >&/dev/null; then
     if [[ -f /etc/profile.d/grc.bashrc ]]; then
-        source /etc/profile.d/grc.bashrc # grc/colourify
+        source /etc/profile.d/grc.bashrc >&/dev/null # grc/colourify
         if alias colourify >&/dev/null; then
             # enables colourify dinamycally, if the above
             # didn't fail for some reason
