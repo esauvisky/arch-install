@@ -416,6 +416,7 @@
 
 - Instalar e configurar profile-sync-daemon(https://wiki.archlinux.org/index.php/Profile-sync-daemon)
 
+
 - Instalar e configurar anything-sync-daemon(https://wiki.archlinux.org/index.php/anything-sync-daemon)
     - Diretórios para sincronizar
 

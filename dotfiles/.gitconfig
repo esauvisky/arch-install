@@ -1,5 +1,5 @@
 [credential]
-	helper = /usr/lib/git-core/git-credential-libsecret
+	helper = /usr/lib/git-core/git-credential-gnome-keyring
 [user]
 	email = esauvisky@gmail.com
 	name = emi~

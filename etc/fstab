@@ -3,14 +3,14 @@
 
 # <file system> <dir> <type> <options> <dump> <pass>
 # /dev/nvme0n1p1
-UUID=B8B4-7FB9                              /boot       vfat        rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro   0 2
+UUID=B8B4-7FB9      	                    /boot     	vfat      	rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro	0 2
 
 # /dev/mapper/cryptroot LABEL=Archie
-UUID=20243c97-77b5-4a91-904d-1e950c97ec83   /           btrfs       rw,relatime,compress=zstd:3,ssd,space_cache,discard=async,subvolid=256,subvol=/@,subvol=@                   0 0
+UUID=20243c97-77b5-4a91-904d-1e950c97ec83	/         	btrfs     	rw,relatime,compress=zstd:3,ssd,space_cache,discard=async,subvolid=256,subvol=/@,subvol=@	                0 0
 
 # /dev/mapper/cryptroot LABEL=Archie
-UUID=20243c97-77b5-4a91-904d-1e950c97ec83   /.snapshots btrfs       rw,relatime,compress=zstd:3,ssd,space_cache,discard=async,subvolid=257,subvol=/@snapshots,subvol=@snapshots 0 0
+UUID=20243c97-77b5-4a91-904d-1e950c97ec83	/.snapshots	btrfs     	rw,relatime,compress=zstd:3,ssd,space_cache,discard=async,subvolid=257,subvol=/@snapshots,subvol=@snapshots	0 0
 
 # /dev/mapper/cryptroot LABEL=Archie
-UUID=20243c97-77b5-4a91-904d-1e950c97ec83   /home       btrfs       rw,relatime,compress=zstd:3,ssd,space_cache,discard=async,subvolid=258,subvol=/@home,subvol=@home           0 0
+UUID=20243c97-77b5-4a91-904d-1e950c97ec83	/home     	btrfs     	rw,relatime,compress=zstd:3,ssd,space_cache,discard=async,subvolid=258,subvol=/@home,subvol=@home	        0 0
 

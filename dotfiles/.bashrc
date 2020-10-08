@@ -441,7 +441,7 @@ alias dd="dd status=progress oflag=sync"
 # Makes df pretty
 alias df="${_COLOURIFY_CMD} df -H"
 
-if hash btrfs >&/dev/null; then
+if hash "btrfs" >&/dev/null; then
     alias bdf="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem df /"
     alias busage="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem usage -H /"
 fi
@@ -555,78 +555,32 @@ if hash "pacman" >&/dev/null; then
         sudo \pacman -Su --noconfirm
     }
 
-    # Exports the function so every bash process sees it (http://tinyurl.com/y5bnarjm)
-    # This way we can call `gnome-terminal -- bash -c 'pacsyu; bash'` and use it in,
-    # for example, the 'Arch Linux Updates' gnome extension.
-    # export -f pacsyu
-    # FIXME: doesn't work, so concatenating it all is the current workaround (watchout for quotes!)... 🙄:
-    # gnome-terminal --profile="System Update" -- bash --rcfile /home/esauvisky/.bashrc -c 'echo -e "\e[00;91m\nUpdating pacman repositories...\e[00m";sudo \pacman -Sy;echo -e "\e[00;91m\nSaving log of packages to upgrade...\e[00m";mkdir -p "$HOME/.pacman-updated";LOG_FILE="$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)";\pacman -Qu --color never > "$LOG_FILE";echo -e "\e[00;91m\nPress Enter to update pacman packages.\e[00m";read;sudo \pacman -Su --noconfirm;echo -e "\e[00;91m\nPress Enter to update AUR packages.\e[00m";read;aurget -Syu --noconfirm;echo -e "\e[00;91m\nPress Enter to update AUR devel packages (e.g.: -git). \e[01mThis will take a long time!\e[00m";read;aurget -Syu --devel --noconfirm'
-
-    ## TODO: The Awesome WIP Pacman RollerBack
-    function pacman_rollback() {
-        echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST AND RUN MANUALLY.'
-        return 1
-        if [[ -f $1 ]]; then
-            while read line; do
-                pkg=$(echo "$i" | sed 's/ -> .+//' | sed 's/ /-/')
-                echo "Downgrading $pkg"
-                sudo pacman --noconfirm --needed -U /var/cache/pacman/pkg/$pkg*
-            done < <(cat $1)
-        fi
-    }
+    ## NOT REQUIRED ANYMORE BECAUSE BTRFS
+    # function pacman_rollback() {
+    #     echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST AND RUN MANUALLY.'
+    #     return 1
+    #     if [[ -f $1 ]]; then
+    #         while read line; do
+    #             pkg=$(echo "$i" | sed 's/ -> .+//' | sed 's/ /-/')
+    #             echo "Downgrading $pkg"
+    #             sudo pacman --noconfirm --needed -U /var/cache/pacman/pkg/$pkg*
+    #         done < <(cat $1)
+    #     fi
+    # }
 
     # Optimizes pacman stuff (TODO: does it?)
     alias pacfix='sudo pacman-optimize; sudo pacman -S $(pacman -Qkqn | sed -E "s/ .+$//" | uniq | xargs); paccache -k2 --min-mtime "60 days ago" -rv'
 fi
 
-if hash adb >&/dev/null; then
+if hash "adb" >&/dev/null; then
     # Pretty colorful and super verbose logcat for adb devices
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
-if hash bat >&/dev/null; then
+if hash "bat" >&/dev/null; then
     export BAT_THEME="Monokai Extended Bright"
     alias bat="bat --italic-text=always --decorations=always --color=always"
 fi
-
-# #################3########
-# ## Colorizes Everything ##
-# ##########################
-# ## FIXME!
-# ## This only colourizes commands that
-# ## **were not** aliased before, so to
-# ## not overwrite them. If you want to
-# ## colourize those as well, add it manually.
-# ## Author: Emi
-# if [[ -n $GRC ]]; then
-#     shopt -s nullglob
-
-#     ## This has a problem:
-#     # 1 - It's very slow
-#     # 2 - Commands with spaces (like `docker info` get merged into dockerinfo)
-#     #     so we should grep the conf.dockerinfo file and somehow grab from the regexp
-#     readarray -d '\n' _raw_cmds < <(find /usr/local/share/grc/* /usr/share/grc/* $HOME/.grc/* -execdir sh -c 'basename {} | sed -E "s/^conf\.(.+$)/\1/"' \;)
-
-#     shopt -u nullglob
-
-#     for cmd in ${_raw_cmds[@]}; do
-#         case "${cmd}" in
-#             configure )
-#                 alias "${cmd}=colourify ./configure"
-#                 ;;
-#             docker )
-#                 alias docker='colourify docker'
-#                 ;;
-#             *)
-#                 if ! alias "${cmd}" >&/dev/null && hash  "${cmd}" >&/dev/null; then
-#                     echo  "${cmd}=colourify ${cmd}.conf"
-#                     alias "${cmd}=colourify ${cmd}.conf"
-#                 fi
-#                 ;;
-#         esac
-#     done
-# fi
-
 
 
 ############################
@@ -901,7 +855,7 @@ function _set_prompt() {
     # printed characters so that the prompt doesn't do strange things when
     # editing the entered text.
 
-    PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
+    PS1="\[${Save}\\n\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
 
     # Changes the terminal window title to the current dir by default, truncating if too long.
     PS1="\033]0;$(_get_truncated_pwd)\007${PS1}"
