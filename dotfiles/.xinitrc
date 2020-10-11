@@ -107,7 +107,7 @@ export GDK_BACKEND=x11
 exec gnome-session --systemd
 
 ## Crap! gnome-shell sucks ass!
-# exec twm
-# exec cinnamon-session
+#exec twm
+#exec cinnamon-session
 #exec mate-session
 
