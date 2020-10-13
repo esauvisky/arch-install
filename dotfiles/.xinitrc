@@ -23,9 +23,6 @@ fi
 ###########
 # ENVVARS #
 ###########
-## Forces Radeon GPU for everything (don't. just don't do it unless you want your house in fire)
-#export DRI_PRIME=0
-
 ## Links bash to gnome-keyring-daemon
 eval "$(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh)"
 dbus-update-activation-environment --systemd DISPLAY
@@ -42,12 +39,6 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 ## Also, if no logic is needed, it's preferable to create systemd units into
 ## .config/systemd/user and enable them manually, or even create on-the-go units.
 
-
-## Starts rclone and immediatly closes it (doesn't quite work)
-# xdotool search --sync --onlyvisible --name '(\([0-9]*\) ){0,1}(rclone$|rclone Web$)' windowminimize &
-# rclone-browser &
-
-
 ## Starts Deluge only if there's something to be downloaded
 # sleep 5 && (
 #     deluged && sleep 5 &&
@@ -57,23 +48,8 @@ export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 #         killall deluged && systemd-run --user --unit deluge deluge
 #     fi) &
 
-
 ## Starts electrum
 # sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
-
-
-# ## Starts WhatsApp and immediatly closes it
-# sleep 15s && xdotool search --sync --onlyvisible --name '.*WhatsApp|WhatsApp Web)' windowminimize &
-# sleep 10s && whatsapp-nativefier &
-
-
-## Starts Telegram and immediatly closes it
-sleep 5s && xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
-sleep 10s && telegram-desktop &
-
-## Starts discord
-sleep 6s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
-sleep 12s && discord-open &
 
 # ## Starts slack if it's job hours
 # if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
@@ -81,14 +57,23 @@ sleep 12s && discord-open &
 #    sleep 10s && slack -u &
 # fi
 
+## Starts Telegram and immediatly closes it
+sleep 2s && xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
+sleep 5s && telegram-desktop &
 
-# ## Starts guake
-sleep 5s && guake &
+## Starts discord and immediatly closes it
+sleep 2s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
+sleep 5s && discord-open &
 
+## guake daemon
+# guake &
 
-# ## Gnome: Ignore Lid Switch
-sleep 5s && /usr/lib/gnome-tweak-tool-lid-inhibitor &
-# ## Gnome: Allows to lock the screen
+# Copyq daemon
+copyq &
+
+## Gnome: Ignore Lid Switch
+/usr/lib/gnome-tweak-tool-lid-inhibitor &
+## Gnome: Allows to lock the screen
 # gnome-screensaver &
 
 ############
@@ -96,7 +81,6 @@ sleep 5s && /usr/lib/gnome-tweak-tool-lid-inhibitor &
 ############
 ## Main Session
 # GNOME on Xorg, using Gnome-Classic:
-# export GDK_BACKEND=x11
 # export XDG_CURRENT_DESKTOP=GNOME-Classic:GNOME
 # export GNOME_SHELL_SESSION_MODE=classic
 # #exec gnome-session --session=gnome-flashback --builtin
@@ -106,8 +90,6 @@ export XDG_SESSION_TYPE=x11
 export GDK_BACKEND=x11
 exec gnome-session --systemd
 
-## Crap! gnome-shell sucks ass!
 #exec twm
 #exec cinnamon-session
 #exec mate-session
-

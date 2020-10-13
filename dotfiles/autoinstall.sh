@@ -6,7 +6,7 @@ __deps=( "sed" "grep" "gio")
 for dep in ${__deps[@]}; do hash $dep >& /dev/null || (echo "$dep was not found. Please install it and try again." && exit 1); done
 
 
-dotfiles=( ".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc" )
+dotfiles=( ".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc" ".bash_preexec" )
 
 
 cd "$HOME"

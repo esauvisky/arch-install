@@ -1,0 +1,25 @@
+## Node Versioning Manager
+if [[ $PWD =~ .*[sS]pongy-{0,1}[eE]lephant.* ]]; then
+    source ~/.nvm/nvm.sh
+    nvm use lts/carbon
+fi
+
+# MagicCD
+alias cdb='_magicCD 2 $HOME/Bravi/'
+alias cdp='_magicCD 2 $HOME/Coding/'
+
+# Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
+alias subl3='open-subl3'
+
+# Uses perl-rename as default for rename
+alias rename='perl-rename'
+
+## Dangerous stuff that interferes with scripts
+## Put these at the end of your .bashrc preferably so it doesn't
+## intereferes with anything that is being done there.
+# Allows non case-sensitive wildcard globs (*, ?):
+# shopt -s nocaseglob
+# Allows extended wildcard globs
+# shopt -s extglob
+# Enables the ** glob
+shopt -s globstar

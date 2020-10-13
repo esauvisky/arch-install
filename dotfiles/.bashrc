@@ -5,75 +5,9 @@
 ##############################################
 ###### Also requires bash 4.4 or higher ######
 
-## Enable for debugging:
+## Enable lines below for debugging this file.
 # PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
 # set -o xtrace
-
-## Don't do anything if not running interactively
-#[[ $- != *i* ]] && exit
-
-###########
-# CONFIGS #
-###########
-## Replace with your username if you want to run the big block at the end of this file
-ENABLE_RANDOM_STUFF='emi'
-
-## Notifies commands that take longer than 60 seconds via notify-send
-# hash notify-send >&/dev/null && NOTIFY_SLOW_COMMANDS=1
-
-#########################
-# Environment Variables #
-#########################
-## Magic with `less` (like colors and other cool stuff)
-export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
-
-## Magic with man pages (colors mainly)
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
-## Asks for Ctrl+D to be pressed twice to exit the shell
-export IGNOREEOF=1
-
-## Hostname for SSH stuff
-_HOSTNAME="$(hostname -f)"
-
-## Sets default EDITOR environment variable
-## If logged as root use exclusively term editors
-if [[ ! -z $DISPLAY && ! $EUID -eq 0 ]]; then
-    for editor in "subl3" "gedit"; do
-        if hash "$editor" >&/dev/null; then
-            export EDITOR=$editor
-            break
-        else
-            continue
-        fi
-        export EDITOR="vi"
-    done
-else
-    if hash "nano" >&/dev/null; then
-        export EDITOR="nano"
-    else
-        export EDITOR="vi"
-    fi
-fi
-
-## GPG Signing TTY
-# Adds GPG key to bash profile, for git and stuff
-export GPG_TTY=$(tty)
-
-# This fixes a bug that happens when `sudo su USER`
-# inside a SSH shell that keeps loginctl envvars
-# making some commands not work.
-# @see: https://unix.stackexchange.com/questions/346841/why-does-sudo-i-not-set-xdg-runtime-dir-for-the-target-user
-if [[ -z $XDG_RUNTIME_DIR ]]; then
-    export XDG_RUNTIME_DIR=/run/user/$UID
-fi
-
 
 ##########################
 ## BASH ETERNAL HISTORY ##
@@ -116,11 +50,11 @@ trap historymerge EXIT
 if [[ -f /usr/share/bash-completion/bash_completion ]]; then
     source /usr/share/bash-completion/bash_completion
 fi
-# Loads gits completion file for our custom completions
+## Loads gits completion file for our custom completions
 if [ -f /usr/share/bash-completion/completions/git ]; then
     # the STDERR redirection is to not print an annoying bug on
     # GCP VMs that make sed error out for some stupid reason and bad coding
-    . /usr/share/bash-completion/completions/git 2>/dev/null
+    source /usr/share/bash-completion/completions/git #2>/dev/null
 fi
 
 #################
@@ -129,6 +63,7 @@ fi
 # Returns if the current shell is running inside a SSH
 # Works with sudo su, also works if running local sshd.
 # Taken from: https://unix.stackexchange.com/a/12761
+_HOSTNAME="$(hostname -f)"
 function is_ssh() {
   p=${1:-$PPID}
   read pid name x ppid y < <( cat /proc/$p/stat )
@@ -242,11 +177,11 @@ transfer() {
         shift
         isEncrypted=1
         tmpUpload=$(mktemp -t upload-XXX)
-        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')".enc"
+        basefile=$(basename "$1" | sed -E 's/[^a-zA-Z0-9._-]/-/g')".enc"
         echo "Encrypting file $basefile to $tmpUpload..." >&2
         cat "$1" | gpg -ac -o- >> "$tmpUpload"
     else
-        basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g')
+        basefile=$(basename "$1" | sed -E 's/[^a-zA-Z0-9._-]/-/g')
         tmpUpload="$1"
     fi
 
@@ -350,6 +285,18 @@ function findir() {
 ###################
 ## COLORS, LOTS! ##
 ###################
+## Magic with `less` (like colors and other cool stuff)
+export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
+
+## Magic with man pages (colors mainly)
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+
 if [[ -x /usr/bin/dircolors ]]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
     _COLOR_ALWAYS_ARG='--color=always'
@@ -370,61 +317,18 @@ if hash "grc" >&/dev/null; then
     fi
 fi
 
-
-###########
-# Aliases #
-###########
+#############
+## Aliases ##
+#############
 ## Allows using aliases after sudo (the ending space is what does teh trick)
 alias sudo='sudo '
 
 ## Navigation
-alias clear='_clear'
 alias mkdir="mkdir -p"
 alias go="xdg-open"
 alias ls="${_COLOURIFY_CMD} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
-
-
-# WIP:
-# function cd() {
-#     # readarray -d '' results < <(find . -maxdepth 1 -path "*node_modules*" -prune -o -type d -print0)
-#     # readarray results < <(ls -x -w1)
-#     readarray -d '' results < <(find "${1}/" -maxdepth 1 -path "*node_modules*" -prune -o -type d -print0)
-
-#     # echo "${results[@]}"
-#     if [[ ${#results[@]} -ge 2 && ${#results[@]} -lt 20 ]]; then
-#         # Let the user choose
-#         select_option "${results[@]}"
-#         local option="${results[$?]}"
-#         if [[ "$option" != '.' ]]; then
-#             echo "$option"
-#             cd "$option"
-#             # cd "${results[$?]}"
-#         else
-#             echo "$option"
-#             builtin cd "${1}"
-#         fi
-#     fi
-#     builtin cd "${1}"
-# }
-
-# Makes grep useful
-# grep() {
-#     # WIP:
-#     # This makes it only actually grep if it's not being piped
-#     # so it works for <(grep ..) or var=$(grep ..) or echo '' | grep
-#     #
-#     # Another way is using [ -t 1 ] and [ -t 0 ]
-#     if { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 || [ "$(LC_ALL=C stat -c %F -)" = fifo ]; then
-#         command grep "$@"
-#     else
-#         command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
-#   fi
-# }
-
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 
-# Makes sed useful
-alias sed="sed -E"
 # Makes diff decent
 if hash colordiff >&/dev/null; then
     alias diff="colordiff -B -U 5 --suppress-common-lines"
@@ -441,6 +345,7 @@ alias dd="dd status=progress oflag=sync"
 # Makes df pretty
 alias df="${_COLOURIFY_CMD} df -H"
 
+# Btrfs aliases for usage and df
 if hash "btrfs" >&/dev/null; then
     alias bdf="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem df /"
     alias busage="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem usage -H /"
@@ -453,8 +358,19 @@ fi
 
 # journalctl handy aliases
 if hash "journalctl" >&/dev/null; then
-    alias je='journalctl -efn 60 | \ccze -A'
-    alias jb='journalctl -b'
+    alias je='journalctl -efn 50 -o short --no-hostname | \ccze -A'
+    alias jb='journalctl -eb -o short --no-hostname'
+
+    # alias js='journalctl -lx _SYSTEMD_UNIT='
+    # function js() {
+    #     if [[ $# -eq 0 ]]; then
+    #         echo -e 'js is a handy script to monitor systemd logs in real time,\nmany orders of magnitude better than using systemctl status.'
+    #         echo -e "Usage:\n\t$0 SYSTEMD_UNIT"
+    #     fi
+    #     journalctl -lx _SYSTEMD_UNIT="${1}"
+    # }
+    # TODO: autocomplete js
+
 fi
 
 ## Git
@@ -462,6 +378,7 @@ if hash "git" >&/dev/null; then
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gits='git status'
+
     alias gitcam='git commit -a -m '
     function gitcleanbranches() {
         git fetch --prune
@@ -572,92 +489,20 @@ if hash "pacman" >&/dev/null; then
     alias pacfix='sudo pacman-optimize; sudo pacman -S $(pacman -Qkqn | sed -E "s/ .+$//" | uniq | xargs); paccache -k2 --min-mtime "60 days ago" -rv'
 fi
 
+# Pretty colorful and super verbose logcat for adb devices
 if hash "adb" >&/dev/null; then
-    # Pretty colorful and super verbose logcat for adb devices
     alias logcat="adb logcat -b all -v color,usec,uid"
 fi
 
+# Sets default stuff for bat
 if hash "bat" >&/dev/null; then
     export BAT_THEME="Monokai Extended Bright"
     alias bat="bat --italic-text=always --decorations=always --color=always"
 fi
 
-
-############################
-# Bottom Padding (DECSTBM) #
-############################
-# Besides the first couple functions, this attempt
-# was a major fail. Any resizing of the window screws things up.
-
 ## True screen clearing
-function _clear() {
+function clear() {
     echo -en "\033c"
-}
-
-## Leaves 3 lines of clearance at the bottom of the terminal
-function _set_bottom_padding() {
-    if $1; then
-        echo -e "\n\033[1;$((LINES - 3))r"
-    else
-        echo -e "\n\033[1;$((LINES - 3))r\033c"
-    fi
-}
-# _set_bottom_padding true
-
-# # FIXME: Tries to fix the padding when resizing the terminal window
-# function _fix_bottom_padding() {
-#     # Saves current cursor position
-#     tput sc
-
-#     # Gets current cursor position
-#     echo -en "\E[6n"
-#     read -sdR CURPOS
-#     CURPOS=${CURPOS#*;}
-
-#     # Calculates difference between number of lines -3 and cursor position
-#     DIFERENCE=$(($((LINES - 3)) - ${CURPOS%;*}))
-
-#     # Prints debug on first line
-#     #tput cup 0 0
-#     #echo "LINES=$LINES CURPOS=$CURPOS DIFERENCE=$((${CURPOS%;*}-$((LINES-3))))"
-#     #tput rc
-
-#     # Do the magic (except it doesn't work)
-#     if [[ $DIFERENCE -ge 0 ]]; then
-#         echo -e "\033[1;$((LINES - 3))r"
-#         tput rc
-#     elif [[ $DIFERENCE -eq -1 ]]; then
-#         tput cup $LINES 0
-#         #for ((i=-1; i>=$DIFERENCE; i--)); do echo -en '\n'; done
-#         echo -e "\n\033[1;$((LINES - 3))r"
-#         tput rc
-#         tput cuu1
-#     fi
-# }
-# Runs _fix_bottom_padding each time the window is resized:
-# trap '_fix_bottom_padding' WINCH
-
-#Sets bottom padding and changes clear alias **only** in TTYs
-#if [[ ! $DISPLAY ]]; then
-#  _clear
-#  _set_bottom_padding
-#  alias clear="_clear; _set_bottom_padding"
-#fi
-
-# Lets disable the embedded prompt and make our own :)
-export VIRTUAL_ENV_DISABLE_PROMPT=0
-function _virtualenv_info() {
-    [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
-}
-
-# Helper function that truncates $PWD depending on window width
-# Optionally specify maximum length as parameter (defaults to 1/3 of terminal)
-function _get_truncated_pwd() {
-    local tilde="~"
-    local newPWD="${PWD/#${HOME}/${tilde}}"
-    local pwdmaxlen="${1:-$((${COLUMNS:-80} / 3))}"
-    [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="…${newPWD:3-$pwdmaxlen}"
-    echo -n "${newPWD}"
 }
 
 #####################################
@@ -665,6 +510,52 @@ function _get_truncated_pwd() {
 #####################################
 ## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
 [[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" >&/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
+
+## Formats seconds into more pretty H:M:S
+## Stolen from: https://bit.ly/3nJQFwp
+function format-duration() {
+    T=$1
+    S=$((T % 60))
+    M=$((T / 60 % 60))
+    H=$((T / 60 / 60 % 24))
+    D=$((T / 60 / 60 / 24))
+    [[ $D -gt 0 ]] && printf '%dd%dh' $D $H ||
+        ([[ $H -gt 0 ]] && printf '%dh%dm' $H $M) ||
+        ([[ $M -gt 0 ]] && printf '%dm%ds' $M $S) ||
+        printf "%ds" $S
+}
+
+## Adds the time it took the cmd to run
+function preexec() {
+    if [[ "UNSET" == "${timer}" ]]; then
+        timer=$SECONDS
+    else
+        timer=${timer:-$SECONDS}
+    fi
+}
+function precmd() {
+    if [[ "UNSET" == "${timer}" ]]; then
+        timer_show="0s"
+    else
+        the_seconds=$((SECONDS - timer))
+        timer_show="$(format-duration seconds $the_seconds)"
+    fi
+    timer="UNSET"
+}
+## Returns a truncated $PWD depending on window width
+function _get_truncated_pwd() {
+    local tilde="~"
+    local newPWD="${PWD/#${HOME}/${tilde}}"
+    local pwdmaxlen="$((${COLUMNS:-80} / 3))"
+    [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="…${newPWD:3-$pwdmaxlen}"
+    echo -n "${newPWD}"
+}
+
+## Lets disable the embedded venv prompt and make our own :)
+export VIRTUAL_ENV_DISABLE_PROMPT=0
+function _virtualenv_info() {
+    [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
+}
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
@@ -675,7 +566,7 @@ function _pre_command() {
     # Instead of using $BASH_COMMAND, which doesn't deals with aliases,
     # uses an awesome tip by @zeroimpl. It's scary, touch it and it breaks!!!
     # *see https://goo.gl/2ZFDfM
-    local this_command="$(HISTTIMEFORMAT= history 1 | \sed -e 's/^[ ]*[0-9]*[ ]*//')"
+    local this_command="$(HISTTIMEFORMAT= history 1 | \sed -E 's/^[ ]*[0-9]*[ ]*//')"
     case "$this_command" in
     *\033]0* | set_prompt* | echo* | printf* | cd* | ls)
         # The command is trying to set the title bar as well;
@@ -735,34 +626,10 @@ function _set_prompt() {
     local FancyX='\342\234\227'
     local Checkmark='\342\234\223'
 
-    ######################
-    ## Teh Prompt (PS1) ##
-    ######################
     # Prints  ---\n\n after previous command without spawning
     # a newline after it, so you can actually easily notice
     # if it's output has an EOF linebreak.
     PS1="$YellowN---$Reset\\n\\n"
-
-
-    ## FIXME: fix this shit. maybe this? http://tinyurl.com/yfa8cwam
-    ## Sends a notification if command took longer than 60 seconds and finished
-    ## Good for when updating and when you forget you had something running.
-    # if [[ -n $NOTIFY_SLOW_COMMANDS && -n $_cmd_starttime ]]; then
-    #     _cmd_endtime=$(date +%s)
-    #     _time_taken_seconds=$((_cmd_endtime - _cmd_starttime))
-    #     if [[ $_time_taken_seconds -ge 60 ]]; then
-    #         # If cmd took more than 60 seconds to finish, notify
-    #         icon=dialog-information
-    #         urgency=low
-    #         if [[ $_last_command != 0 ]]; then
-    #             # high priority for error codes > 0
-    #             icon=dialog-error
-    #             urgency=critical
-    #         fi
-    #         notify-send -i $icon -u $urgency "$(fc -ln -1) completed in $_time_taken_seconds"
-    #     fi
-    # fi
-
 
     if [[ $_last_command == 0 ]]; then
         # If last cmd didn't return an error (exit code == 0)
@@ -781,13 +648,16 @@ function _set_prompt() {
         fi
     fi
 
-    # Nicely shows you're in a python virtual environment
+    ## Nicely shows you're in a python virtual environment
     if [[ -n $VIRTUAL_ENV ]]; then
         PS1+=" $Magenta(venv:$(_virtualenv_info))"
     fi
 
     ## Nicely shows you're in a git repository
-    ## TODO: @see: /usr/share/git/git-prompt.sh for more use cases and much more robust
+    # TODO: @see: /usr/share/git/git-prompt.sh for more use cases and
+    # more robust implementations.
+    # FIXME: **this is slow**. depending on what you're doing, it might
+    # hang when inside dirs of big projects (3gb+)
     repo_info="$(git rev-parse --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
     rev_parse_exit_code="$?"
 
@@ -802,9 +672,8 @@ function _set_prompt() {
 
         PS1+=" ${Violet}["
 
-        # TODO: do not repeat yourself yourself
-        #       use git status once, save its output and fix this crappy code
-        local git_status=$(git status 2>&1)
+        local -r git_status=$(git status 2>&1)  # TODO: still couldn't find what -r is about
+                                                # see: https://github.com/koalaman/shellcheck/wiki/SC2155)
         if echo "${git_status}" | grep -qm1 'nothing to commit'; then
             if [[ $branch_name == "$short_sha" ]]; then
                 PS1+="${GrayBackground}${White}• $branch_name•$Reset" # DETACHED HEAD
@@ -835,9 +704,9 @@ function _set_prompt() {
     #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
 
     ## Time right aligned
-    ## @see: https://superuser.com/questions/187455/right-align-part-of-prompt
-    # Create a string like:  "[ Apr 25 16:06 ]" with time in RED.
-    printf -v PS1RHS "\e[0m[ \e[0;0;33m%(%b %d %H:%M:%S)T \e[0m]" -1 # -1 is current time
+    # @see: https://superuser.com/questions/187455/right-align-part-of-prompt
+    # Update: now with the time it took to run the previous command!
+    printf -v PS1RHS "\e[0m[ $the_seconds \e[0;0;33m%(%b %d %H:%M:%S)T \e[0m]" -1 # -1 is current time
 
     # Strip ANSI commands before counting length
     # From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
@@ -861,10 +730,12 @@ function _set_prompt() {
     PS1="\033]0;$(_get_truncated_pwd)\007${PS1}"
 
     # Otherwise, if something is currently running, run _pre_command and change title to the app's name.
-    _cmd_starttime="$(date +%s)"
     trap '_pre_command' DEBUG
 }
 
+##########################
+## BUG FIXES AND TWEAKS ##
+##########################
 ## vte.sh
 # Fixes a bug (http://tinyurl.com/ohy3kmb) where spawning a new tab or window in gnome-terminal
 # does not keep the current PWD, and defaults back to HOME (http://tinyurl.com/y7yknu3r).
@@ -877,78 +748,68 @@ else
     PROMPT_COMMAND='_set_prompt'
 fi
 
-## PERSONAL RANDOM STUFF YOU PROBABLY WONT NEED
-if [[ $ENABLE_RANDOM_STUFF == "$USER" ]]; then
-    ## Node Versioning Manager
-    if [[ $PWD =~ .*[sS]pongy-{0,1}[eE]lephant.* ]]; then
-        source ~/.nvm/nvm.sh
-        nvm use lts/carbon
-    fi
+## GPG Signing TTY
+## I don't recall why but this is required for GPG signing in git
+GPG_TTY=$(tty)
+export GPG_TTY
 
-    # MagicCD
-    alias cdb='_magicCD 2 $HOME/Bravi/'
-    alias cdp='_magicCD 2 $HOME/Coding/'
-
-    # Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
-    alias subl3='open-subl3'
-    alias subl='open-subl3'
-
-    # Uses perl-rename as default for rename
-    alias rename='perl-rename'
-
-
-    #############################
-    # "SECURE" FTP TLS Transfer #
-    #############################
-    ## Sets a password via the keyring:
-    ## If you see a dialog when running this, function, run the command below with your credentials:
-    # python -c "import keyring; keyring.set_password('name', 'username', '$PASSWORD')"
-    function emibemol_ftp() {
-        USER='u373108367'
-        HOST='ftp.emibemol.com'
-        PASS=$(python -c "import keyring; print(keyring.get_password('${HOST}', '${USER}'))")
-        if [[ $# == 1 ]]; then
-            TARGET='/public_html'
-        elif [[ $# == 2 ]]; then
-            TARGET="${2}"
-        elif ! hash ncftpput || [[ ! -f "${1}" ]]; then
-            echo 'Usage: emibemol_ftp local_file_or_dir [remote_dir]'
-            echo
-            echo '[remote_dir] defaults to /public_html. You also need ncftp.'
-            return 1
-        fi
-
-        ncftpput -vRm -u "${USER}" -p "${PASS}" "${HOST}" "${TARGET}" "$1"
-        URL="${HOST##ftp\.}/${TARGET%%public_html}/${1##\./}"
-        URL="${URL/\/\//}"
-        echo "Uploaded to $URL. Copied to clipboard."
-        if hash xclip; then echo "$URL" | xclip -selection clipboard -i; fi
-    }
-
-    ## Dangerous stuff that interferes with scripts
-    ## Put these at the end of your .bashrc preferably so it doesn't
-    ## intereferes with anything that is being done there.
-    # Allows non case-sensitive wildcard globs (*, ?):
-    # shopt -s nocaseglob
-    # Allows extended wildcard globs
-    # shopt -s extglob
-    # Enables the ** glob
-    shopt -s globstar
-
-    ####################
-    ## In development ##
-    ####################
-    # Use exit status from declare command to determine whether input argument is a
-    # bash function
-    function is_function() {
-        declare -Ff "${1}" >/dev/null
-    }
-
-    # Helper function to read the first line of a file into a variable.
-    # __git_eread requires 2 arguments, the file path and the name of the
-    # variable, in that order.
-    function __git_eread() {
-        echo 'USING GIT EREAD'
-        test -r "$1" && IFS=$'\r\n' read "$2" <"$1"
-    }
+## This fixes a bug that happens when `sudo su USER`
+## inside a SSH shell that keeps loginctl envvars
+## making some commands not work.
+## @see: https://unix.stackexchange.com/questions/346841/why-does-sudo-i-not-set-xdg-runtime-dir-for-the-target-user
+if [[ -z $XDG_RUNTIME_DIR && $(is_ssh) ]]; then
+    export XDG_RUNTIME_DIR=/run/user/$UID
 fi
+
+## Asks for Ctrl+D to be pressed twice to exit the shell
+export IGNOREEOF=1
+
+## Sets default EDITOR environment variable
+## If logged as root or in a ssh shell uses only term editors.
+if [[ -n $DISPLAY && ! $EUID -eq 0 && ! $(is_ssh) ]]; then
+    for editor in "subl3" "gedit"; do
+        if hash "$editor" >&/dev/null; then
+            export EDITOR=$editor
+            break
+        else
+            continue
+        fi
+        export EDITOR="vi"
+    done
+else
+    if hash "nano" >&/dev/null; then
+        export EDITOR="nano"
+    else
+        export EDITOR="vi"
+    fi
+fi
+
+## Adds alias autocompletion for **all** the aliases that
+## did not had it manually added using _complete_alias.
+## This is called after all aliases are defined before the prompt block.
+while read -r i; do
+    _alias=$(echo "$i" | sed -E 's/alias ([^=]+)=.+/\1/')
+    if ! complete -p "$_alias" >&/dev/null; then
+        complete -F _complete_alias "$_alias"
+    fi
+done < <(alias -p)
+
+
+##################
+## CUSTOM STUFF ##
+##################
+if [[ -f "$HOME/.bash_custom" ]]; then
+    source "$HOME/.bash_custom"
+fi
+
+
+##################
+## BASH PREEXEC ##
+##################
+## Adds zsh-like preexec and precmd support to bash
+## @see https://github.com/rcaloras/bash-preexec/
+## **Must be the last thing to be imported!**
+if [[ -f "$HOME/.bash_preexec" ]]; then
+    source "$HOME/.bash_preexec"
+fi
+
