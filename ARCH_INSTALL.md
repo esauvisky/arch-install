@@ -429,9 +429,9 @@
     - Ativa o daemon do SmartmonTools
 
             $ pacs smartmontools
-            $ gedit /etc/smartd.conf
+            $ subl /etc/smartd.conf
                 - Substituir DEVICESCAN por:
-                    /dev/sda -a -o on -S on -s (S/../.././02|L/../../6/03) -W 4,35,45
+                    /dev/nvme0n1 -a -o on -S on -s (S/../.././02|L/../../6/03) -W 4,35,45
                 - Substituir /dev/sda acima por DEVICESCAN se desejar escanear *todos* os hds presentes
             $ systemctl start smartd
             $ systemctl status smartd
@@ -439,12 +439,8 @@
 
 - Teclado
 
-    - Instalar e configurar clipit
-        - Copiar backup `.config/clipit/clipitrc`
-
-    - Copiar backup do layout do teclado /usr/share/X11/xkb/symbols/br
-
-        - TODO: Procurar uma forma de fazer isso de forma local (por usuário)
+    - Install CopyQ
+    - **TODO: ** the xkb thingamabove
 
 - Instalar e configurar linux-ck(https://wiki.archlinux.org/index.php/Linux-ck) (*para MuQSS + BFQ baby!*)
 
