@@ -213,15 +213,20 @@ transfer() {
 # Searches for directories recursively and cds into them.
 # Author: emi~
 function _magicCD() {
-    if [[ ! -d $2 && ! ${1} -ge 2 ]]; then
+    if [[ ! -d "$2" && ! "$1" -ge 2 ]]; then
         echo "Error in the syntax."
         return 1
     fi
+
 
     __MAGIC_CD_DIR="${2}"
     __DEPTH="${1}"
     shift
     shift
+
+    if [[ -d "${1}" ]]; then
+        cd "${1}"
+    fi
 
     # Black magic ;)
     # results=()
@@ -525,23 +530,34 @@ function format-duration() {
         printf "%ds" $S
 }
 
-## Adds the time it took the cmd to run
-function preexec() {
-    if [[ "UNSET" == "${timer}" ]]; then
-        timer=$SECONDS
-    else
-        timer=${timer:-$SECONDS}
-    fi
-}
-function precmd() {
-    if [[ "UNSET" == "${timer}" ]]; then
-        timer_show="0s"
-    else
-        the_seconds=$((SECONDS - timer))
-        timer_show="$(format-duration seconds $the_seconds)"
-    fi
-    timer="UNSET"
-}
+###########################################
+# TODO: find some shit that actually wrks #
+###########################################
+## BASH PREEXEC
+## Adds zsh-like preexec and precmd support to bash
+## @see https://github.com/rcaloras/bash-preexec/
+## **Must be the last thing to be imported!**
+# if [[ -f "$HOME/.bash_preexec" ]]; then
+#     source "$HOME/.bash_preexec"
+# fi
+
+# ## Adds the time it took the cmd to run
+# function preexec() {
+#     if [[ "UNSET" == "${timer}" ]]; then
+#         timer=$SECONDS
+#     else
+#         timer=${timer:-$SECONDS}
+#     fi
+# }
+# function precmd() {
+#     if [[ "UNSET" == "${timer}" ]]; then
+#         timer_show="0s"
+#     else
+#         the_seconds=$((SECONDS - timer))
+#         timer_show="$(format-duration seconds $the_seconds)"
+#     fi
+#     timer="UNSET"
+# }
 ## Returns a truncated $PWD depending on window width
 function _get_truncated_pwd() {
     local tilde="~"
@@ -706,7 +722,7 @@ function _set_prompt() {
     ## Time right aligned
     # @see: https://superuser.com/questions/187455/right-align-part-of-prompt
     # Update: now with the time it took to run the previous command!
-    printf -v PS1RHS "\e[0m[ $the_seconds \e[0;0;33m%(%b %d %H:%M:%S)T \e[0m]" -1 # -1 is current time
+    printf -v PS1RHS "\e[0m[ \e[0;0;33m%(%b %d %H:%M:%S)T \e[0m]" -1 # -1 is current time
 
     # Strip ANSI commands before counting length
     # From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
@@ -802,14 +818,4 @@ if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
 
-
-##################
-## BASH PREEXEC ##
-##################
-## Adds zsh-like preexec and precmd support to bash
-## @see https://github.com/rcaloras/bash-preexec/
-## **Must be the last thing to be imported!**
-if [[ -f "$HOME/.bash_preexec" ]]; then
-    source "$HOME/.bash_preexec"
-fi
 
