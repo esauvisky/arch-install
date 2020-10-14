@@ -23,7 +23,7 @@ TAB: menu-complete
 # Não começa de primeira: exibe a lista antes, e depois faz o loop se apertar
 # TAB novamente. Desta forma permite dar uma "espiada" nos nomes dos arquivos
 # ou termos a completar antes de começar a preencher.
-set menu-complete-display-prefix on
+set menu-complete-display-prefix off
 
 # Remove as páginas de autocompletação de aspecto igual a 'more' ou 'less'
 set page-completions off
