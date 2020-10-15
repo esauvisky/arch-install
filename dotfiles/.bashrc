@@ -12,10 +12,12 @@
 ## (some) Configs ##
 ####################
 # List of places to show when using 'cdcool [arg]'
-cool_places=("~/.local/share/gnome-shell/extensions"
-             "~/.config/systemd/user/"
-             "/etc/systemd/user/"
-             "/var/lib/docker/volumes")
+cool_places=(
+    "~/.local/share/gnome-shell/extensions"
+    "~/.config/systemd/user/"
+    "/etc/systemd/user/"
+    "/var/lib/docker/volumes"
+    )
 
 ########################
 # BASH ETERNAL HISTORY #
@@ -38,11 +40,13 @@ shopt -s cmdhist
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
 # Erases history dups on EXIT
-function historymerge {
-    history -n; history -w; history -c; history -r;
+function historymerge() {
+    history -n
+    history -w
+    history -c
+    history -r
 }
 trap historymerge EXIT
-
 
 ##################
 # AUTOCOMPLETION #
@@ -71,12 +75,12 @@ fi
 # Taken from: https://unix.stackexchange.com/a/12761
 _HOSTNAME="$(hostname -f)"
 function is_ssh() {
-  p=${1:-$PPID}
-  read pid name x ppid y < <( cat /proc/$p/stat )
-  # or: read pid name ppid < <(ps -o pid= -o comm= -o ppid= -p $p)
-  [[ "$name" =~ sshd ]] && { return 0; }
-  [ "$ppid" -le 1 ]     && { return 1; }
-  is_ssh $ppid
+    p=${1:-$PPID}
+    read pid name x ppid y < <(cat /proc/$p/stat)
+    # or: read pid name ppid < <(ps -o pid= -o comm= -o ppid= -p $p)
+    [[ "$name" =~ sshd ]] && { return 0; }
+    [ "$ppid" -le 1 ]     && { return 1; }
+    is_ssh $ppid
 }
 
 #################
@@ -116,14 +120,17 @@ function select_option() {
             ((idx++))
         done
         case $(key_input) in
-            enter)
-                break ;;
-            up)
-                ((selected--))
-                if [ $selected -lt 0 ]; then selected=$(($# - 1)); fi ;;
-            down)
-                ((selected++))
-                if [ $selected -ge $# ]; then selected=0; fi ;;
+        enter)
+            break
+            ;;
+        up)
+            ((selected--))
+            if [ $selected -lt 0 ]; then selected=$(($# - 1)); fi
+            ;;
+        down)
+            ((selected++))
+            if [ $selected -ge $# ]; then selected=0; fi
+            ;;
         esac
     done
     cursor_to $lastrow
@@ -169,8 +176,6 @@ function extract() {
     done
 }
 
-
-
 ###########
 # magicCD #
 ###########
@@ -205,7 +210,6 @@ function _magicCD() {
         echo "Error in the syntax."
         return 1
     fi
-
 
     __MAGIC_CD_DIR="${2}"
     __DEPTH="${1}"
@@ -282,7 +286,7 @@ function findir() {
 # cd into commonly used, hard-to-type directories,
 # changing to a su prompt if the user doesn't have
 # reading permissions as well.
-function cdcool {
+function cdcool() {
     # Filters the array in case there's an arg
     if [[ -n "$1" ]]; then
         for index in "${!cool_places[@]}"; do
@@ -496,7 +500,7 @@ if hash "pacman" >&/dev/null; then
             echo -e "\e[00;92\nThis is the same list that was previously saved, not saving again.\e[00m"
         else
             echo -e "\e[01;93m\nSaving log of packages to upgrade...\e[00m"
-            echo "$currentUpdatePkgs" > "$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
+            echo "$currentUpdatePkgs" >"$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
         fi
 
         echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
@@ -716,8 +720,8 @@ function _set_prompt() {
 
         PS1+=" ${Violet}["
 
-        local -r git_status=$(git status 2>&1)  # TODO: still couldn't find what -r is about
-                                                # see: https://github.com/koalaman/shellcheck/wiki/SC2155)
+        local -r git_status=$(git status 2>&1) # TODO: still couldn't find what -r is about
+        # see: https://github.com/koalaman/shellcheck/wiki/SC2155)
         if echo "${git_status}" | grep -qm1 'nothing to commit'; then
             if [[ $branch_name == "$short_sha" ]]; then
                 PS1+="${GrayBackground}${White}• $branch_name•$Reset" # DETACHED HEAD
@@ -837,7 +841,6 @@ while read -r i; do
         complete -F _complete_alias "$_alias"
     fi
 done < <(alias -p)
-
 
 ################
 # CUSTOM STUFF #
