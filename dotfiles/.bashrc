@@ -8,6 +8,15 @@
 ## Uncomment the following line for debugging this file
 # PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
 
+####################
+## (some) Configs ##
+####################
+# List of places to show when using 'cdcool [arg]'
+cool_places=("~/.local/share/gnome-shell/extensions"
+             "~/.config/systemd/user/"
+             "/etc/systemd/user/"
+             "/var/lib/docker/volumes")
+
 ########################
 # BASH ETERNAL HISTORY #
 ########################
@@ -28,9 +37,6 @@ export HISTTIMEFORMAT='[%F %T] '
 shopt -s cmdhist
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
-# Do not enable this or it's gonna duplicate the last command if it's multiline
-# shopt -s lithist
-
 # Erases history dups on EXIT
 function historymerge {
     history -n; history -w; history -c; history -r;
@@ -269,9 +275,46 @@ function findir() {
     fi
 }
 
-###################
-## COLORS, LOTS! ##
-###################
+##########
+# cdcool #
+##########
+# This shows a selector to quickly change
+# cd into commonly used, hard-to-type directories,
+# changing to a su prompt if the user doesn't have
+# reading permissions as well.
+function cdcool {
+    # Filters the array in case there's an arg
+    if [[ -n "$1" ]]; then
+        for index in "${!cool_places[@]}"; do
+            if [[ ! ${cool_places[$index]} =~ $1 ]]; then
+                unset -v 'cool_places[$index]'
+            fi
+        done
+    fi
+
+    # Let the user choose
+    if [[ ${#cool_places[@]} -eq 1 ]]; then
+        selected_index=0
+    else
+        select_option "${cool_places[@]}"
+        selected_index="$?"
+    fi
+
+    final_path="${cool_places[$selected_index]/#\~/$HOME}"
+
+    if [[ ! -d "$final_path" ]]; then
+        echo "The selected path does not exist. Fix your script." && return 1
+    elif ! test -r "$final_path"; then
+        echo -n "No read permissions for $final_path! "
+        sudo su root sh -c "cd $final_path; bash" # don't ask, just don't.
+    else
+        cd "$final_path" || return 1
+    fi
+}
+
+#################
+# COLORS, LOTS! #
+#################
 ## Magic with `less` (like colors and other cool stuff)
 export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
 
