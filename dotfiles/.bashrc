@@ -5,13 +5,12 @@
 ##############################################
 ###### Also requires bash 4.4 or higher ######
 
-## Enable lines below for debugging this file.
-# PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
-# set -o xtrace
+## Uncomment the following line for debugging this file
+# PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
 
-##########################
-## BASH ETERNAL HISTORY ##
-##########################
+########################
+# BASH ETERNAL HISTORY #
+########################
 ## Author: emi et al., took ages to figure something that worked.
 # Change the file location because certain bash sessions truncate .bash_history file upon close:
 export HISTFILE=~/.bash_eternal_history
@@ -37,6 +36,7 @@ function historymerge {
     history -n; history -w; history -c; history -r;
 }
 trap historymerge EXIT
+
 
 ##################
 # AUTOCOMPLETION #
@@ -185,33 +185,35 @@ transfer() {
         tmpUpload="$1"
     fi
 
-    tmpResponse=$(mktemp -t transfer-XXX)
-
-    if tty -s; then
-        echo "Uploading file $tmpUpload to transfer.sh/$basefile..." >&2
-        curl --progress-bar --upload-file "$tmpUpload" "https://transfer.sh/$basefile" >> "$tmpResponse"
-    else
-        echo "Uploading file $tmpUpload to transfer.sh/$tmpUpload..." >&2
-        curl --progress-bar --upload-file "-" "https://transfer.sh/$tmpUpload" >> "$tmpResponse"
-    fi
-
-    # Copies URL to clipboard if 'xclip' exists.
-    if hash xclip; then cat "$tmpResponse" | xclip -selection clipboard -i; fi
-    echo -e '\nTransfer finished! URL was copied '
-    cat "$tmpResponse" <(echo)
-
-    if [[ -n $isEncrypted ]]; then
-        echo -e "Use gpg -o- to decrypt:\n  $ curl $(cat "$tmpResponse") | gpg -o- > ./${basefile%%.enc}" >&2
-    fi
-    rm -f "$tmpResponse"
-}
-
-
 ###########
 # magicCD #
 ###########
-# Searches for directories recursively and cds into them.
+# Searches for directories recursively and cds into them
+# Usage:
+#   alias ALIAS_NAME='_magicCD DIR_DEPTH BASE_DIR
+# Where DIR_DEPTH is how many nested directories from
+# within BASE_DIR to recursively search into.
 # Author: emi~
+]
+# Example:
+# Suppose you have this structure:
+# - ~/Coding/
+#   - Projects/
+#       - project_1/
+#       - project_2/
+#       - foo/
+#   - Personal/
+#      - secret_self_bot/
+#      - wip_project/
+#
+# If you add to this file,
+#   alias cdp='_magicCD 2 $HOME/Coding/'
+# then if you run,
+# cdp: will send you to ~/Coding/
+# cdp proj: will show you a selector with all the dirs containing 'proj',
+#           i.e.: ~/Coding/Projects/project_1 and 2 and wip_project from Personal
+# cdp wip: will directly send you to the only dir containing 'wip'
+#           i.e.: ~/Coding/Projects/wip_project
 function _magicCD() {
     if [[ ! -d "$2" && ! "$1" -ge 2 ]]; then
         echo "Error in the syntax."
@@ -235,7 +237,7 @@ function _magicCD() {
     # done < <(find "${__MAGIC_CD_DIR}" -depth  -maxdepth 2 -type d -iname \*${*}\* -print0)
 
     # Neat black magic (bash 4.4 only)
-    readarray -d '' results < <(find ${__MAGIC_CD_DIR} -maxdepth ${__DEPTH} -path "*node_modules*" -prune -o -type d -iname \*${*}\* -print0)
+    readarray -d '' results < <(find -L ${__MAGIC_CD_DIR} -maxdepth ${__DEPTH} -path "*node_modules*" -prune -o -type d -iname \*${*}\* -print0)
 
     if [[ ${#results[@]} -eq 1 ]]; then
         # If there's an unique result for the argument, cd into it:
@@ -322,9 +324,10 @@ if hash "grc" >&/dev/null; then
     fi
 fi
 
-#############
-## Aliases ##
-#############
+###########
+# Aliases #
+###########
+
 ## Allows using aliases after sudo (the ending space is what does teh trick)
 alias sudo='sudo '
 
@@ -510,9 +513,9 @@ function clear() {
     echo -en "\033c"
 }
 
-#####################################
-## The Divine and Beautiful Prompt ##
-#####################################
+###################################
+# The Divine and Beautiful Prompt #
+###################################
 ## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
 [[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" >&/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
 
@@ -608,6 +611,8 @@ function _set_prompt() {
 
     # Saves on history after each command
     history -a
+    # Read back from history file
+    history -n
     # Not working crazy shit that's supposed to actually erase previous dups (https://goo.gl/DXAcPO)
     # history -n; history -w; history -c; history -r;
 
@@ -749,9 +754,9 @@ function _set_prompt() {
     trap '_pre_command' DEBUG
 }
 
-##########################
-## BUG FIXES AND TWEAKS ##
-##########################
+########################
+# BUG FIXES AND TWEAKS #
+########################
 ## vte.sh
 # Fixes a bug (http://tinyurl.com/ohy3kmb) where spawning a new tab or window in gnome-terminal
 # does not keep the current PWD, and defaults back to HOME (http://tinyurl.com/y7yknu3r).
@@ -811,11 +816,9 @@ while read -r i; do
 done < <(alias -p)
 
 
-##################
-## CUSTOM STUFF ##
-##################
+################
+# CUSTOM STUFF #
+################
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
-
-
