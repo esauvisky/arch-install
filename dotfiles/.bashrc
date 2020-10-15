@@ -185,7 +185,7 @@ function extract() {
 # Where DIR_DEPTH is how many nested directories from
 # within BASE_DIR to recursively search into.
 # Author: emi~
-]
+#
 # Example:
 # Suppose you have this structure:
 # - ~/Coding/
