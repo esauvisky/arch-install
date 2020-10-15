@@ -163,27 +163,7 @@ function extract() {
     done
 }
 
-################
-## transfer.sh #
-################
-# Transfer any file to transfer.sh with a couple tweaks.
-transfer() {
-    if [[ $# -eq 0 ]]; then
-        echo -e "No arguments specified.\n\n  Arguments:\n  \t-e: Encrypts file before uploading.\n\n  Usage Examples:\n  \ttransfer /tmp/test.md\n  \tcat /tmp/test.md | transfer test.md\n  \ttransfer -e /tmp/test.md" >&2
-        return 1
-    fi
 
-    if [[ "$1" == '-e' || "$1" == '--encrypt' ]]; then
-        shift
-        isEncrypted=1
-        tmpUpload=$(mktemp -t upload-XXX)
-        basefile=$(basename "$1" | sed -E 's/[^a-zA-Z0-9._-]/-/g')".enc"
-        echo "Encrypting file $basefile to $tmpUpload..." >&2
-        cat "$1" | gpg -ac -o- >> "$tmpUpload"
-    else
-        basefile=$(basename "$1" | sed -E 's/[^a-zA-Z0-9._-]/-/g')
-        tmpUpload="$1"
-    fi
 
 ###########
 # magicCD #
