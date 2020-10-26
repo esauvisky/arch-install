@@ -63,7 +63,9 @@ sleep 5s && telegram-desktop &
 
 ## Starts discord and immediatly closes it
 sleep 2s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
-sleep 5s && discord-open &
+sleep 5s && discord &
+
+syncthing-gtk &
 
 ## guake daemon
 # guake &
