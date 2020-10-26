@@ -140,6 +140,39 @@ function select_option() {
     return $selected
 }
 
+###################
+# history grepper #
+###################
+# Fancy way of grepping history, think of it
+# as an improved Ctrl+R that supports regex
+function h() {
+    # Workaround for the lack of
+    # multidimensional arrays in bash.
+    local results_cmds=()
+    local results_nums=()
+    local query="${1}"
+
+    readarray -d '' grepped_history < <(history | \grep -ZE -- "$query")
+    while read -r entry; do
+        local number="${entry// */}"
+        local datetime="${entry#*[}"
+        datetime="${datetime%] *}"
+        local cmd="${entry##$number*$datetime] }"
+        # Strips repeated results
+        if [[ ! "${results_cmds[*]}" =~ $cmd ]]; then
+            results_cmds+=("$cmd")
+            results_nums+=("$number")
+        fi
+    done < <(echo "${grepped_history[@]}")
+
+    local string
+    for r in "${!results_cmds[@]}"; do
+        cmd=$(echo "${results_cmds[$r]}" | \grep --color=always "$query")
+        line="\e[01;96m${results_nums[$r]} \e[00m$cmd\e[00m"
+        echo -e "$line"
+    done
+}
+
 ###########
 # Extract #
 ###########
@@ -216,8 +249,14 @@ function _magicCD() {
     shift
     shift
 
+    # If the search query is exactly the dir name
+    # then just cd
     if [[ -d "${1}" ]]; then
         cd "${1}"
+        return
+    elif [[ -d "${__MAGIC_CD_DIR}${1}" ]]; then
+        cd "${__MAGIC_CD_DIR}${1}"
+        return
     fi
 
     # Black magic ;)
@@ -411,7 +450,7 @@ fi
 ## Git
 if hash "git" >&/dev/null; then
     # alias gitl='git log --all --decorate=full --oneline'
-    alias gitl="git log --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
+    alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gits='git status'
 
     alias gitcam='git commit -a -m '
@@ -639,7 +678,7 @@ function _set_prompt() {
     # Saves on history after each command
     history -a
     # Read back from history file
-    history -n
+    # history -n
     # Not working crazy shit that's supposed to actually erase previous dups (https://goo.gl/DXAcPO)
     # history -n; history -w; history -c; history -r;
 
