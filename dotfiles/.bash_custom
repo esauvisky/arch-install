@@ -29,3 +29,40 @@ alias subl3='open-subl3'
 # shopt -s extglob
 # Enables the ** glob
 shopt -s globstar
+
+
+## WIP:
+## This makes it only actually grep if it's not being piped
+## so it works for <(grep ..) or var=$(grep ..) or echo '' | grep
+# grep() {
+#     #
+#     # Another way is using [ -t 1 ] and [ -t 0 ]
+#     if { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 || [ "$(LC_ALL=C stat -c %F -)" = fifo ]; then
+#         command grep "$@"
+#     else
+#         command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
+#   fi
+# }
+
+## WIP:
+# function cd() {
+#     # readarray -d '' results < <(find . -maxdepth 1 -path "*node_modules*" -prune -o -type d -print0)
+#     # readarray results < <(ls -x -w1)
+#     readarray -d '' results < <(find "${1}/" -maxdepth 1 -path "*node_modules*" -prune -o -type d -print0)
+
+#     # echo "${results[@]}"
+#     if [[ ${#results[@]} -ge 2 && ${#results[@]} -lt 20 ]]; then
+#         # Let the user choose
+#         select_option "${results[@]}"
+#         local option="${results[$?]}"
+#         if [[ "$option" != '.' ]]; then
+#             echo "$option"
+#             cd "$option"
+#             # cd "${results[$?]}"
+#         else
+#             echo "$option"
+#             builtin cd "${1}"
+#         fi
+#     fi
+#     builtin cd "${1}"
+# }

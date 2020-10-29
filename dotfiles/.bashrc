@@ -17,7 +17,7 @@ cool_places=(
     "~/.config/systemd/user/"
     "/etc/systemd/user/"
     "/var/lib/docker/volumes"
-    )
+)
 
 ########################
 # BASH ETERNAL HISTORY #
@@ -79,7 +79,7 @@ function is_ssh() {
     read pid name x ppid y < <(cat /proc/$p/stat)
     # or: read pid name ppid < <(ps -o pid= -o comm= -o ppid= -p $p)
     [[ "$name" =~ sshd ]] && { return 0; }
-    [ "$ppid" -le 1 ]     && { return 1; }
+    [ "$ppid" -le 1 ] && { return 1; }
     is_ssh $ppid
 }
 
@@ -91,11 +91,11 @@ function is_ssh() {
 # Further edits by @emi
 function select_option() {
     ESC=$(printf "\033")
-    cursor_blink_on() { printf "$ESC[?25h"; }
-    cursor_blink_off() { printf "$ESC[?25l"; }
-    cursor_to() { printf "$ESC[$1;${2:-1}H"; }
+    cursor_blink_on() { printf "${ESC}[?25h"; }
+    cursor_blink_off() { printf "${ESC}[?25l"; }
+    cursor_to() { printf "${ESC}[$1;${2:-1}H"; }
     print_option() { printf "   $1 "; }
-    print_selected() { printf "  $ESC[7m $1 $ESC[27m"; }
+    print_selected() { printf "  ${ESC}[7m $1 ${ESC}[27m"; }
     get_cursor_row() {
         IFS=';' read -sdR -p $'\E[6n' ROW COL
         echo ${ROW#*\[}
@@ -150,7 +150,7 @@ function h() {
     # multidimensional arrays in bash.
     local results_cmds=()
     local results_nums=()
-    local query="${1}"
+    local query="${@}"
 
     readarray -d '' grepped_history < <(history | \grep -ZE -- "$query")
     while read -r entry; do
@@ -371,8 +371,12 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
 if [[ -x /usr/bin/dircolors ]]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    _COLOR_ALWAYS_ARG='--color=always'
+    if [[ -f ~/.dircolors ]]; then
+        eval "$(dircolors -b ~/.dircolors)"
+    else
+        eval "$(dircolors -b)"
+    fi
+    _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
 fi
 
 if hash "grc" >&/dev/null; then
@@ -403,6 +407,38 @@ alias go="xdg-open"
 alias ls="${_COLOURIFY_CMD} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 
+## Safe rm using gio trash
+## Falls back to rm in any unsupported case
+## Only caveat: ignores -r as gio trash already
+## does it recursively, without option.
+if hash gio >&/dev/null; then
+    function rm() {
+        use_gio=true
+        local argv=("$@")
+        for index in "${!argv[@]}"; do
+            if [[ ${argv[$index]} == '-r' || ${argv[$index]} == '-R' ]]; then
+                unset -v 'argv[$index]'
+            elif [[ ${argv[$index]} =~ ^-{1}[^-]?[rR] ]]; then
+                argv[$index]=${argv[$index]//[Rr]/}
+                echo "new argv is ${argv[$index]}"
+            fi
+            if [[ ${argv[$index]} =~ ^-[^f] && ${argv[$index]} != "--force" ]]; then
+                echo "keep argv is ${argv[$index]}"
+                use_gio=false
+            fi
+        done
+
+        if $use_gio; then
+            if gio trash "${argv[@]}" 2>/dev/null; then
+                echo "Sent to Trash (gio)."
+                return 0
+            else
+                echo "Gio failed, trying rm ${*}."
+            fi
+        fi
+        command rm "${@}"
+    }
+fi
 # Makes diff decent
 if hash colordiff >&/dev/null; then
     alias diff="colordiff -B -U 5 --suppress-common-lines"
