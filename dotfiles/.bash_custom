@@ -19,6 +19,10 @@ alias subl='open-subl3'
 alias subl3='open-subl3'
 
 
+# Fixes kitty on ssh
+if [[ $(is_ssh) ]]; then
+    export TERM=xterm
+fi
 
 ## Dangerous stuff that interferes with scripts
 ## Put these at the end of your .bashrc preferably so it doesn't

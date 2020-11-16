@@ -40,13 +40,13 @@ shopt -s cmdhist
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
 # Erases history dups on EXIT
-function historymerge() {
-    history -n
-    history -w
-    history -c
-    history -r
-}
-trap historymerge EXIT
+# function historymerge() {
+#     history -n
+#     history -w
+#     history -c
+#     history -r
+# }
+# trap historymerge EXIT
 
 ##################
 # AUTOCOMPLETION #
@@ -167,7 +167,7 @@ function h() {
 
     local string
     for r in "${!results_cmds[@]}"; do
-        cmd=$(echo "${results_cmds[$r]}" | \grep --color=always "$query")
+        cmd=$(echo "${results_cmds[$r]}" | \grep -E --color=always "$query")
         line="\e[01;96m${results_nums[$r]} \e[00m$cmd\e[00m"
         echo -e "$line"
     done
@@ -304,7 +304,7 @@ complete -W "$(compgen -c)" -o bashdefault -o default 'e'
 # Finds directories recursively, and shows select_option
 # afterwards if less than 20 results.
 function findir() {
-    readarray -d '' results < <(find . -type d -iname \*"${1}"\* -print0)
+    readarray -d '' results < <(find . -path "*node_modules*" -prune -o -type d -iname \*"${1}"\* -print0 2>/dev/null)
 
     if [[ ${#results[@]} -eq 1 ]]; then
         # If there's an unique result for the argument, cd into it:
@@ -488,6 +488,7 @@ if hash "git" >&/dev/null; then
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gits='git status'
+    alias gitm='git commit --amend -m '
 
     alias gitcam='git commit -a -m '
     function gitcleanbranches() {
@@ -667,7 +668,7 @@ function format-duration() {
 function _get_truncated_pwd() {
     local tilde="~"
     local newPWD="${PWD/#${HOME}/${tilde}}"
-    local pwdmaxlen="$((${COLUMNS:-80} / 3))"
+    local pwdmaxlen="$((${COLUMNS:-80} / 4))"
     [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="…${newPWD:3-$pwdmaxlen}"
     echo -n "${newPWD}"
 }
@@ -870,6 +871,14 @@ if [[ -n $VTE_VERSION && -f /etc/profile.d/vte.sh ]]; then
 else
     PROMPT_COMMAND='_set_prompt'
 fi
+
+## "Fixes" kitty (or other terminals) from overriding XTERM inside SSH sessions:
+if is_ssh; then
+    if [[ $TERM =~ .*kitty.* ]]; then
+        export TERM=xterm-256color
+    fi
+fi
+
 
 ## GPG Signing TTY
 ## I don't recall why but this is required for GPG signing in git
