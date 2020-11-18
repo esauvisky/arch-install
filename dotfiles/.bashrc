@@ -5,8 +5,11 @@
 ##############################################
 ###### Also requires bash 4.4 or higher ######
 
-## Uncomment the following line for debugging this file
+## Perf. optimization: https://stackoverflow.com/questions/18039751/how-to-debug-a-bash-script-and-get-execution-time-per-command
+## Uncomment one of the following line for debugging this file
 # PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
+# N=`date +%s%N`; export PS4='+[$(((`date +%s%N`-$N)/1000000))ms][${BASH_SOURCE}:${LINENO}]: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'; set -x;
+
 
 ####################
 ## (some) Configs ##
@@ -73,7 +76,6 @@ fi
 # Returns if the current shell is running inside a SSH
 # Works with sudo su, also works if running local sshd.
 # Taken from: https://unix.stackexchange.com/a/12761
-_HOSTNAME="$(hostname -f)"
 function is_ssh() {
     p=${1:-$PPID}
     read pid name x ppid y < <(cat /proc/$p/stat)
@@ -280,24 +282,6 @@ function _magicCD() {
     fi
 }
 
-###############
-# Quick Spawn #
-###############
-# Spawns a process and closes the terminal, without killing the process.
-# Author: emi~
-function e() {
-    if [ -x "$(command -v "${1}")" ] || alias "${1}" >&/dev/null; then
-        eval "${@}" &
-        disown
-        exit 0
-    else
-        echo "Error: ${1} is not installed." >&2
-        exit 1
-    fi
-}
-# Adds list of completions to e() (basically adds every executable)
-complete -W "$(compgen -c)" -o bashdefault -o default 'e'
-
 #############
 # FIND DIRS #
 #############
@@ -393,6 +377,12 @@ if hash "grc" >&/dev/null; then
         _COLOURIFY_CMD='grc'
     fi
 fi
+
+## Pretty hostname
+_HOSTNAME="$(hostname -f)"
+_HOSTNAME=${_HOSTNAME%.*}
+_HOSTNAME=${_HOSTNAME//.*./}
+
 
 ###########
 # Aliases #
@@ -636,34 +626,7 @@ function format-duration() {
         printf "%ds" $S
 }
 
-###########################################
-# TODO: find some shit that actually wrks #
-###########################################
-## BASH PREEXEC
-## Adds zsh-like preexec and precmd support to bash
-## @see https://github.com/rcaloras/bash-preexec/
-## **Must be the last thing to be imported!**
-# if [[ -f "$HOME/.bash_preexec" ]]; then
-#     source "$HOME/.bash_preexec"
-# fi
 
-# ## Adds the time it took the cmd to run
-# function preexec() {
-#     if [[ "UNSET" == "${timer}" ]]; then
-#         timer=$SECONDS
-#     else
-#         timer=${timer:-$SECONDS}
-#     fi
-# }
-# function precmd() {
-#     if [[ "UNSET" == "${timer}" ]]; then
-#         timer_show="0s"
-#     else
-#         the_seconds=$((SECONDS - timer))
-#         timer_show="$(format-duration seconds $the_seconds)"
-#     fi
-#     timer="UNSET"
-# }
 ## Returns a truncated $PWD depending on window width
 function _get_truncated_pwd() {
     local tilde="~"
@@ -708,6 +671,8 @@ function _pre_command() {
     echo -ne "\e[0m"
 }
 
+
+
 function _set_prompt() {
     # Must come first
     _last_command=$?
@@ -725,51 +690,39 @@ function _set_prompt() {
     local White='\[\e[01;37m\]'
     local Violet='\[\e[01;35m\]'
     local Magenta='\[\e[01;36m\]'
-    local Red='\[\e[01;31m\]'
-    local Green='\[\e[01;32m\]'
+    local Red='\[\e[00;31m\]'
+    local RedBold='\[\e[01;31m\]'
+    local Green='\[\e[00;32m\]'
+    local GreenBold='\[\e[01;32m\]'
     local GreenLight='\[\e[01;92m\]'
     local YellowLight='\[\e[01;93m\]'
     local VioletLight='\[\e[01;95m\]'
     local PinkLight='\[\e[00;91m\]'
     local GrayBold='\[\e[01;98m\]'
     local GrayBackground='\[\e[01;40m\]'
+    local Yellow='\[\e[00;33m\]'
+    local YellowBold='\[\e[01;33m\]'
     # 1337 users get different colors
     # a.k.a: warns if you're in a root shell
 
-    # TODO: fix this shit, do not set the color according to the user
-    #       actually, set global colors to be used all along this file
-    if [ $(id -u) -eq 0 ]; then
-        local YellowB='\[\e[01;31m\]'
-        local YellowN='\[\e[00;31m\]'
-    else
-        local YellowB='\[\e[01;33m\]'
-        local YellowN='\[\e[00;33m\]'
-    fi
-
     local Reset='\[\e[00m\]'
-    local FancyX='\342\234\227'
-    local Checkmark='\342\234\223'
+    # local FancyX='\342\234\227'
+    # local Checkmark='\342\234\223'
+    local FancyX='✘'
+    local Checkmark='✔'
 
     # Prints  ---\n\n after previous command without spawning
     # a newline after it, so you can actually easily notice
     # if it's output has an EOF linebreak.
-    PS1="$YellowN---$Reset\\n\\n"
+    PS1="$Yellow---$Reset\\n\\n"
 
+    # Prints the error code
     if [[ $_last_command == 0 ]]; then
-        # If last cmd didn't return an error (exit code == 0)
-        PS1+="$Green$Checkmark ${White}000 "
-        if is_ssh; then
-            PS1+="$YellowB\\u@$_HOSTNAME"
-        else
-            PS1+="$Green\\u@\\h"
-        fi
+        PS1+="$GreenBold$Checkmark ${White}000 "
+        PS1+="$GreenBold\\u${__cHost}@${_HOSTNAME}"
     else
-        PS1+="$Red$FancyX $White$(printf "%03d" $_last_command) "
-        if is_ssh; then
-            PS1+="$YellowB\\u@$_HOSTNAME"
-        else
-            PS1+="$Red\\u@\\h"
-        fi
+        PS1+="$RedBold$FancyX ${White}$(printf "%03d" $_last_command) "
+        PS1+="$RedBold\\u${__cHost}@${_HOSTNAME}"
     fi
 
     ## Nicely shows you're in a python virtual environment
@@ -805,7 +758,7 @@ function _set_prompt() {
                 PS1+="$GreenLight✔ $branch_name•$Reset"
             fi
         elif echo "${git_status}" | grep -qm1 'Changes not staged'; then
-            PS1+="$YellowB→ $branch_name!$Reset"
+            PS1+="$YellowBold→ $branch_name!$Reset"
         elif echo "${git_status}" | grep -qm1 'Changes to be committed'; then
             PS1+="$Violet→ $branch_name+$Reset"
         else
@@ -817,7 +770,14 @@ function _set_prompt() {
         PS1+="$Violet]$Reset"
     fi
 
-    PS1+=" $Bluelly\\w\\n$YellowB\\\$ $YellowN"
+    # Sets the prompt color according to
+    # user (if logged in as root gets red)
+    if [[ $(id -u) -eq 0 ]]; then
+        PS1+=" $Bluelly\\w\\n${RedBold}\\\$ ${Red}"
+    else
+        PS1+=" $Bluelly\\w\\n${YellowBold}\\\$ ${Yellow}"
+    fi
+
 
     # Aligns stuff when you don't close quotes
     PS2=" | "
@@ -872,13 +832,13 @@ else
     PROMPT_COMMAND='_set_prompt'
 fi
 
-## "Fixes" kitty (or other terminals) from overriding XTERM inside SSH sessions:
+## SSH Stuff (runs only if it's inside ssh)
 if is_ssh; then
     if [[ $TERM =~ .*kitty.* ]]; then
         export TERM=xterm-256color
     fi
+    _HOSTNAME="\[\e[01;33m\]${_HOSTNAME} [SSH]"
 fi
-
 
 ## GPG Signing TTY
 ## I don't recall why but this is required for GPG signing in git
