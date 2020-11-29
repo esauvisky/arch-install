@@ -9,7 +9,7 @@ for dep in "${__deps[@]}"; do hash $dep >&/dev/null || (echo "$dep was not found
 
 
 if [[ ! -t 0 ]]; then
-    echo -e '\n\nPlease run like this instead:\nbash $(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)' && exit 1
+    echo -e '\n\nPlease run like this instead:\nbash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"' && exit 1
 fi
 
 dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc")
