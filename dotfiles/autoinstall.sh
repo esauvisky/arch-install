@@ -24,7 +24,7 @@ if ! hash wget 2>/dev/null; then
             echo "Well sorry then. Get wget first."
             exit 1
         else
-            pacman -S --needed --noconfirm wget
+            sudo pacman -S --needed --noconfirm wget
         fi
     elif hash apt 2>/dev/null; then
         echo -n "I need wget to be installed for this to work. May I? "
@@ -33,7 +33,7 @@ if ! hash wget 2>/dev/null; then
             echo "Well sorry then. Get wget first."
             exit 1
         else
-            apt install wget
+            udo apt install wget
         fi
     fi
 fi
@@ -70,13 +70,13 @@ if hash pacman 2>/dev/null; then
     echo -en "\n\nBtw, you use Arch. Might I install a couple cool shit for this to work even better?"
     read -p " [Y/n] "
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano
+        sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano
     fi
 elif hash apt 2>/dev/null; then
     echo -en "\n\nI see you're not an Arch user, but at least it's linux.\nMight I install a couple cool shit for this to work even better?"
     read -p " [Y/n] "
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        apt install grc cowsay fortune-mod lolcat ccze colordiff nano
+        sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
     fi
 fi
 
