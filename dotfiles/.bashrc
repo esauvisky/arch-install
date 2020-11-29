@@ -10,6 +10,8 @@
 # PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
 # N=`date +%s%N`; export PS4='+[$(((`date +%s%N`-$N)/1000000))ms][${BASH_SOURCE}:${LINENO}]: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'; set -x;
 
+[[ $- != *i* ]] && return
+
 
 ####################
 ## (some) Configs ##
@@ -20,6 +22,7 @@ cool_places=(
     "~/.config/systemd/user/"
     "/etc/systemd/user/"
     "/var/lib/docker/volumes"
+    "/usr/share/bash-completion/completions"
 )
 
 ########################
@@ -69,6 +72,13 @@ if [ -f /usr/share/bash-completion/completions/git ]; then
     # GCP VMs that make sed error out for some stupid reason and bad coding
     source /usr/share/bash-completion/completions/git #2>/dev/null
 fi
+## Allows zsh-style completion for dirs
+## Example:
+##     cd /u/s/*comp[TAB]
+# if [[ -f ~/.bash_adv_completion ]]; then
+#     source ~/.bash_adv_completion
+#     _bcpp --defaults
+# fi
 
 #################
 #    is_ssh     #
@@ -171,7 +181,7 @@ function h() {
     for r in "${!results_cmds[@]}"; do
         cmd=$(echo "${results_cmds[$r]}" | \grep -E --color=always "$query")
         line="\e[01;96m${results_nums[$r]} \e[00m$cmd\e[00m"
-        echo -e "$line"
+        printf "$line\n"
     done
 }
 
@@ -394,8 +404,10 @@ alias sudo='sudo '
 ## Navigation
 alias mkdir="mkdir -p"
 alias go="xdg-open"
-alias ls="${_COLOURIFY_CMD} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
+
+alias ls="${_COLOURIFY_CMD} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+if hash complete >&/dev/null; then complete -F _filedir ls; fi
 
 ## Safe rm using gio trash
 ## Falls back to rm in any unsupported case
@@ -429,6 +441,7 @@ if hash gio >&/dev/null; then
         command rm "${@}"
     }
 fi
+
 # Makes diff decent
 if hash colordiff >&/dev/null; then
     alias diff="colordiff -B -U 5 --suppress-common-lines"
@@ -570,7 +583,7 @@ if hash "pacman" >&/dev/null; then
         fi
 
         echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
-        sudo \pacman -Su --noconfirm
+        sudo yay -Syu --noconfirm
     }
 
     ## NOT REQUIRED ANYMORE BECAUSE BTRFS
@@ -875,16 +888,6 @@ else
         export EDITOR="vi"
     fi
 fi
-
-## Adds alias autocompletion for **all** the aliases that
-## did not had it manually added using _complete_alias.
-## This is called after all aliases are defined before the prompt block.
-while read -r i; do
-    _alias=$(echo "$i" | sed -E 's/alias ([^=]+)=.+/\1/')
-    if ! complete -p "$_alias" >&/dev/null; then
-        complete -F _complete_alias "$_alias"
-    fi
-done < <(alias -p)
 
 ################
 # CUSTOM STUFF #
