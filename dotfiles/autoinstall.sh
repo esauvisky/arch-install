@@ -11,6 +11,26 @@ dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc")
 
 cd "$HOME"
 
+if ! hash wget 2>/dev/null; then
+    if hash pacman 2>/dev/null; then
+        echo -n "I need wget to be installed for this to work. May I? "
+        read -p " [Y/n] " -r
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+            echo "Well sorry then. Get wget first."
+        else
+            pacman -S --needed --noconfirm wget
+        fi
+    elif hash apt 2>/dev/null; then
+        echo -n "I need wget to be installed for this to work. May I? "
+        read -p " [Y/n] " -r
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+            echo "Well sorry then. Get wget first."
+        else
+            apt install wget
+        fi
+    fi
+fi
+
 if hash gio 2>/dev/null; then
     # has gio support, can send older scripts to trash
     for dep in "${dotfiles[@]}"; do
