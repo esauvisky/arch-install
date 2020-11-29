@@ -8,7 +8,7 @@ __deps=("sed" "grep")
 for dep in "${__deps[@]}"; do hash $dep >&/dev/null || (echo "$dep was not found. Please install it and try again." && exit 1); done
 
 
-[[ $- != *i* ]] && echo -e "Please run like this instead:\n\tbash $(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)" && exit 1
+[[ $- != *i* ]] && echo -e 'Please run like this instead:\n\tbash $(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)' && exit 1
 
 dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc")
 
