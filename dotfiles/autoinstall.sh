@@ -17,6 +17,7 @@ if ! hash wget 2>/dev/null; then
         read -p " [Y/n] " -r
         if [[ $REPLY =~ ^[Nn]$ ]]; then
             echo "Well sorry then. Get wget first."
+            exit 1
         else
             pacman -S --needed --noconfirm wget
         fi
@@ -25,6 +26,7 @@ if ! hash wget 2>/dev/null; then
         read -p " [Y/n] " -r
         if [[ $REPLY =~ ^[Nn]$ ]]; then
             echo "Well sorry then. Get wget first."
+            exit 1
         else
             apt install wget
         fi
