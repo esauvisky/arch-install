@@ -4,7 +4,7 @@
 # Allows readline to bind tty special chars, i.e.:
 # to override custom special key combinations that might
 # be controlled by the emulator.
-set bind-tty-special-chars off
+set bind-tty-special-chars on
 
 # Troca a ação padrão de TAB para menu-complete (ao invés de complete).
 # menu-complete é mais eficiente pois faz loop pelos autocompletes,
@@ -12,24 +12,19 @@ set bind-tty-special-chars off
 TAB: menu-complete
 # Faz a mesma coisa com Shift+TAB, só que faz o caminho inverso.
 "\e[Z": menu-complete-backward
-
-# Troca a ação padrão de TAB para menu-complete (ao invés de complete).
-# menu-complete é mais eficiente pois faz loop pelos autocompletes,
-# quando há uma lista de valores ambíguos.
-TAB: menu-complete
-# Faz a mesma coisa com Shift+TAB, só que faz o caminho inverso.
-"\e[Z": menu-complete-backward
+# If above doesn't work
+#"\e[Z": "\e-1\C-i"
 
 # Não começa de primeira: exibe a lista antes, e depois faz o loop se apertar
 # TAB novamente. Desta forma permite dar uma "espiada" nos nomes dos arquivos
 # ou termos a completar antes de começar a preencher.
-set menu-complete-display-prefix off
+set menu-complete-display-prefix on
 
 # Remove as páginas de autocompletação de aspecto igual a 'more' ou 'less'
 set page-completions off
 
 # display one column with matches
-set completion-display-width 1
+#set completion-display-width 3
 
 # Ignora maiúsculas e minúsculas quando autocompletando.
 set completion-ignore-case on
@@ -39,7 +34,7 @@ set completion-map-case on
 
 # Se o tamanho do prefixo comum entre items de autocomplete for maior do que 10,
 # ocultar o prefixo na lista de autocomplete.
-set completion-prefix-display-length 20
+set completion-prefix-display-length 10
 
 # Não autocompleta dot-files a não ser que o padrão comece explicitamente com um ponto
 set match-hidden-files off
@@ -58,11 +53,11 @@ set visible-stats on
 # Não adiciona barras no final de nomes de diretórios quando autocompletando
 # P.S.: se TAB está associado a menu-complete, é recomendado deixar esta
 # variável off, pois pode-se apertar / para autocompletar o diretório escolhido.
-set mark-directories on
+set mark-directories off
 
 # Faz o mesmo para symlinks. Do contrário ele não adicionaria a barra pois
 # teoricamente o synlink é somente um arquivo.
-set mark-symlinked-directories on
+set mark-symlinked-directories off
 
 ## Colors
 # FIXME: Criar uma tabela de cores e arrumar o bug que o PS1 termina em yellow
@@ -82,8 +77,8 @@ set skip-completed-text on
 ##################
 ## RANDOM STUFF ##
 ##################
-# Não exibir caracteres como ^C & etc. (somente fora de programas)
-set echo-control-characters off
+# Show control characters
+set echo-control-characters on
 
 # Ao resgatar o primeiro histórico, posiciona o cursor no mesmo lugar aonde
 # estava quando o último comando foi executado.
@@ -133,13 +128,6 @@ set history-preserve-point on
 ################
 ## NAVIGATION ##
 ################
-# Navega por argumentos, respeitando espaços dentro de aspas e tudo mais.
-"\C-w": shell-backward-kill-word
-"\C-d": shell-kill-word
-
-# Starts and automatically disowns a cmd (doesnt work)
-#"\\C-M": '& disown\015'
-
 # Permite pesquisas no histórico.
 # Após digitar algum texto, ao usar as teclas para cima e para baixo
 # o histórico será pesquisado por comandos começando com tal texto.
@@ -147,10 +135,16 @@ set history-preserve-point on
 "\e[B": history-search-forward
 "\e[A": history-search-backward
 
-# Arruma a tecla delete para Androids
+# Deletes by arguments (i.e: until space, instead of "non-letter")
+"\C-w": shell-backward-kill-word
+"\C-d": shell-kill-word
+"\C-h": backward-kill-word  # ctrl+backspace
+"\e[3;5~": kill-word        # ctrl+delete
+
+# Fixes delete key in android devices
 "\e[3~": delete-char
 
-# Mappings for Ctrl-left-arrow and Ctrl-right-arrow for word moving
+# Mappings for Ctrl+Arrows
 "\e[1;5C": forward-word
 "\e[1;5D": backward-word
 "\e[5C": forward-word
@@ -159,5 +153,7 @@ set history-preserve-point on
 "\e\e[D": backward-word
 
 # Mappings for Alt+Arrows
-"\e[1;3D": shell-backward-word
-"\e[1;3C": shell-forward-word
+"\e[1;3D": shell-backward-word      # alt+left
+"\e[1;3C": shell-forward-word       # alt+right
+"\e\177": shell-backward-kill-word  # alt+backspace
+"\e[3;3~": shell-kill-word          # alt+delete

@@ -473,7 +473,8 @@ fi
 if hash "journalctl" >&/dev/null; then
     alias je='journalctl -efn 50 -o short --no-hostname | \ccze -A'
     alias jb='journalctl -eb -o short --no-hostname'
-
+    complete -F _journalctl je
+    complete -F _journalctl jb
     # alias js='journalctl -lx _SYSTEMD_UNIT='
     # function js() {
     #     if [[ $# -eq 0 ]]; then
@@ -762,6 +763,8 @@ function _set_prompt() {
 
         PS1+=" ${Violet}["
 
+        # TODO: stop using git status here, it lags like fuck when
+        #       lots of files are deleted
         local -r git_status=$(git status 2>&1) # TODO: still couldn't find what -r is about
         # see: https://github.com/koalaman/shellcheck/wiki/SC2155)
         if echo "${git_status}" | grep -qm1 'nothing to commit'; then
