@@ -12,7 +12,6 @@
 
 [[ $- != *i* ]] && return
 
-
 ####################
 ## (some) Configs ##
 ####################
@@ -75,10 +74,10 @@ fi
 ## Allows zsh-style completion for dirs
 ## Example:
 ##     cd /u/s/*comp[TAB]
-# if [[ -f ~/.bash_adv_completion ]]; then
-#     source ~/.bash_adv_completion
-#     _bcpp --defaults
-# fi
+if [[ -f ~/.bash_comp_dirs ]]; then
+    source ~/.bash_comp_dirs
+    _bcpp --defaults
+fi
 
 #################
 #    is_ssh     #
@@ -349,66 +348,9 @@ function cdcool() {
     fi
 }
 
-#################
-# COLORS, LOTS! #
-#################
-## Magic with `less` (like colors and other cool stuff)
-export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
-
-## Magic with man pages (colors mainly)
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
-if [[ -x /usr/bin/dircolors ]]; then
-    if [[ -f ~/.dircolors ]]; then
-        eval "$(dircolors -b ~/.dircolors)"
-    else
-        eval "$(dircolors -b)"
-    fi
-    _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
-fi
-
-if hash "grc" >&/dev/null; then
-    if [[ -f /etc/profile.d/grc.bashrc ]]; then
-        source /etc/profile.d/grc.bashrc >&/dev/null # grc/colourify
-        if alias colourify >&/dev/null; then
-            # enables colourify dinamycally, if the above
-            # didn't fail for some reason
-            _COLOURIFY_CMD='colourify'
-        else
-            _COLOURIFY_CMD='grc'
-        fi
-    else
-        _COLOURIFY_CMD='grc'
-    fi
-fi
-
-## Pretty hostname
-_HOSTNAME="$(hostname -f)"
-_HOSTNAME=${_HOSTNAME%.*}
-_HOSTNAME=${_HOSTNAME//.*./}
-
-
 ###########
-# Aliases #
+# SAFE RM #
 ###########
-
-## Allows using aliases after sudo (the ending space is what does teh trick)
-alias sudo='sudo '
-
-## Navigation
-alias mkdir="mkdir -p"
-alias go="xdg-open"
-alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
-
-alias ls="${_COLOURIFY_CMD} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
-if hash complete >&/dev/null; then complete -F _filedir ls; fi
-
 ## Safe rm using gio trash
 ## Falls back to rm in any unsupported case
 ## Only caveat: ignores -r as gio trash already
@@ -442,6 +384,60 @@ if hash gio >&/dev/null; then
     }
 fi
 
+#################
+# COLORS, LOTS! #
+#################
+## Magic with `less` (like colors and other cool stuff)
+export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
+
+## Magic with man pages (colors mainly)
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+
+if [[ -x /usr/bin/dircolors ]]; then
+    if [[ -f ~/.dircolors ]]; then
+        eval "$(dircolors -b ~/.dircolors)"
+    else
+        eval "$(dircolors -b)"
+    fi
+    _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
+fi
+
+if hash "grc" >&/dev/null; then
+    GRC='grc -es'
+    for i in ~/.grc/*; do
+        alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
+    done
+    if [[ -f /etc/profile.d/grc.bashrc ]]; then
+        source /etc/profile.d/grc.bashrc >&/dev/null # grc/colourify
+    fi
+    alias cat="$GRC cat"
+fi
+
+## Pretty hostname
+_HOSTNAME="$(hostname -f)"
+_HOSTNAME=${_HOSTNAME%.*}
+_HOSTNAME=${_HOSTNAME//.*./}
+
+###########
+# Aliases #
+###########
+
+## Allows using aliases after sudo (the ending space is what does teh trick)
+alias sudo='sudo '
+
+## Navigation
+alias ls="${GRC} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+alias go="xdg-open"
+alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
+
+if hash complete >&/dev/null; then complete -F _filedir ls; fi
+
 # Makes diff decent
 if hash colordiff >&/dev/null; then
     alias diff="colordiff -B -U 5 --suppress-common-lines"
@@ -452,11 +448,10 @@ fi
 ## Logging
 alias watch="watch --color -n0.5"
 # Makes dmesg timestamps readable
-alias dmesg='dmesg --time-format ctime'
+alias df="${GRC} df -H"
 # Makes dd pretty
 alias dd="dd status=progress oflag=sync"
-# Makes df pretty
-alias df="${_COLOURIFY_CMD} df -H"
+# Makes df$GRC
 
 # Btrfs aliases for usage and df
 if hash "btrfs" >&/dev/null; then
@@ -471,7 +466,7 @@ fi
 
 # journalctl handy aliases
 if hash "journalctl" >&/dev/null; then
-    alias je='journalctl -efn 50 -o short --no-hostname | \ccze -A'
+    alias je='journalctl -efn 50 -o short --no-hostname'
     alias jb='journalctl -eb -o short --no-hostname'
     complete -F _journalctl je
     complete -F _journalctl jb
@@ -640,7 +635,6 @@ function format-duration() {
         printf "%ds" $S
 }
 
-
 ## Returns a truncated $PWD depending on window width
 function _get_truncated_pwd() {
     local tilde="~"
@@ -684,8 +678,6 @@ function _pre_command() {
     # Small fix that clears up all prompt colors, so we don't colorize any output by mistake
     echo -ne "\e[0m"
 }
-
-
 
 function _set_prompt() {
     # Must come first
@@ -793,7 +785,6 @@ function _set_prompt() {
     else
         PS1+=" $Bluelly\\w\\n${YellowBold}\\\$ ${Yellow}"
     fi
-
 
     # Aligns stuff when you don't close quotes
     PS2=" | "

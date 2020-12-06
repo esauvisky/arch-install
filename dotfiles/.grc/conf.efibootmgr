@@ -1,0 +1,18 @@
+-
+# Type/Name
+regexp=^([^/ ]+)/(\S+)
+colour=unchanged,yellow,bright_white
+-
+# BootNums and command
+regexp=^([BT][a-z]+\d*[\*:]?\S+) .+
+colour=bold,bold green
+-
+# Location
+regexp=(\([^\s\/]+\))
+colour=unchanged,bright_green,magenta
+count=more
+-
+# Kernel Params
+regexp=([\.\w\d\-_]+=)([\/=\.\w\d\-_\\\:]+)
+colour=unchanged,blue,bright_yellow
+count=more
