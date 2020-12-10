@@ -12,7 +12,7 @@ if [[ ! -t 0 ]]; then
     echo -e '\n\nPlease run like this instead:\nbash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"' && exit 1
 fi
 
-dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc")
+dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc" ".dircolors")
 
 cd "$HOME"
 
@@ -33,7 +33,7 @@ if ! hash wget 2>/dev/null; then
             echo "Well sorry then. Get wget first."
             exit 1
         else
-            udo apt install wget
+            sudo apt install wget
         fi
     fi
 fi
