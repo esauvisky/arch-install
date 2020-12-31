@@ -410,9 +410,11 @@ fi
 
 if hash "grc" >&/dev/null; then
     GRC='grc -es'
-    for i in ~/.grc/*; do
-        alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
-    done
+    if [[ -d ~/.grc/ ]]; then
+        for i in ~/.grc/*; do
+            alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
+        done
+    fi
     if [[ -f /etc/profile.d/grc.bashrc ]]; then
         source /etc/profile.d/grc.bashrc >&/dev/null # grc/colourify
     fi
@@ -601,7 +603,9 @@ fi
 
 # Pretty colorful and super verbose logcat for adb devices
 if hash "adb" >&/dev/null; then
-    alias logcat="adb logcat -b all -v color,usec,uid"
+    alias logcat_5min="adb logcat -v color,usec,uid -d -t \"\$(date \"+%F %T.000\" --date=\"5 minutes ago\")\""
+    alias logcat_live="adb logcat -T1 -v color,usec,uid"
+    alias logcat_giant="adb logcat -b all -v color,usec,uid -b"
 fi
 
 # Sets default stuff for bat

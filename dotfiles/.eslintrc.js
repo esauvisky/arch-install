@@ -2,15 +2,15 @@ module.exports = {
     "env": {
         "es6": true,
     },
-    "extends": [
-        // "google", // Hardcoded on this file
-    ],
+    "plugins": [],
     "globals": {
         "Atomics":           "readonly",
         "SharedArrayBuffer": "readonly",
     },
     "parserOptions": {
-        "ecmaVersion": 2018,
+        "ecmaVersion":                 6,
+        "sourceType":                  "module",
+        "allowImportExportEverywhere": true,
     },
     "rules": {
         /**
@@ -33,7 +33,7 @@ module.exports = {
         ],
         "quotes": [
             "warn",
-            "single",
+            "double",
         ],
         "semi": [
             "warn",
@@ -61,7 +61,7 @@ module.exports = {
         "object-curly-spacing": ["warn", "always"],
         "space-in-parens":      ["warn", "never"],
         "no-use-before-define": ["warn", {
-            "functions": true,
+            // "functions": true,
             "classes":   true,
             "variables": true,
         }],
@@ -73,7 +73,7 @@ module.exports = {
         "new-cap":          ["off"],
         "require-jsdoc":    ["off"],
         "valid-jsdoc":      ["off"],
-        "no-unused-vars":   ["warn"],
+        "no-unused-vars":   ["off"],
         "no-throw-literal": ["off"],
         "no-tabs":          ["warn"],
 
@@ -167,7 +167,7 @@ module.exports = {
         // 'no-implicit-coercion': 0,
         // 'no-implicit-globals': 0,
         // 'no-implied-eval': 0,
-        "no-invalid-this":              2,
+        "no-invalid-this":              0,
         // 'no-iterator': 0,
         // 'no-labels': 0,
         // 'no-lone-blocks': 0,
@@ -224,8 +224,6 @@ module.exports = {
         // 'no-undef': 2, // eslint:recommended
         // 'no-undef-init': 0,
         // 'no-undefined': 0,
-        // 'no-use-before-define': 0,
-
         // Node.js and CommonJS
         // http://eslint.org/docs/rules/#nodejs-and-commonjs
         // -------------------------------------------------
@@ -247,13 +245,12 @@ module.exports = {
         "array-bracket-newline":     0, // eslint:recommended
         "array-bracket-spacing":     [2, "never"],
         "array-element-newline":     0, // eslint:recommended
-        "block-spacing":             [2, "never"],
-        "brace-style":               2,
-        // 'camelcase': [2, {properties: 'never'}],
+        "block-spacing":             1,
+        "brace-style":               [1, "1tbs", { "allowSingleLine": true }],
         // 'capitalized-comments': 0,
-        "comma-dangle":              [2, "always-multiline"],
-        "comma-spacing":             2,
-        "comma-style":               2,
+        "comma-dangle":              [1, "always-multiline"],
+        "comma-spacing":             1,
+        "comma-style":               1,
         "computed-property-spacing": 2,
         // 'consistent-this': 0,
         "eol-last":                  2,
@@ -325,7 +322,7 @@ module.exports = {
         // 'no-restricted-syntax': 0,
         // 'no-tabs': 2,
         // 'no-ternary': 0,
-        "no-trailing-spaces":        2,
+        "no-trailing-spaces":        0,
         // 'no-underscore-dangle': 0,
         // 'no-unneeded-ternary': 0,
         // 'no-whitespace-before-property': 0,
@@ -364,9 +361,9 @@ module.exports = {
             named:      "never",
         }],
         // 'space-in-parens': 0,
-        // 'space-infix-ops': 0,
         // 'space-unary-ops': 0,
         // 'spaced-comment': [2, 'always'],
+        "space-infix-ops":      1,
         "switch-colon-spacing": 2,
         // 'template-tag-spacing': 0,
         // 'unicode-bom': 0,

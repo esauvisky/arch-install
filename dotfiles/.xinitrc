@@ -28,6 +28,10 @@ eval "$(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ss
 dbus-update-activation-environment --systemd DISPLAY
 export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
 
+## Fixes HiDPI QT5 Applications (that respect the config)
+## In particular, fixes copyq menu below
+export QT_AUTO_SCREEN_SCALE_FACTOR=1
+
 #############
 # AUTOSTART #
 #############
@@ -71,7 +75,7 @@ syncthing-gtk &
 # guake &
 
 # Copyq daemon
-copyq &
+sleep 5s && copyq &
 
 ## Gnome: Ignore Lid Switch
 /usr/lib/gnome-tweak-tool-lid-inhibitor &
