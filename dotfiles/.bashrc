@@ -410,13 +410,15 @@ fi
 
 if hash "grc" >&/dev/null; then
     GRC='grc -es'
+    if [[ -f /etc/profile.d/grc.sh ]]; then
+        source /etc/profile.d/grc.sh >&/dev/null # grc/colourify
+    fi
     if [[ -d ~/.grc/ ]]; then
         for i in ~/.grc/*; do
-            alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
+            if [[ ${i//*\//} != "grc.conf" && ! $(alias "${i##*conf.}" 2>/dev/null) ]]; then
+                alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
+            fi
         done
-    fi
-    if [[ -f /etc/profile.d/grc.bashrc ]]; then
-        source /etc/profile.d/grc.bashrc >&/dev/null # grc/colourify
     fi
     alias cat="$GRC cat"
 fi
@@ -605,7 +607,7 @@ fi
 if hash "adb" >&/dev/null; then
     alias logcat_5min="adb logcat -v color,usec,uid -d -t \"\$(date \"+%F %T.000\" --date=\"5 minutes ago\")\""
     alias logcat_live="adb logcat -T1 -v color,usec,uid"
-    alias logcat_giant="adb logcat -b all -v color,usec,uid -b"
+    alias logcat_giant="adb logcat -b all -v color,usec,uid"
 fi
 
 # Sets default stuff for bat
