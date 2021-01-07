@@ -20,7 +20,7 @@ alias subl3='open-subl3'
 
 
 # Fixes kitty on ssh
-if [[ $(is_ssh) ]]; then
+if [[ $(is_ssh) && $TERM == "xterm-kitty" ]]; then
     export TERM=xterm
 fi
 
@@ -28,12 +28,11 @@ fi
 ## Put these at the end of your .bashrc preferably so it doesn't
 ## intereferes with anything that is being done there.
 # Allows non case-sensitive wildcard globs (*, ?):
-# shopt -s nocaseglob
+shopt -s nocaseglob
 # Allows extended wildcard globs
-# shopt -s extglob
+shopt -s extglob
 # Enables the ** glob
 shopt -s globstar
-
 
 ## WIP:
 ## This makes it only actually grep if it's not being piped
@@ -70,3 +69,18 @@ shopt -s globstar
 #     fi
 #     builtin cd "${1}"
 # }
+
+# Adds coloring output for the rest of the shit
+if [[ -d ~/.grc/ ]]; then
+    for i in ~/.grc/*; do
+        if [[ ${i//*\//} != "grc.conf" && ! $(alias "${i##*conf.}" 2>/dev/null) ]]; then
+            alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
+        fi
+    done
+fi
+
+## Allows zsh-style completion for dirs
+## Example:
+##     cd /u/s/*comp[TAB]
+_bcpp --dirs --nocase --cooperate
+complete -F _bcpp_complete_dir rmdir

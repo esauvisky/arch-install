@@ -134,7 +134,7 @@ _bcpp_complete() {
     compopt -o default
 
     # If input is already a valid path, do not try to be clever
-    if [[ -e "$INPUT" ]]
+    if [[ -e "$INPUT" || "$INPUT" == "" ]]
     then
         if [[ "_$ACTION" == "_directory" ]]
         then

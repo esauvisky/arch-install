@@ -34,6 +34,7 @@ set completion-map-case on
 
 # Se o tamanho do prefixo comum entre items de autocomplete for maior do que 10,
 # ocultar o prefixo na lista de autocomplete.
+set menu-complete-display-prefix on
 set completion-prefix-display-length 10
 
 # Não autocompleta dot-files a não ser que o padrão comece explicitamente com um ponto

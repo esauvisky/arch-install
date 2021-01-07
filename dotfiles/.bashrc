@@ -40,8 +40,13 @@ export HISTIGNORE="clear:exit:history:ls"
 export HISTCONTROL=ignoredups:erasedups
 # Custom history time prefix format
 export HISTTIMEFORMAT='[%F %T] '
-# Writes multiline commands on the history as one line
+# FIXME: Writes multiline commands on the history as one line
+# TODO: TESTING!!!
+# Actually writes multiline commands on the history AS MULTIPLE LINES!
+# If something breaks, write down what was and restore backup from
+# ~/.bash_eternal_history~ (jan 7 2021)
 shopt -s cmdhist
+shopt -s lithist
 # ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
 shopt -s histappend
 # Erases history dups on EXIT
@@ -62,22 +67,15 @@ shopt -s histappend
 # 3. The output is the hook that was used to complete it.
 # 4. Change it accordingly to apply it to your function.
 ## Loads bash's system-wide installed completions
-if [[ -f /usr/share/bash-completion/bash_completion ]]; then
-    source /usr/share/bash-completion/bash_completion
-fi
 ## Loads gits completion file for our custom completions
 if [ -f /usr/share/bash-completion/completions/git ]; then
     # the STDERR redirection is to not print an annoying bug on
     # GCP VMs that make sed error out for some stupid reason and bad coding
     source /usr/share/bash-completion/completions/git #2>/dev/null
 fi
-## Allows zsh-style completion for dirs
-## Example:
-##     cd /u/s/*comp[TAB]
-if [[ -f ~/.bash_comp_dirs ]]; then
-    source ~/.bash_comp_dirs
-    _bcpp --defaults
-fi
+# if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+#     source /usr/share/bash-completion/bash_completion
+# fi
 
 #################
 #    is_ssh     #
@@ -407,18 +405,11 @@ if [[ -x /usr/bin/dircolors ]]; then
     fi
     _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
 fi
-
+# GRC
 if hash "grc" >&/dev/null; then
     GRC='grc -es'
     if [[ -f /etc/profile.d/grc.sh ]]; then
-        source /etc/profile.d/grc.sh >&/dev/null # grc/colourify
-    fi
-    if [[ -d ~/.grc/ ]]; then
-        for i in ~/.grc/*; do
-            if [[ ${i//*\//} != "grc.conf" && ! $(alias "${i##*conf.}" 2>/dev/null) ]]; then
-                alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
-            fi
-        done
+        source /etc/profile.d/grc.sh >&/dev/null
     fi
     alias cat="$GRC cat"
 fi
@@ -440,7 +431,6 @@ alias ls="${GRC} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --gr
 alias go="xdg-open"
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 
-if hash complete >&/dev/null; then complete -F _filedir ls; fi
 
 # Makes diff decent
 if hash colordiff >&/dev/null; then

@@ -67,15 +67,15 @@ module.exports = {
         }],
         "no-undef":         ["off"],
         "max-len":          ["off"],
-        "camelcase":        ["off"],
+        "camelcase":        ["warn"],
         "no-var":           ["warn"],
         "spaced-comment":   ["off"],
         "new-cap":          ["off"],
         "require-jsdoc":    ["off"],
         "valid-jsdoc":      ["off"],
-        "no-unused-vars":   ["off"],
+        "no-unused-vars":   ["warn"],
         "no-throw-literal": ["off"],
-        "no-tabs":          ["warn"],
+        "no-tabs":          ["error"],
 
 
         // The rules below are listed in the order they appear on the eslint
