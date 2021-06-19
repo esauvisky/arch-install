@@ -82,5 +82,5 @@ fi
 ## Allows zsh-style completion for dirs
 ## Example:
 ##     cd /u/s/*comp[TAB]
-_bcpp --dirs --nocase --cooperate
-complete -F _bcpp_complete_dir rmdir
+_bcpp --dirs --nocase --cooperate --files
+#complete -F _bcpp_complete_dir rmdir

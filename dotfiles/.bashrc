@@ -15,6 +15,20 @@
 ####################
 ## (some) Configs ##
 ####################
+# android shit (mostly for arch/manjaro)
+if [[ -d /opt/android-ndk ]]; then
+    export ANDROID_NDK_ROOT="/opt/android-ndk" # the proper one
+    export ANDROID_NDK_HOME="/opt/android-ndk" # uncommon
+    export ANDROID_NDK="/opt/android-ndk"      # uncommon
+
+    # adds build tools (aapt, dexdump, etc)
+    # only adds the highest version
+    build_tools="$(find "$ANDROID_HOME/build-tools" -maxdepth 1 -type d | sort --numeric-sort --reverse | head -n1)"
+    if [[ -d "$build_tools" ]]; then
+        export PATH="$PATH:$build_tools"
+    fi
+fi
+
 # List of places to show when using 'cdcool [arg]'
 cool_places=(
     "~/.local/share/gnome-shell/extensions"
@@ -90,6 +104,14 @@ function is_ssh() {
     [[ "$name" =~ sshd ]] && { return 0; }
     [ "$ppid" -le 1 ] && { return 1; }
     is_ssh $ppid
+}
+
+##############
+# url_decode #
+##############
+function urldecode() {
+    : "${*//+/ }"
+    echo -e "${_//%/\\x}"
 }
 
 #################
@@ -431,7 +453,6 @@ alias ls="${GRC} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --gr
 alias go="xdg-open"
 alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
 
-
 # Makes diff decent
 if hash colordiff >&/dev/null; then
     alias diff="colordiff -B -U 5 --suppress-common-lines"
@@ -480,10 +501,16 @@ fi
 if hash "git" >&/dev/null; then
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
+    alias gitw="git whatchanged --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gits='git status'
     alias gitm='git commit --amend -m '
 
     alias gitcam='git commit -a -m '
+
+    function gitc {
+        git clone $1 && cd $(basename $1 .git)
+    }
+
     function gitcleanbranches() {
         git fetch --prune
         git checkout master
@@ -545,7 +572,7 @@ fi
 if hash "pacman" >&/dev/null; then
     alias pacman="pacman "
     alias pacs="sudo pacman -S --needed --asdeps"
-    alias pacr="sudo pacman -R"
+    alias pacr="sudo pacman -R --recursive --unneeded --cascade"
     alias pacss="pacman -Ss"
     alias paci="pacman -Qi"
     alias pacl="pacman -Ql"
