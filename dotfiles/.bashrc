@@ -29,9 +29,14 @@ if [[ -d /opt/android-ndk ]]; then
     fi
 fi
 
+if [[ -d ~/.local/bin ]]; then
+    export PATH="$PATH:$HOME/.local/bin"
+fi
+
 # List of places to show when using 'cdcool [arg]'
 cool_places=(
     "~/.local/share/gnome-shell/extensions"
+    "~/.local/share/applications"
     "~/.config/systemd/user/"
     "/etc/systemd/user/"
     "/var/lib/docker/volumes"
@@ -513,10 +518,18 @@ if hash "git" >&/dev/null; then
 
     function gitcleanbranches() {
         git fetch --prune
-        git checkout master
+        if [[ $# == 1 ]]; then
+            master="$1"
+        else
+            master="master"
+        fi
+        if ! git checkout $master 2>/dev/null; then
+            echo "Pass the master branch name as argv[1]!"
+            return
+        fi
         for r in $(git for-each-ref refs/heads --format='%(refname:short)'); do
-            if [[ "$(git merge-base master "$r")" == "$(git rev-parse --verify "$r")" ]]; then
-                if [ "$r" != "master" ]; then
+            if [[ "$(git merge-base $master "$r")" == "$(git rev-parse --verify "$r")" ]]; then
+                if [ "$r" != "$master" ]; then
                     git branch --delete "$r"
                 fi
             fi
@@ -625,6 +638,8 @@ if hash "adb" >&/dev/null; then
     alias logcat_5min="adb logcat -v color,usec,uid -d -t \"\$(date \"+%F %T.000\" --date=\"5 minutes ago\")\""
     alias logcat_live="adb logcat -T1 -v color,usec,uid"
     alias logcat_giant="adb logcat -b all -v color,usec,uid"
+    alias adl="adb devices -l | sed -E 's/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID:\3\tserial:\1\tdevice:\2/' | grcat .grc/conf.netstat"
+    alias adt="adb -t "
 fi
 
 # Sets default stuff for bat

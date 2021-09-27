@@ -18,9 +18,9 @@
 #     startx
 # fi
 
-if [[ -z $DISPLAY && $(tty) == /dev/tty2 ]]; then
-    GDK_BACKEND=x11 startx
-fi
+#if [[ -z $DISPLAY && $(tty) == /dev/tty2 ]]; then
+#    GDK_BACKEND=x11 startx
+#fi
 
 # Carrega o .bashrc
 [[ -f ~/.bashrc ]] && . ~/.bashrc
