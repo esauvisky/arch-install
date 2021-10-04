@@ -536,6 +536,10 @@ if hash "git" >&/dev/null; then
         done
     }
 
+    # Nicer version of git pull
+    # - Deletes all local branches that were merged and deleted from the remote.
+    # - Makes local branches without remote counterparts track them in case it's possible.
+    # - Updates/syncs all local branches with their remote counterpart, not only the current checked-out one.
     function _git_sync() {
         local bold="$(printf '\033')[1m"
         local fgre="$(printf '\033')[32m"
@@ -545,11 +549,7 @@ if hash "git" >&/dev/null; then
         local fvio="$(printf '\033')[35m"
         local end="$(printf '\033')[0m"
 
-        REMOTES="$@"
-        if [ -z "$REMOTES" ]; then
-            REMOTES=$(git remote)
-        fi
-        REMOTES=$(echo "$REMOTES" | xargs -n1 echo)
+        REMOTES=$(git remote | xargs -n1 echo)
         CLB=$(git rev-parse --abbrev-ref HEAD)
         echo "$REMOTES" | while read REMOTE; do
             # for i in $(git for-each-ref --format='%(refname:short)' --no-merged=$REMOTE/HEAD refs/remotes/$REMOTE); do
@@ -589,9 +589,9 @@ if hash "git" >&/dev/null; then
     }
 
     function git() {
-        if [[ $1 == "pull" ]]; then
+        if [[ $1 == "pull" && $# == 1 ]]; then
             shift
-            _git_sync "$@"
+            _git_sync
         else
             command git "$@"
         fi
