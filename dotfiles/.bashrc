@@ -542,10 +542,12 @@ if hash "git" >&/dev/null; then
         done
     }
 
-    # Nicer version of git pull
+    ## Super awesome automatic git pull
     # - Deletes all local branches that were merged and deleted from the remote.
     # - Makes local branches without remote counterparts track them in case it's possible.
-    # - Updates/syncs all local branches with their remote counterpart, not only the current checked-out one.
+    # - Updates/syncs all local branches with their remote counterpart, not only the current checked-out one (if possible, of course).
+    # - Warns about local branches that are both ahead and behind the remote counterparts and require manual intervention, something that will hopefully happen much less often by using this.
+    # - If you have unstaged or uncommited local changes, git won't make you commit or stash them before pulling and will update the branch properly if the changes don't conflict. If they do, it'll warn you.
     function _git_sync() {
         local bold="$(printf '\033')[1m"
         local fgre="$(printf '\033')[32m"
@@ -583,8 +585,16 @@ if hash "git" >&/dev/null; then
                         if [ "$NAHEAD" -gt 0 ]; then
                             echo -e "   ${fred}Branch ${bold}$LB${end}${fred} is ${bold}$NBEHIND${end}${fred} commit(s) behind and ${bold}$NAHEAD${end}${fred} commit(s) ahead of ${bold}$REMOTE/$RB${end}${fred}. Could not be fast-forwarded.${end}"
                         elif [ "$LB" = "$CLB" ]; then
-                            echo -e "   ${fblu}Branch ${bold}$LB${end}${fblu} was ${bold}$NBEHIND${end}${fblu} commit(s) behind of ${bold}$REMOTE/$RB${end}${fblu}. Fast-forward merge.${end}"
-                            git merge -q $ARB
+                            git merge -q $ARB 2>/dev/null
+                            if [[ $? == 0 ]]; then
+                                echo -e "   ${fblu}Branch ${bold}$LB${end}${fblu} was ${bold}$NBEHIND${end}${fblu} commit(s) behind of ${bold}$REMOTE/$RB${end}${fblu}. Fast-forward merge.${end}"
+                            else
+                                if [[ $(git rev-parse --symbolic-full-name --abbrev-ref HEAD) == $LB ]]; then
+                                    CURRENT="(currently checked out)"
+                                fi
+                                echo -e "   ${bold}${fred}Warning! Branch $LB${end}${fred} $CURRENT will conflict with new commits incoming from ${bold}$REMOTE/$RB${end}${fred}!${end}"
+                                echo -e "   ${fred}You'll need to stash your changes before. Try \`${bold}git stash${end}${fred}\`, \`${bold}git merge${end}${fred}\`, then \`${bold}git stash pop${end}${fred}\`, and good luck!${end}"
+                            fi
                         else
                             echo -e "   ${fgre}Branch ${bold}$LB${end}${fgre} was ${bold}$NBEHIND${end}${fgre} commit(s) behind of ${bold}$REMOTE/$RB${end}${fgre}. Resetting local branch to remote.${end}"
                             git branch -f $LB -t $ARB >/dev/null
