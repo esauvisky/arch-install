@@ -446,9 +446,11 @@ if hash "grc" >&/dev/null; then
 fi
 
 ## Pretty hostname
-_HOSTNAME="$(hostname -f)"
-_HOSTNAME=${_HOSTNAME%.*}
-_HOSTNAME=${_HOSTNAME//.*./}
+_HOSTNAME="$(hostname)"
+# not posix / doesnt verk in windows
+# _HOSTNAME="$(hostname -f)"
+# _HOSTNAME=${_HOSTNAME%.*}
+# _HOSTNAME=${_HOSTNAME//.*./}
 
 ###########
 # Aliases #
