@@ -589,7 +589,7 @@ if hash "git" >&/dev/null; then
     }
 
     function git() {
-        if [[ $1 == "sync" ]]; then
+        if [[ $1 == "pull" ]]; then
             shift
             _git_sync "$@"
         else
