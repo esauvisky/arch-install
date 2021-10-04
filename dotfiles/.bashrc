@@ -491,14 +491,14 @@ if hash "journalctl" >&/dev/null; then
     complete -F _journalctl je
     complete -F _journalctl jb
     # alias js='journalctl -lx _SYSTEMD_UNIT='
-    # function js() {
-    #     if [[ $# -eq 0 ]]; then
-    #         echo -e 'js is a handy script to monitor systemd logs in real time,\nmany orders of magnitude better than using systemctl status.'
-    #         echo -e "Usage:\n\t$0 SYSTEMD_UNIT"
-    #     fi
-    #     journalctl -lx _SYSTEMD_UNIT="${1}"
-    # }
-    # TODO: autocomplete js
+    function js() {
+        if [[ $# -eq 0 ]]; then
+            echo -e 'js is a handy script to monitor systemd logs in real time,\nmany orders of magnitude better than using systemctl status.'
+            echo -e "Usage:\n\t$0 SYSTEMD_UNIT"
+        fi
+        # TODO: autocomplete js
+        journalctl -lx _SYSTEMD_UNIT="${1}"
+    }
 
 fi
 
@@ -506,7 +506,7 @@ fi
 if hash "git" >&/dev/null; then
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
-    alias gitw="git whatchanged --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
+    alias gitw="git log --no-merges --pretty=format:'------------> %C(bold red)%h%Creset -%C(bold yellow)%d%C(bold white) %s %C(bold green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -p"
     alias gits='git status'
     alias gitm='git commit --amend -m '
 
@@ -536,6 +536,67 @@ if hash "git" >&/dev/null; then
         done
     }
 
+    function _git_sync() {
+        local bold="$(printf '\033')[1m"
+        local fgre="$(printf '\033')[32m"
+        local fblu="$(printf '\033')[34m"
+        local fred="$(printf '\033')[31m"
+        local fyel="$(printf '\033')[33m"
+        local fvio="$(printf '\033')[35m"
+        local end="$(printf '\033')[0m"
+
+        REMOTES="$@"
+        if [ -z "$REMOTES" ]; then
+            REMOTES=$(git remote)
+        fi
+        REMOTES=$(echo "$REMOTES" | xargs -n1 echo)
+        CLB=$(git rev-parse --abbrev-ref HEAD)
+        echo "$REMOTES" | while read REMOTE; do
+            # for i in $(git for-each-ref --format='%(refname:short)' --no-merged=$REMOTE/HEAD refs/remotes/$REMOTE); do
+            #     git switch --track $i
+            # done
+            git remote update $REMOTE --prune 2>&1 | \sed "s/ - \[deleted\]..*-> *$REMOTE\/\(..*\)/   ${fyel}Branch ${bold}\1${end}${fyel} was deleted from $REMOTE and will be pruned locally.${end}/"
+            while read branch; do
+                upstream=$(git rev-parse --abbrev-ref $branch@{upstream} 2>/dev/null)
+                if [[ $? != 0 ]]; then
+                    git branch --set-upstream-to=$REMOTE/$branch $branch >/dev/null 2>/dev/null
+                    if [[ $? == 0 ]]; then
+                        echo -e "   ${fvio}Branch ${bold}$branch${end}${fvio} was not tracking any remote branch! It was set to track ${bold}$REMOTE/$branch.${end}"
+                    fi
+                fi
+            done < <(git for-each-ref --format='%(refname:short)' refs/heads/*)
+
+            git remote show $REMOTE -n |
+                awk '/merges with remote/{print $5" "$1}' |
+                while read RB LB; do
+                    ARB="refs/remotes/$REMOTE/$RB"
+                    ALB="refs/heads/$LB"
+                    NBEHIND=$(($(git rev-list --count $ALB..$ARB 2>/dev/null) + 0))
+                    NAHEAD=$(($(git rev-list --count $ARB..$ALB 2>/dev/null) + 0))
+                    if [ "$NBEHIND" -gt 0 ]; then
+                        if [ "$NAHEAD" -gt 0 ]; then
+                            echo -e "   ${fred}Branch ${bold}$LB${end}${fred} is ${bold}$NBEHIND${end}${fred} commit(s) behind and ${bold}$NAHEAD${end}${fred} commit(s) ahead of ${bold}$REMOTE/$RB${end}${fred}. Could not be fast-forwarded.${end}"
+                        elif [ "$LB" = "$CLB" ]; then
+                            echo -e "   ${fblu}Branch ${bold}$LB${end}${fblu} was ${bold}$NBEHIND${end}${fblu} commit(s) behind of ${bold}$REMOTE/$RB${end}${fblu}. Fast-forward merge.${end}"
+                            git merge -q $ARB
+                        else
+                            echo -e "   ${fgre}Branch ${bold}$LB${end}${fgre} was ${bold}$NBEHIND${end}${fgre} commit(s) behind of ${bold}$REMOTE/$RB${end}${fgre}. Resetting local branch to remote.${end}"
+                            git branch -f $LB -t $ARB >/dev/null
+                        fi
+                    fi
+                done
+        done
+    }
+
+    function git() {
+        if [[ $1 == "sync" ]]; then
+            shift
+            _git_sync "$@"
+        else
+            command git "$@"
+        fi
+    }
+
     function gitdelbranch() {
         # First command deletes local branch, but exits > 0 if not fully merged,
         # so the second command (which deletes the remote branch), will only run
@@ -562,6 +623,7 @@ if hash "git" >&/dev/null; then
             fi
         fi
     }
+
     # Autocomplete local branches only
     function _git_local_branches() {
         __gitcomp_direct "$(__git_heads)"
