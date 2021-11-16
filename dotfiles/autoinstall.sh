@@ -16,54 +16,45 @@ dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc" ".dircol
 
 cd "$HOME"
 
-if ! hash wget 2>/dev/null; then
-    if hash pacman 2>/dev/null; then
-        echo -n "I need wget to be installed for this to work. May I? "
-        read -p " [Y/n] "
-        if [[ $REPLY =~ ^[Nn]$ ]]; then
-            echo "Well sorry then. Get wget first."
-            exit 1
-        else
-            sudo pacman -S --needed --noconfirm wget
-        fi
-    elif hash apt 2>/dev/null; then
-        echo -n "I need wget to be installed for this to work. May I? "
-        read -p " [Y/n] "
-        if [[ $REPLY =~ ^[Nn]$ ]]; then
-            echo "Well sorry then. Get wget first."
-            exit 1
-        else
-            sudo apt install wget
-        fi
-    fi
-fi
-
 if hash gio 2>/dev/null; then
     # has gio support, can send older scripts to trash
     for dep in "${dotfiles[@]}"; do
         echo "Downloading script $dep from esauvisky/arch-install/master/dotfiles"
         url="https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/$dep"
-        wget -q "$url" -O "$dep.1" || curl -o "$dep.1" "$url"
+
+        if hash wget 2>/dev/null; then
+            wget -q "$url" -O "$dep.1" 2>/dev/null
+        else
+            curl -o "$dep.1" "$url" 2>/dev/null
+        fi
+
         gio trash -f "./$dep"
         mv "./$dep.1" "./$dep"
+
         if [[ -f "./$dep" ]]; then
             echo -e "All good! Moving on...\n"
         fi
     done
-    echo -e "Everything went well! Your old files are in the trashbin in case something explodes. Buh-bye!"
+    echo -e "Everything went well! Previous files (if any) were backed up with a .bak extension! Buh-bye!"
 else
     # no gio support, better backup in place
     for dep in "${dotfiles[@]}"; do
         echo "Downloading script $dep from esauvisky/arch-install/master/dotfiles"
         url="https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/$dep"
-        wget -q "$url" -O "$dep.1" || curl -o "$dep.1" "$url"
-        mv "./$dep" "./$dep.bak" || true
+
+        if hash wget 2>/dev/null; then
+            wget -q "$url" -O "$dep.1" 2>/dev/null
+        else
+            curl -o "$dep.1" "$url" 2>/dev/null
+        fi
+
+        mv "./$dep" "./$dep.bak" 2>/dev/null || true
         mv "./$dep.1" "./$dep"
         if [[ -f "./$dep" ]]; then
             echo -e "All good! Moving on...\n"
         fi
     done
-    echo -e "Everything went well! Your old files are backed up with a .bak extension! Buh-bye!"
+    echo -e "Everything went well! Previous files (if any) were backed up with a .bak extension! Buh-bye!"
 fi
 
 if hash pacman 2>/dev/null; then
