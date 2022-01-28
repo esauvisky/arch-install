@@ -34,10 +34,15 @@ for dir in /home/* "/etc/skel" "/root"; do
             continue
         fi
 
-        if [[ -d ${dir}/"${i//\.\//}"
-            || ($(md5sum ${dir}/"${i//\.\//}" | cut -d' ' -f1) != $(md5sum "$i" | cut -d' ' -f1)) ]]; then
+        if [[ -d "$i" ]]; then
+            if ! diff ${dir}/"${i//\.\//}" "$i"; then
+		echo "The dir ${dir}/${i//\.\//} and ${i} aren't sync."
+		gio trash ${dir}/"${i//\.\//}" || mv ${dir}/"${i//\.\//}" ${dir}/"${i//\.\//}".bak
+		ln -s "$PWD/${i//\.\//}" ${dir}/"${i//\.\//}"
+  	    fi
+        elif [[ -d ${dir}/"${i//\.\//}" || ($(md5sum ${dir}/"${i//\.\//}" | cut -d' ' -f1) != $(md5sum "$i" | cut -d' ' -f1)) ]]; then
             echo "The files ${dir}/${i//\.\//} and ${i} arent the same or the latter is not a symlink."
-            gio trash ${dir}/"${i//\.\//}"
+            gio trash ${dir}/"${i//\.\//}" || mv ${dir}/"${i//\.\//}" ${dir}/"${i//\.\//}".bak
             ln -s "$PWD/${i//\.\//}" ${dir}/"${i//\.\//}"
         fi
 
@@ -46,7 +51,7 @@ for dir in /home/* "/etc/skel" "/root"; do
         elif [[ ( -e ${dir}/"${i//\.\//}" && ! -L ${dir}/"${i//\.\//}" ) ]]; then
             if diff ${dir}/"${i//\.\//}" "$PWD/${i//\.\//}" -q; then
                 echo "File ${i//\.\//} exits but is not a link, but contents are identical. Replacing..."
-                gio trash ${dir}/"${i//\.\//}" || true
+                gio trash ${dir}/"${i//\.\//}" || rm ${dir}/"${i//\.\//}"
                 ln -s "$PWD/${i//\.\//}" ${dir}/"${i//\.\//}"
             else
                 echo "IDK WHAT TO DO! FILES DIFFER. GOOD LUCK! BB"
