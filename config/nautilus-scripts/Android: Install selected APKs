@@ -1,0 +1,84 @@
+#!/bin/bash
+i=0
+failed=0
+message=''
+TMP=$(mktemp)
+HASERROR=$(mktemp)
+num_devices=$(($(adb devices | wc -l)-2))
+# num_devices=$(adb devices | \grep device$ | sed 's/[\t ][\t ]*..*$//' | wc -l)
+if [[ $num_devices -ge 1 ]]; then
+    devices=$(zenity --separator=' ' --list --text="Select which devices to install to" --title="Select Devices" --multiple --column=Device --column=State $(adb devices | sed 's/device/connected/' | tail -n+2))
+else
+    zenity --title "Error" --error --text "No device was found. If you think this is wrong, try troubleshooting with 'adb devices'" --width 300 --height 35
+    exit
+fi
+
+if [[ -z $devices ]]; then
+    zenity --title "Error" --error --text "No device selected!" --width 300 --height 35
+    exit
+fi
+
+(
+    for device in $devices; do
+        for localAPK in "$@"; do
+            nameAPK="$(basename ${localAPK})"
+            remoteAPK="/data/local/tmp/$nameAPK"
+
+            i=$(($i+1)) && echo $(($i * 100 / ($# * $num_devices * 3)))
+            echo "#$device: Checking cached ${nameAPK}..."
+            if [[ "$(adb shell md5sum ${remoteAPK} | sed 's/ .*//')" != "$(md5sum ${localAPK} | sed 's/ .*//')" ]]; then
+                echo "#$device: Pushing ${nameAPK}..."
+                message+="$ adb -s $device push \"${localAPK}\" \"${remoteAPK}\""$'\n'
+                message+=$(adb -s $device push "${localAPK}" "${remoteAPK}" 2>&1)$'\n'
+                [[ $? != 0 ]] && failed=$(($failed+1))
+            else
+                message+=">>> WARNING: cached copy found on device. Skipping transfer..."$'\n'
+            fi
+
+            i=$(($i+1)) && echo $(($i * 100 / ($# * $num_devices * 3)))
+            echo "#$device: Installing ${nameAPK}..."
+            message+="$ adb -s $device shell -- pm install -g -r -d '"${remoteAPK}"'"$'\n'
+            message+="$(adb -s $device shell -- pm install -g -r -d \'"${remoteAPK}"\' 2>&1)"$'\n'
+            if [[ $? != 0 ]]; then
+                i=$(($i+1)) && echo $(($i * 100 / ($# * $num_devices * 3)))
+                failed=$(($failed+1))
+                message+=">>> ERROR: installation didn't work. Keeping cached copy of APK!"$'\n'
+            else
+                i=$(($i+1)) && echo $(($i * 100 / ($# * $num_devices * 3)))
+                echo "#$device: Deleting ${remoteAPK}..."
+                message+="$ adb -s $device shell -- rm '"${remoteAPK}"'"$'\n'
+                message+="$(adb -s $device shell -- rm \'"${remoteAPK}"\' 2>&1)"
+                [[ $? != 0 ]] && failed=$(($failed+1)) || message+="Deleted '${remoteAPK}' successfully."
+            fi
+            message+=$'\n'
+        done
+        message+=$'\n'
+    done
+
+    echo "$message" > $TMP
+    if [[ $failed -ge 1 ]]; then
+        echo "#$failed from $i operations failed!\nCheck the logs for more info."
+    else
+        if [[ $# -gt 1 ]]; then
+            message="#$# APKs were succesfully installed"
+        else
+            message="#$1 was succesfully installed"
+        fi
+        if [[ $num_devices -gt 1 ]]; then
+            message+=" in $num_devices devices.\nCheck the logs for more info."
+        else
+            if [[ $# -gt 1 ]]; then
+                message+=".\nCheck the logs for more info."
+            else
+                message+="."
+            fi
+        fi
+        echo "$message"
+    fi
+    echo $failed > $HASERROR
+) | zenity --progress --title "APK Easy Installer" --width 600 --height 100
+
+if [[ $# -gt 1 || $num_devices -gt 1 || $(cat $HASERROR) -gt 0 ]]; then
+    cat $TMP | zenity --text-info --width 1000 --height 500
+fi
+rm $TMP
