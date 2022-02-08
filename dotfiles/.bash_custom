@@ -15,8 +15,8 @@ alias cdp='_magicCD 2 $HOME/Pokemod/'
 #     )
 
 # Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
-alias subl='open-subl3'
-alias subl3='open-subl3'
+# alias subl='open-subl3'
+# alias subl3='open-subl3'
 
 
 # Fixes kitty on ssh

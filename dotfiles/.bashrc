@@ -510,6 +510,8 @@ fi
 
 ## Git
 if hash "git" >&/dev/null; then
+    # does not open editor when merging
+    export GIT_MERGE_AUTOEDIT=no
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gitw="git log --no-merges --pretty=format:'------------> %C(bold red)%h%Creset -%C(bold yellow)%d%C(bold white) %s %C(bold green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -p"
@@ -661,6 +663,24 @@ fi
 
 ## Pacman
 if hash "pacman" >&/dev/null; then
+    if hash "yay" >&/dev/null; then
+        function yayedit() {
+            CURRDIR="$PWD"
+            if ! yay -Ss "$1" | tail -n2 | grep "/$1 " -qm 1; then
+                echo "Package $1 does not exist."
+                return
+            fi
+            echo "Will edit PKGBUILD of package $1"
+            cd /tmp
+            yay -G "$1"
+            cd "$1"
+            $EDITOR PKGBUILD
+            echo "Press enter when done editing..."
+            read
+            makepkg -si
+            cd "$CURRDIR"
+        }
+    fi
     alias pacman="pacman "
     alias pacs="sudo pacman -S --needed --asdeps"
     alias pacr="sudo pacman -R --recursive --unneeded --cascade"
