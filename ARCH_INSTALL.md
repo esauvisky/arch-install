@@ -185,31 +185,31 @@
 
 - Fazer login como root
 
+- Colocar este repo num pendrive e fazer mount em /mnt
+
 - Ativar e iniciar a internet
 
         # systemctl enable NetworkManager
         # systemctl start NetworkManager
 
-- Instalar algumas coisas:
+- Instalar algumas coisas para a shell:
 
-        # pacman -S bash-completion xorg-xinit fortune-mod lolcat cowsay wget git
+        # pacman -S bash-completion xorg-xinit
+        # bash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"
+        # pacman -Sy nano-syntax-highlighting
+        # nano /etc/nanorc
+                include "/usr/share/nano/*.nanorc"
+                include "/usr/share/nano-syntax-highlighting/*.nanorc"
+        
+- Editar /etc/pacman.conf
 
-    - Copiar regra udev para usar BFQ como I/O scheduler
+        # diff /mnt/arch-install/etc/pacman.conf /etc/pacman.conf
+        # nano /etc/pacman.conf
 
-            # cp /mnt/arch-install/etc/udev/rules.d/60-ioscheduler.rules /etc/udev/rules.d/
- -->
-    - Importar /etc/pacman.conf
+- Desmontar, sair e logar novamente
 
-            # cp /mnt/arch-install/etc/pacman.conf /etc/pacman.conf
-
-<!--     - Importar módulo snd_hda_intel (para evitar power-saving e ruídos):
-
-            # cp /mnt/arch-install/etc/modprobe.d/snd-hda-intel.conf /etc/modprobe.d/snd-hda-intel.conf
- -->
-    - Desmontar, sair e logar novamente
-
-            # sync && umount /mnt
-            # exit
+        # sync && umount /mnt
+        # exit
 
 - Editar /etc/sudoers
 
