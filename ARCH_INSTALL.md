@@ -74,9 +74,8 @@
 
 - Selecionar mirrors do arch rápidos
 
-        # cd /etc/pacman.d
-        # mv mirrorlist mirrorlist~
-        # reflector --country 'Brazil,United States,' --sort rate --threads 8 --age 6 --number 10 --verbose
+        # reflector --country 'Brazil,United States,' --sort rate --threads 8 --age 6 --number 10 --verbose --save /etc/pacman.d/mirrorlist
+
 
 - Instalar o sistema base
 
