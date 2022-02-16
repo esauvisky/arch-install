@@ -135,13 +135,20 @@
 - Instalar ferramentas para conectar à internet depois de instalado
 
         # pacman -S iw dialog wpa_supplicant networkmanager
+        
+- Setar fonte de consoles virtuais (ttys) e também de early space
+
+        # nano /etc/vconsole.conf
+            KEYMAP=br-abnt2
+            FONT=lat2-16
+            FONT_MAP=8859-2
 
 - Configurar e regerar mkinitcpio para funcionar com o dm-crypt [Wiki](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_entire_system#Configuring_mkinitcpio)
 
-    - Adicionar HOOKS 'keyboard' e 'keymap' antes de 'block' e 'encrypt' antes de 'filesystems'
+    - Adicionar HOOKS 'keyboard' e 'keymap' e 'consolefont' antes de 'block' e 'encrypt' antes de 'filesystems'
 
             # nano /etc/mkinitcpio.conf
-                HOOKS=(... keyboard keymap block encrypt ... filesystems ...)
+                HOOKS=(... keyboard keymap consolefont block encrypt ... filesystems ...)
                 - Apagar instâncias repetidas
 
     - Regerar mkinitcpio
