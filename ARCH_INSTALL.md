@@ -76,7 +76,7 @@
 
         # cd /etc/pacman.d
         # mv mirrorlist mirrorlist~
-        # rankmirrors -vn 6 mirrorlist~ > mirrorlist
+        # reflector --country 'Brazil,United States,' --sort rate --threads 8 --age 6 --number 10 --verbose
 
 - Instalar o sistema base
 
