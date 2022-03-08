@@ -4,7 +4,7 @@
 	email = esauvisky@gmail.com
 	name = emi~
 	# signingkey = 48BB2CE13A282092
-	signingkey = 0F8230C1B6489951
+	signingKey = FEF4818C534D5986
 [push]
 	default = current
 [core]
