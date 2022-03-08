@@ -1,0 +1,11 @@
+[/]
+attach-modal-dialogs=false
+dynamic-workspaces=false
+overlay-key='Super_R'
+
+[keybindings]
+toggle-tiled-left=@as []
+toggle-tiled-right=@as []
+
+[wayland/keybindings]
+restore-shortcuts=@as []

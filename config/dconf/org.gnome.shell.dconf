@@ -1,0 +1,61 @@
+[/]
+command-history=['xsensors', 'peek', 'copyq show', 'copyq', 'scrpcpy', 'ghidra', 'r', 'scrcpy', 'nautilus', 'nautilus /home/emi', 'nautilus /home/emi -w', 'nautilus -w']
+disable-user-extensions=false
+disabled-extensions=['native-window-placement@gnome-shell-extensions.gcampax.github.com', 'workspace-indicator@gnome-shell-extensions.gcampax.github.com']
+enabled-extensions=['draw-on-your-screen@som.codeberg.org', 'tiling-assistant@leleat-on-github', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'extension-list@tu.berry', 'wsmatrix@martin.zurowietz.de']
+welcome-dialog-last-shown-version='41.4'
+
+[extensions/tiling-assistant]
+activate-layout0=@as []
+activate-layout1=@as []
+activate-layout2=@as []
+activate-layout3=@as []
+auto-tile=@as []
+center-window=['<Super>KP_5']
+changelog-version=32
+debugging-free-rects=@as []
+debugging-show-tiled-rects=@as []
+default-move-mode='Edge Tiling'
+dynamic-keybinding-behaviour='Favorite Layout'
+enable-advanced-experimental-features=true
+enable-raise-tile-group=false
+enable-tile-animations=false
+enable-tiling-popup=true
+favorite-layouts=['-1']
+import-layout-examples=false
+maximize-with-gap=false
+move-adaptive-tiling-mod='Ctrl'
+move-favorite-layout-mod='Alt'
+restore-window=@as []
+restore-window-size-on='Grab Start'
+search-popup-layout=@as []
+show-layout-panel-indicator=true
+tile-bottom-half=['<Super>KP_2']
+tile-bottomleft-quarter=['<Super>KP_1']
+tile-bottomright-quarter=['<Super>KP_3']
+tile-edit-mode=['<Super>space']
+tile-left-half=['<Super>Left', '<Super>KP_4']
+tile-maximize=@as []
+tile-maximize-horizontally=@as []
+tile-maximize-vertically=@as []
+tile-right-half=['<Super>Right', '<Super>KP_6']
+tile-top-half=['<Super>KP_8']
+tile-topleft-quarter=['<Super>KP_7']
+tile-topright-quarter=['<Super>KP_9']
+toggle-always-on-top=['<Shift><Control><Alt>a']
+toggle-tiling-popup=@as []
+window-gap=0
+
+[extensions/wsmatrix]
+num-columns=4
+popup-timeout=200
+
+[keybindings]
+focus-active-notification=@as []
+open-application-menu=@as []
+toggle-application-view=@as []
+toggle-message-tray=['<Super>n']
+toggle-overview=['<Alt>F1']
+
+[world-clocks]
+locations=@av []

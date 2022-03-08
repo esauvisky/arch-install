@@ -1,0 +1,42 @@
+[/]
+area-screenshot=@as []
+area-screenshot-clip=['Print']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/']
+help=@as []
+logout=@as []
+magnifier=@as []
+magnifier-zoom-in=@as []
+magnifier-zoom-out=@as []
+next=['<Super>F3']
+play=['<Super>F1']
+previous=['<Super>F2']
+screencast=@as []
+screenreader=@as []
+screensaver=@as []
+screenshot=@as []
+screenshot-clip=['<Primary>Print']
+stop=['<Super>F4']
+volume-down=['<Super>minus']
+volume-up=['<Super>equal']
+window-screenshot=@as []
+window-screenshot-clip=['<Alt>Print']
+
+[custom-keybindings/custom0]
+binding='<Shift><Alt>t'
+command='gnome-terminal'
+name='Open Terminal'
+
+[custom-keybindings/custom1]
+binding='<Shift><Alt>w'
+command='shortenurl'
+name='Shorten Url'
+
+[custom-keybindings/custom2]
+binding='<Super>s'
+command='splatmoji --disable-emoticon-db --skin-tones none copy'
+name='splatmoji'
+
+[custom-keybindings/custom3]
+binding='<Shift><Alt>e'
+command='nautilus -w'
+name='Open home folder in a new window'
