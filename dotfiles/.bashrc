@@ -16,16 +16,28 @@
 ## (some) Configs ##
 ####################
 # android shit (mostly for arch/manjaro)
-if [[ -d /opt/android-ndk ]]; then
-    export ANDROID_NDK_ROOT="/opt/android-ndk" # the proper one
-    export ANDROID_NDK_HOME="/opt/android-ndk" # uncommon
-    export ANDROID_NDK="/opt/android-ndk"      # uncommon
+if [[ -d $ANDROID_NDK ]]; then
+    export ANDROID_NDK_ROOT="$ANDROID_NDK"
+    export ANDROID_NDK_HOME="$ANDROID_NDK"
+fi
+
+if [[ -d "/opt/android-sdk" ]]; then
+    if [[ ! -d $ANDROID_SDK_ROOT && ! -d $ANDROID_HOME ]]; then
+        export ANDROID_SDK_ROOT="/opt/android-sdk"
+        export ANDROID_HOME="$ANDROID_SDK_ROOT"
+    elif [[ ! -d $ANDROID_SDK_ROOT ]]; then
+        export ANDROID_SDK_ROOT="$ANDROID_HOME"
+    fi
 
     # adds build tools (aapt, dexdump, etc)
     # only adds the highest version
     build_tools="$(find "$ANDROID_HOME/build-tools" -maxdepth 1 -type d | sort --numeric-sort --reverse | head -n1)"
     if [[ -d "$build_tools" ]]; then
         export PATH="$PATH:$build_tools"
+    fi
+
+    if [[ -d "$ANDROID_HOME/platform-tools" ]]; then
+        export PATH="${PATH}:$ANDROID_HOME/platform-tools"
     fi
 fi
 

@@ -30,7 +30,7 @@ set page-completions off
 set completion-ignore-case on
 
 # Se completion-ignore-case for on, trata underscores (_) e hífens (-) como iguais
-set completion-map-case on
+set completion-map-case off
 
 # Se o tamanho do prefixo comum entre items de autocomplete for maior do que 10,
 # ocultar o prefixo na lista de autocomplete.
