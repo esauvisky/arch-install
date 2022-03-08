@@ -135,7 +135,7 @@
 - Instalar ferramentas para conectar à internet depois de instalado
 
         # pacman -S iw dialog wpa_supplicant networkmanager
-        
+
 - Setar fonte de consoles virtuais (ttys) e também de early space
 
         # nano /etc/vconsole.conf
@@ -207,7 +207,7 @@
         # nano /etc/nanorc
                 include "/usr/share/nano/*.nanorc"
                 include "/usr/share/nano-syntax-highlighting/*.nanorc"
-        
+
 - Editar /etc/pacman.conf
 
         # diff /mnt/arch-install/etc/pacman.conf /etc/pacman.conf
@@ -756,6 +756,9 @@ _Em função dos pontos decimais invertidos_
 
 
         ### Tips and Tricks
+        - Enable Ctrl+TAB and Ctrl+Shift+TAB for switching tabs on gnome-terminal:
+            $ gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/ next-tab '<Primary>Tab'
+            $ gsettings set org.gnome.Terminal.Legacy.Keybindings:/org/gnome/terminal/legacy/keybindings/ prev-tab '<Primary><Shift>Tab'
         - Para montar partições do Windows *com* permissão de escrita, instalar ntfs-3g
         - Como remover o popup "application is ready", e fazer a janela roubar o foco instalar (ou copiar do backup) a extensão Steal my Focus
         - Configurar GIT para usar o gnome-keyring:
