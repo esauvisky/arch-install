@@ -529,7 +529,6 @@ if hash "git" >&/dev/null; then
     alias gitw="git log --no-merges --pretty=format:'------------> %C(bold red)%h%Creset -%C(bold yellow)%d%C(bold white) %s %C(bold green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -p"
     alias gits='git status'
     alias gitm='git commit --amend -m '
-
     alias gitcam='git commit -a -m '
 
     function gitc {
@@ -622,6 +621,8 @@ if hash "git" >&/dev/null; then
         if [[ $1 == "pull" && $# == 1 ]]; then
             shift
             _git_sync
+        elif [[ $1 == "commit" && $2 == "--amend" && $# == 2 ]]; then
+            command git commit --amend --no-edit
         else
             command git "$@"
         fi
@@ -686,6 +687,10 @@ if hash "pacman" >&/dev/null; then
             cd /tmp
             yay -G "$1"
             cd "$1"
+            echo "Appending SKIP to hashes"
+            if ! grep -q 'sha256sums.*"SKIP"' PKGBUILD; then
+                sed 's/sha256sums=(/sha256sums=("SKIP"\n            /' -i PKGBUILD
+            fi
             $EDITOR PKGBUILD
             echo "Press enter when done editing..."
             read
@@ -747,7 +752,7 @@ fi
 if hash "adb" >&/dev/null; then
     alias logcat_5min="adb logcat -v color,usec,uid -d -t \"\$(date \"+%F %T.000\" --date=\"5 minutes ago\")\""
     alias logcat="adb logcat -T1000 -v color,usec,uid"
-    alias logcat_pogo=$'adb logcat -T10000 -b all -v color,usec,uid | egrep "( $(adb shell dumpsys package | \grep -C0 -A1 \'Package \[.*pokemo.*$\' | \grep userId | sed \'s/[^0-9]*//g\' | xargs | sed -e \'s/ / | /g\') |Unity|pokemongo|il2cpp)"'
+    alias logcat_pogo=$'adb logcat -T10000 -b all -v color,usec,uid | egrep "( $(adb shell dumpsys package | \grep -C0 -A1 \'Package \[.*pokemo.*$\' | \grep userId | sed \'s/[^0-9]*//g\' | xargs | sed -e \'s/ / | /g\') |Unity|pokemongo|il2cpp|\[HAL)"'
     alias logcat_giant="adb logcat -b all -v color,usec,uid"
     alias adl="adb devices -l | sed -E 's/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID:\3\tserial:\1\tdevice:\2/' | grcat .grc/conf.netstat"
     alias adt="adb -t "
@@ -1015,7 +1020,7 @@ export IGNOREEOF=1
 ## Sets default EDITOR environment variable
 ## If logged as root or in a ssh shell uses only term editors.
 if [[ -n $DISPLAY && ! $EUID -eq 0 && ! $(is_ssh) ]]; then
-    for editor in "subl3" "gedit"; do
+    for editor in "subl3" "subl" "code" "gedit"; do
         if hash "$editor" >&/dev/null; then
             export EDITOR=$editor
             break
