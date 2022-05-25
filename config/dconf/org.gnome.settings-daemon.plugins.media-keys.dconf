@@ -1,7 +1,7 @@
 [/]
 area-screenshot=@as []
 area-screenshot-clip=['Print']
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/']
 help=@as []
 logout=@as []
 magnifier=@as []
@@ -40,3 +40,8 @@ name='splatmoji'
 binding='<Shift><Alt>e'
 command='nautilus -w'
 name='Open home folder in a new window'
+
+[custom-keybindings/custom4]
+binding='<Primary><Shift><Alt>c'
+command='gnome-calculator'
+name='Open Calculator'

@@ -61,7 +61,7 @@ if hash pacman 2>/dev/null; then
     echo -en "\n\nBtw, you use Arch. Might I install a couple cool shit for this to work even better?"
     read -p " [Y/n] "
     if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano
+        sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils
     fi
 elif hash apt 2>/dev/null; then
     echo -en "\n\nI see you're not an Arch user, but at least it's linux.\nMight I install a couple cool shit for this to work even better?"

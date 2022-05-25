@@ -14,6 +14,9 @@ alias cdp='_magicCD 2 $HOME/Pokemod/'
 
 #     )
 
+# NVM
+# [[ -f "/usr/share/nvm/init-nvm.sh" ]] && source /usr/share/nvm/init-nvm.sh
+
 # Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
 alias subl='subl3open'
 alias subl3='subl3open'

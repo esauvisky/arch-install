@@ -687,14 +687,10 @@ if hash "pacman" >&/dev/null; then
             cd /tmp
             yay -G "$1"
             cd "$1"
-            echo "Appending SKIP to hashes"
-            if ! grep -q 'sha256sums.*"SKIP"' PKGBUILD; then
-                sed 's/sha256sums=(/sha256sums=("SKIP"\n            /' -i PKGBUILD
-            fi
             $EDITOR PKGBUILD
             echo "Press enter when done editing..."
             read
-            makepkg -si
+            makepkg -esi --skipchecksums
             cd "$CURRDIR"
         }
     fi

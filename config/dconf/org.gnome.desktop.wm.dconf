@@ -31,5 +31,6 @@ toggle-fullscreen=['<Alt>F11']
 unmaximize=@as []
 
 [preferences]
+action-double-click-titlebar='none'
 num-workspaces=12
 workspace-names=@as []

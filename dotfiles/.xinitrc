@@ -75,12 +75,14 @@ syncthing-gtk &
 # guake &
 
 # Copyq daemon
-sleep 5s && copyq &
+(while :; do sleep 5s && copyq; done) &
 
 ## Gnome: Ignore Lid Switch
 /usr/lib/gnome-tweak-tool-lid-inhibitor &
 ## Gnome: Allows to lock the screen
 # gnome-screensaver &
+## Gnome: turns on bluetooth automatically
+sleep 5s && rfkill unblock bluetooth &
 
 ############
 # SESSIONS #

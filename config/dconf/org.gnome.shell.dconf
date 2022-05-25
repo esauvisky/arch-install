@@ -1,9 +1,96 @@
 [/]
-command-history=[]
+command-history=['xsensors', 'copyq show', 'scrpcpy', 'nautilus', 'nautilus /home/emi', 'nautilus /home/emi -w', 'nautilus -w', 'go /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'xdg-open /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'superslicer', 'ghidra', 'sc', 'osu-lazer', 'code .bashrc', 'killall -9 chrome', 'r', 'peek', 'scrcpy', 'copyq']
 disable-user-extensions=false
-disabled-extensions=['native-window-placement@gnome-shell-extensions.gcampax.github.com', 'workspace-indicator@gnome-shell-extensions.gcampax.github.com']
-enabled-extensions=['draw-on-your-screen@som.codeberg.org', 'tiling-assistant@leleat-on-github', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'extension-list@tu.berry', 'wsmatrix@martin.zurowietz.de']
+disabled-extensions=['workspace-indicator@gnome-shell-extensions.gcampax.github.com']
+enabled-extensions=['draw-on-your-screen@som.codeberg.org', 'tiling-assistant@leleat-on-github', 'extension-list@tu.berry', 'wsmatrix@martin.zurowietz.de', 'pop-shell@system76.com', 'native-window-placement@gnome-shell-extensions.gcampax.github.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'auto-move-windows@gnome-shell-extensions.gcampax.github.com']
+remember-mount-password=false
 welcome-dialog-last-shown-version='41.4'
+
+[extensions/auto-move-windows]
+application-list=['spotify.desktop:12']
+
+[extensions/draw-on-your-screen]
+erase-drawings=['<Super>e']
+indicator-disabled=false
+osd-disabled=false
+toggle-drawing=['<Super>d']
+toggle-modal=['<Super>f']
+
+[extensions/draw-on-your-screen/drawing]
+grid-color='rgba(146,146,146,0.0838926)'
+grid-line-auto=false
+grid-line-spacing=uint32 10
+grid-line-width=5.0
+palettes=[('GNOME HIG lighter', ['rgb(153,193,241):Blue 1', 'rgb(143,240,164):Green 1', 'rgb(249,240,107):Yellow 1', 'rgb(255,190,111):Orange 1', 'rgb(246,97,81):Red 1', 'rgb(220,138,221):Purple 1', 'rgb(205,171,143):Brown 1', 'rgb(255,255,255):Light 1', 'rgb(119,118,123):Dark 1']), ('GNOME HIG light', ['rgb(98,160,234):Blue 2', 'rgb(87,227,137):Green 2', 'rgb(248,228,92):Yellow 2', 'rgb(255,163,72):Orange 2', 'rgb(237,51,59):Red 2', 'rgb(192,97,203):Purple 2', 'rgb(181,131,90):Brown 2', 'rgb(246,245,244):Light 2', 'rgb(94,92,100):Dark 2']), ('GNOME HIG normal', ['rgb(53,132,228):Blue 3', 'rgb(51,209,122):Green 3', 'rgb(246,211,45):Yellow 3', 'rgb(255,120,0):Orange 3', 'rgb(224,27,36):Red 3', 'rgb(145,65,172):Purple 3', 'rgb(152,106,68):Brown 3', 'rgb(222,221,218):Light 3', 'rgb(61,56,70):Dark 3']), ('GNOME HIG dark', ['rgb(28,113,216):Blue 4', 'rgb(46,194,126):Green 4', 'rgb(245,194,17):Yellow 4', 'rgb(230,97,0):Orange 4', 'rgb(192,28,40):Red 4', 'rgb(129,61,156):Purple 4', 'rgb(134,94,60):Brown 4', 'rgb(192,191,188):Light 4', 'rgb(36,31,49):Dark 4']), ('GNOME HIG darker', ['rgb(26,95,180):Blue 5', 'rgb(38,162,105):Green 5', 'rgb(229,165,10):Yellow 5', 'rgb(198,70,0):Orange 5', 'rgb(165,29,45):Red 5', 'rgb(97,53,131):Purple 5', 'rgb(99,69,44):Brown 5', 'rgb(154,153,150):Light 5', 'rgb(0,0,0):Dark 5'])]
+
+[extensions/draw-on-your-screen/internal-shortcuts]
+delete-last-element=['KP_7']
+pick-color=['p']
+select-ellipse-shape=['c']
+select-image-shape=['i']
+select-line-shape=['l']
+select-mirror-tool=['<Shift>m']
+select-move-tool=['m']
+select-none-shape=['space']
+select-polygon-shape=['v']
+select-rectangle-shape=['r']
+select-resize-tool=['s']
+select-text-shape=['t']
+smooth-last-element=['apostrophe']
+switch-dash=['KP_0']
+switch-fill=['KP_8']
+switch-linecap=['KP_5']
+switch-linejoin=['KP_4']
+
+[extensions/pop-shell]
+active-hint=true
+gap-inner=uint32 1
+gap-outer=uint32 1
+show-skip-taskbar=false
+show-title=false
+smart-gaps=true
+tile-by-default=true
+
+[extensions/tiling-assistant]
+activate-layout0=@as []
+activate-layout1=@as []
+activate-layout2=@as []
+activate-layout3=@as []
+auto-tile=@as []
+center-window=['<Super>KP_5']
+changelog-version=32
+debugging-free-rects=@as []
+debugging-show-tiled-rects=@as []
+default-move-mode='Edge Tiling'
+dynamic-keybinding-behaviour='Favorite Layout'
+enable-advanced-experimental-features=true
+enable-raise-tile-group=false
+enable-tile-animations=false
+enable-tiling-popup=true
+favorite-layouts=['-1']
+import-layout-examples=false
+maximize-with-gap=false
+move-adaptive-tiling-mod='Ctrl'
+move-favorite-layout-mod='Alt'
+restore-window=@as []
+restore-window-size-on='Grab Start'
+search-popup-layout=@as []
+show-layout-panel-indicator=true
+tile-bottom-half=['<Super>KP_2']
+tile-bottomleft-quarter=['<Super>KP_1']
+tile-bottomright-quarter=['<Super>KP_3']
+tile-edit-mode=['<Super>space']
+tile-left-half=['<Super>Left', '<Super>KP_4']
+tile-maximize=@as []
+tile-maximize-horizontally=@as []
+tile-maximize-vertically=@as []
+tile-right-half=['<Super>Right', '<Super>KP_6']
+tile-top-half=['<Super>KP_8']
+tile-topleft-quarter=['<Super>KP_7']
+tile-topright-quarter=['<Super>KP_9']
+toggle-always-on-top=['<Shift><Control><Alt>a']
+toggle-tiling-popup=@as []
+window-gap=0
 
 [extensions/wsmatrix]
 num-columns=4
