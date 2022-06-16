@@ -1,21 +1,100 @@
 #!/usr/bin/env bash
-##############################################
-######### Author: emi~ (@esauvisky) ##########
-## THIS IS CERTAINLY NOT POSIX COMPATIBLE!! ##
-##############################################
-###### Also requires bash 4.4 or higher ######
+#                          .         .
+####   8888888888            ,8.       ,8.           8 8888    d888888o.   8 8888        8 8 888888888o.      ,o888888o.      ####
+####   8888                 ,888.     ,888.          8 8888  .`8888:' `88. 8 8888        8 8 8888    `88.    8888     `88.    ####
+####   8888                .`8888.   .`8888.         8 8888  8.`8888.   Y8 8 8888        8 8 8888     `88 ,8 8888       `8.   ####
+####   8888               ,8.`8888. ,8.`8888.        8 8888  `8.`8888.     8 8888        8 8 8888     ,88 88 8888             ####
+####   888888888888      ,8'8.`8888,8^8.`8888.       8 8888   `8.`8888.    8 8888        8 8 8888.   ,88' 88 8888             ####
+####   8888             ,8' `8.`8888' `8.`8888.      8 8888    `8.`8888.   8 8888        8 8 888888888P'  88 8888             ####
+####   8888            ,8'   `8.`88'   `8.`8888.     8 8888     `8.`8888.  8 8888888888888 8 8888`8b      88 8888             ####
+####   8888           ,8'     `8.`'     `8.`8888.    8 8888 8b   `8.`8888. 8 8888        8 8 8888 `8b.    `8 8888       .8'   ####
+####   8888          ,8'       `8        `8.`8888.   8 8888 `8b.  ;8.`8888 8 8888        8 8 8888   `8b.     8888     ,88'    ####
+####   888888888888 ,8'         `         `8.`8888.  8 8888  `Y8888P ,88P' 8 8888        8 8 8888     `88.    `8888888P'      ####
 
+##  +-+-+-+-+-+-+-+-+-+ +-+-+-+-+
+##  |D|e|b|u|g|g|i|n|g| |I|n|f|o|
+##  +-+-+-+-+-+-+-+-+-+ +-+-+-+-+
 ## Perf. optimization: https://stackoverflow.com/questions/18039751/how-to-debug-a-bash-script-and-get-execution-time-per-command
 ## Uncomment one of the following line for debugging this file
 # PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
 # N=`date +%s%N`; export PS4='+[$(((`date +%s%N`-$N)/1000000))ms][${BASH_SOURCE}:${LINENO}]: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'; set -x;
 
+##  +-+-+-+-+
+##  |I|n|i|t|
+##  +-+-+-+-+
+## If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-####################
-## (some) Configs ##
-####################
-# android shit (mostly for arch/manjaro)
+## Used for version checking
+export _RCVERSION=1.0
+
+## Returns if the current shell is a SSH shell.
+# @see https://unix.stackexchange.com/a/12761
+function is_ssh() {
+    # For windows or other weird systems:
+    if [[ ! -f /proc/1/stat ]]; then
+        return 1
+    fi
+    p=${1:-$PPID}
+    read pid name x ppid y < <(cat /proc/$p/stat)
+    # or: read pid name ppid < <(ps -o pid= -o comm= -o ppid= -p $p)
+    [[ "$name" =~ sshd ]] && { return 0; }
+    [[ "$ppid" -le 1 ]] && { return 1; }
+    is_ssh $ppid
+}
+
+## Checks if a binary or built-in command exists on PATH with failovers
+function _e() {
+    (hash "$1" >&/dev/null && return 0) ||
+    (command -v "$1" >&/dev/null && return 0) ||
+    (which "$1" >&/dev/null && return 0) || # doesn't work with built-ins
+    return 1
+}
+
+###  _____           _                                      _     _   _            _       _     _
+### |  ___|         (_)                                    | |   | | | |          (_)     | |   | |
+### | |__ _ ____   ___ _ __ ___  _ __  _ __ ___   ___ _ __ | |_  | | | | __ _ _ __ _  __ _| |__ | | ___  ___
+### |  __| '_ \ \ / / | '__/ _ \| '_ \| '_ ` _ \ / _ \ '_ \| __| | | | |/ _` | '__| |/ _` | '_ \| |/ _ \/ __|
+### | |__| | | \ V /| | | | (_) | | | | | | | | |  __/ | | | |_  \ \_/ / (_| | |  | | (_| | |_) | |  __/\__ \
+### \____/_| |_|\_/ |_|_|  \___/|_| |_|_| |_| |_|\___|_| |_|\__|  \___/ \__,_|_|  |_|\__,_|_.__/|_|\___||___/
+## Asks for Ctrl+D to be pressed twice to exit the shell
+export IGNOREEOF=1
+
+## Adds .local/bin to the path
+if [[ -d ~/.local/bin ]]; then
+    export PATH="$PATH:$HOME/.local/bin"
+fi
+
+## Picks a hostname variable to use all around
+## Works on several places including adb shells and ssh
+_HOSTNAME=$(hostname | sed 's/localhost//')
+_e "getprop" && _HOSTNAME=${_HOSTNAME:-$(getprop "net.hostname")}
+_e "getprop" && _HOSTNAME=${_HOSTNAME:-$(getprop "ro.product.device")}
+_HOSTNAME=${_HOSTNAME:-"bielefeld"}
+is_ssh && _HOSTNAME="${_HOSTNAME} \[\e[01;95m\][SSH]"
+_e getprop && _HOSTNAME="${_HOSTNAME} \[\e[01;95m\][ADB]"
+
+## GPG Signing TTY: required for GPG signing in git
+GPG_TTY=$(tty)
+export GPG_TTY
+
+## This fixes a bug that happens when calling `sudo su USER`
+## inside a SSH shell that keeps loginctl envvars making some commands not work.
+## @see https://unix.stackexchange.com/questions/346841/why-does-sudo-i-not-set-xdg-runtime-dir-for-the-target-user
+if [[ -z $XDG_RUNTIME_DIR && $(is_ssh) ]]; then
+    export XDG_RUNTIME_DIR=/run/user/$UID
+fi
+
+## Sets default EDITOR environment variable
+## If logged as root or in a ssh shell uses only term editors.
+_e "nano" && export EDITOR="nano"
+if [[ -n $DISPLAY && ! $EUID -eq 0 && ! $(is_ssh) ]]; then
+    for editor in "subl3" "subl" "code" "gedit"; do
+        _e "$editor" && export EDITOR=$editor
+    done
+fi
+
+## Android shit
 if [[ -d $ANDROID_NDK ]]; then
     export ANDROID_NDK_ROOT="$ANDROID_NDK"
     export ANDROID_NDK_HOME="$ANDROID_NDK"
@@ -41,24 +120,14 @@ if [[ -d "/opt/android-sdk" ]]; then
     fi
 fi
 
-if [[ -d ~/.local/bin ]]; then
-    export PATH="$PATH:$HOME/.local/bin"
-fi
-
-# List of places to show when using 'cdcool [arg]'
-cool_places=(
-    "~/.local/share/gnome-shell/extensions"
-    "~/.local/share/applications"
-    "~/.config/systemd/user/"
-    "/etc/systemd/user/"
-    "/var/lib/docker/volumes"
-    "/usr/share/bash-completion/completions"
-)
-
-########################
-# BASH ETERNAL HISTORY #
-########################
-## Author: emi et al., took ages to figure something that worked.
+### ______           _       _____ _                        _   _   _ _     _
+### | ___ \         | |     |  ___| |                      | | | | | (_)   | |
+### | |_/ / __ _ ___| |__   | |__ | |_ ___ _ __ _ __   __ _| | | |_| |_ ___| |_ ___  _ __ _   _
+### | ___ \/ _` / __| '_ \  |  __|| __/ _ \ '__| '_ \ / _` | | |  _  | / __| __/ _ \| '__| | | |
+### | |_/ / (_| \__ \ | | | | |___| ||  __/ |  | | | | (_| | | | | | | \__ \ || (_) | |  | |_| |
+### \____/ \__,_|___/_| |_| \____/ \__\___|_|  |_| |_|\__,_|_| \_| |_/_|___/\__\___/|_|   \__, |
+###                                                                                        __/ |
+###                                                                                       |___/
 # Change the file location because certain bash sessions truncate .bash_history file upon close:
 export HISTFILE=~/.bash_eternal_history
 # Maximum number of entries on the current session (nothing is infinite):
@@ -71,16 +140,12 @@ export HISTIGNORE="clear:exit:history:ls"
 export HISTCONTROL=ignoredups:erasedups
 # Custom history time prefix format
 export HISTTIMEFORMAT='[%F %T] '
-# FIXME: Writes multiline commands on the history as one line
-# TODO: TESTING!!!
-# Actually writes multiline commands on the history AS MULTIPLE LINES!
-# If something breaks, write down what was and restore backup from
-# ~/.bash_eternal_history~ (jan 7 2021)
+# Writes multiline commands on the history as multiline entries
 shopt -s cmdhist
 shopt -s lithist
-# ESSENTIAL: appends to the history at each command instead of writing everything when the shell exits.
+# Appends to history after every command instead of only after the shell session ends.
 shopt -s histappend
-# Erases history dups on EXIT
+# WIP/FIXME: Erases history dups on EXIT
 # function historymerge() {
 #     history -n
 #     history -w
@@ -89,55 +154,49 @@ shopt -s histappend
 # }
 # trap historymerge EXIT
 
-##################
-# AUTOCOMPLETION #
-##################
-## Tip: Autocompletion for custom funcs without writing our own completion function
+###   ___        _                                  _      _   _
+###  / _ \      | |                                | |    | | (_)
+### / /_\ \_   _| |_ ___   ___ ___  _ __ ___  _ __ | | ___| |_ _  ___  _ __
+### |  _  | | | | __/ _ \ / __/ _ \| '_ ` _ \| '_ \| |/ _ \ __| |/ _ \| '_ \
+### | | | | |_| | || (_) | (_| (_) | | | | | | |_) | |  __/ |_| | (_) | | | |
+### \_| |_/\__,_|\__\___/ \___\___/|_| |_| |_| .__/|_|\___|\__|_|\___/|_| |_|
+###                                          | |
+###                                          |_|
+## TIP: to create autocompletion for custom funcs without
+##      writing our own completion function:
 # 1. Type the command, and press <Tab> to autocomplete
 # 2. Run `complete -p command`
 # 3. The output is the hook that was used to complete it.
 # 4. Change it accordingly to apply it to your function.
 ## Loads bash's system-wide installed completions
+if [[ -f /usr/share/bash-completion/bash_completion ]]; then
+    source /usr/share/bash-completion/bash_completion
+fi
 ## Loads gits completion file for our custom completions
 if [ -f /usr/share/bash-completion/completions/git ]; then
-    # the STDERR redirection is to not print an annoying bug on
+    # The STDERR redirection is to not print an annoying bug on
     # GCP VMs that make sed error out for some stupid reason and bad coding
     source /usr/share/bash-completion/completions/git #2>/dev/null
 fi
-# if [[ -f /usr/share/bash-completion/bash_completion ]]; then
-#     source /usr/share/bash-completion/bash_completion
-# fi
 
-#################
-#    is_ssh     #
-#################
-# Returns if the current shell is running inside a SSH
-# Works with sudo su, also works if running local sshd.
-# Taken from: https://unix.stackexchange.com/a/12761
-function is_ssh() {
-    # windows or other weird system:
-    if [[ ! -f /proc/1/stat ]]; then
-        return 1
-    fi
-    p=${1:-$PPID}
-    read pid name x ppid y < <(cat /proc/$p/stat)
-    # or: read pid name ppid < <(ps -o pid= -o comm= -o ppid= -p $p)
-    [[ "$name" =~ sshd ]] && { return 0; }
-    [[ "$ppid" -le 1 ]] && { return 1; }
-    is_ssh $ppid
-}
+###  _   _ _   _ _
+### | | | | | (_) |
+### | | | | |_ _| |___
+### | | | | __| | / __|
+### | |_| | |_| | \__ \
+###  \___/ \__|_|_|___/
 
-##############
-# url_decode #
-##############
+#  +-+-+-+-+-+-+-+-+-+
+#  |u|r|l|d|e|c|o|d|e|
+#  +-+-+-+-+-+-+-+-+-+
 function urldecode() {
     : "${*//+/ }"
     echo -e "${_//%/\\x}"
 }
 
-#################
-# select_option #
-#################
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+
+##  |s|e|l|e|c|t|_|o|p|t|i|o|n|
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+
 # Amazing bash-only menu selector
 # Taken from http://tinyurl.com/y5vgfon7
 # Further edits by @emi
@@ -192,11 +251,100 @@ function select_option() {
     return $selected
 }
 
-###################
-# history grepper #
-###################
-# Fancy way of grepping history, think of it
-# as an improved Ctrl+R that supports regex
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+##  |f|o|r|m|a|t|_|d|u|r|a|t|i|o|n|
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+## Formats seconds into more pretty H:M:S
+## Stolen from: https://bit.ly/3nJQFwp
+function format_duration() {
+    T=$1
+    S=$((T % 60))
+    M=$((T / 60 % 60))
+    H=$((T / 60 / 60 % 24))
+    D=$((T / 60 / 60 / 24))
+    [[ $D -gt 0 ]] && printf '%dd%dh' $D $H ||
+        ([[ $H -gt 0 ]] && printf '%dh%dm' $H $M) ||
+        ([[ $M -gt 0 ]] && printf '%dm%ds' $M $S) ||
+        printf "%ds" $S
+}
+
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+##  |g|e|t|_|t|r|u|n|c|a|t|e|d|_|p|w|d|
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+## Returns a truncated $PWD depending on window width
+function _get_truncated_pwd() {
+    local tilde="~"
+    local newPWD="${PWD/#${HOME}/${tilde}}"
+    local pwdmaxlen="$((${COLUMNS:-80} / 4))"
+    [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="…${newPWD:3-$pwdmaxlen}"
+    echo -n "${newPWD}"
+}
+
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+##  |d|i|s|a|b|l|e|_|v|e|n|v|_|p|r|o|m|p|t|
+##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+## Disables the native embedded venv prompt so we can make our own
+export VIRTUAL_ENV_DISABLE_PROMPT=0
+function _virtualenv_info() {
+    [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
+}
+
+#  _____       _
+# /  __ \     | |
+# | /  \/ ___ | | ___  _ __ ___
+# | |    / _ \| |/ _ \| '__/ __|
+# | \__/\ (_) | | (_) | |  \__ \
+#  \____/\___/|_|\___/|_|  |___/
+## Magic with `less` (like colors and other cool stuff)
+export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
+
+## Magic with man pages (colors mainly)
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+
+## Colors at file types when autocompleting and more
+if [[ -x /usr/bin/dircolors ]]; then
+    if [[ -f ~/.dircolors ]]; then
+        eval "$(dircolors -b ~/.dircolors)"
+    else
+        eval "$(dircolors -b)"
+    fi
+    _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
+fi
+
+## Global colouriser used all around to make everything even gayer
+if _e "grc"; then
+    GRC='grc -es '
+    if [[ -f /etc/profile.d/grc.sh ]]; then
+        source /etc/profile.d/grc.sh >&/dev/null
+    fi
+    alias cat="${GRC}cat"
+fi
+
+###  _____  _____ _      ______         _
+### |  _  ||  _  | |     |  ___|       | |
+### | | | || | | | |     | |_ ___  __ _| |_ _   _ _ __ ___  ___
+### | | | || | | | |     |  _/ _ \/ _` | __| | | | '__/ _ \/ __|
+### \ \/' /\ \_/ / |____ | ||  __/ (_| | |_| |_| | | |  __/\__ \
+###  \_/\_\ \___/\_____/ \_| \___|\__,_|\__|\__,_|_|  \___||___/
+
+##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
+##  |S|w|i|f|t| |H|i|s|t|o|r|y| |S|e|a|r|c|h|
+##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
+## Fancy way of quickly grepping the command history.
+## An alternative to Ctrl+R that supports regex.
+## Example:
+##   h 'clone.*gitlab'
+## Will show a list with all previous commands that match
+## the regex 'clone.*gitlab'. The number prefixing each entry
+## is the command history position, meaning that if you want to
+## replay a particular entry with the number 4513, you can run:
+##   !!4513
 function h() {
     # Workaround for the lack of
     # multidimensional arrays in bash.
@@ -225,10 +373,12 @@ function h() {
     done
 }
 
-###########
-# Extract #
-###########
-# Extracts anything
+##  +-+-+-+-+ +-+-+-+-+-+-+-+
+##  |E|a|s|y| |E|x|t|r|a|c|t|
+##  +-+-+-+-+ +-+-+-+-+-+-+-+
+## Extracts compressed and archived files of any type
+## without having to remember every single fucking argument
+## for every single fucking compressed file extension
 function extract() {
     for n in "$@"; do
         if [ -f "$n" ]; then
@@ -261,35 +411,35 @@ function extract() {
     done
 }
 
-###########
-# magicCD #
-###########
-# Searches for directories recursively and cds into them
-# Usage:
-#   alias ALIAS_NAME='_magicCD DIR_DEPTH BASE_DIR
-# Where DIR_DEPTH is how many nested directories from
-# within BASE_DIR to recursively search into.
-# Author: emi~
-#
-# Example:
-# Suppose you have this structure:
-# - ~/Coding/
-#   - Projects/
-#       - project_1/
-#       - project_2/
-#       - foo/
-#   - Personal/
-#      - secret_self_bot/
-#      - wip_project/
-#
-# If you add to this file,
-#   alias cdp='_magicCD 2 $HOME/Coding/'
-# then if you run,
-# cdp: will send you to ~/Coding/
-# cdp proj: will show you a selector with all the dirs containing 'proj',
-#           i.e.: ~/Coding/Projects/project_1 and 2 and wip_project from Personal
-# cdp wip: will directly send you to the only dir containing 'wip'
-#           i.e.: ~/Coding/Projects/wip_project
+##  +-+-+-+-+-+-+-+
+##  |m|a|g|i|c|C|D|
+##  +-+-+-+-+-+-+-+
+## Searches for directories recursively and cds into them
+## Usage:
+##   alias ALIAS_NAME='_magicCD DIR_DEPTH BASE_DIR
+## Where DIR_DEPTH is how many nested directories from
+## within BASE_DIR to recursively search into.
+## Author: emi~
+##
+## Example:
+## Suppose you have this structure:
+## - ~/Coding/
+##   - Projects/
+##       - project_1/
+##       - project_2/
+##       - foo/
+##   - Personal/
+##      - secret_self_bot/
+##      - wip_project/
+##
+## If you add to this file,
+##   alias cdp='_magicCD 2 $HOME/Coding/'
+## then if you run,
+## cdp: will send you to ~/Coding/
+## cdp proj: will show you a selector with all the dirs containing 'proj',
+##           i.e.: ~/Coding/Projects/project_1 and 2 and wip_project from Personal
+## cdp wip: will directly send you to the only dir containing 'wip'
+##           i.e.: ~/Coding/Projects/wip_project
 function _magicCD() {
     if [[ ! -d "$2" && ! "$1" -ge 2 ]]; then
         echo "Error in the syntax."
@@ -332,11 +482,11 @@ function _magicCD() {
     fi
 }
 
-#############
-# FIND DIRS #
-#############
-# Finds directories recursively, and shows select_option
-# afterwards if less than 20 results.
+##  +-+-+-+-+-+-+
+##  |F|I|N|D|I|R|
+##  +-+-+-+-+-+-+
+## Finds directories recursively, and shows select_option
+## afterwards if less than 20 results.
 function findir() {
     readarray -d '' results < <(find . -path "*node_modules*" -prune -o -type d -iname \*"${1}"\* -print0 2>/dev/null)
 
@@ -352,13 +502,13 @@ function findir() {
     fi
 }
 
-##########
-# cdcool #
-##########
-# This shows a selector to quickly change
-# cd into commonly used, hard-to-type directories,
-# changing to a su prompt if the user doesn't have
-# reading permissions as well.
+##  +-+-+-+-+-+-+
+##  |c|d|c|o|o|l|
+##  +-+-+-+-+-+-+
+## This shows a selector to quickly change
+## cd into commonly used, hard-to-type directories,
+## changing to a su prompt if the user doesn't have
+## reading permissions as well.
 function cdcool() {
     # Filters the array in case there's an arg
     if [[ -n "$1" ]]; then
@@ -388,15 +538,90 @@ function cdcool() {
         cd "$final_path" || return 1
     fi
 }
+## List of places to show when using 'cdcool [arg]'
+cool_places=(
+    "~/.local/share/gnome-shell/extensions"
+    "~/.local/share/applications"
+    "~/.config/systemd/user/"
+    "/etc/systemd/user/"
+    "/var/lib/docker/volumes"
+    "/usr/share/bash-completion/completions"
+)
 
-###########
-# SAFE RM #
-###########
+###   ___  _ _                                        _    _____                     _     _
+###  / _ \| (_)                                      | |  |  _  |                   (_)   | |
+### / /_\ \ |_  __ _ ___  ___  ___     __ _ _ __   __| |  | | | |_   _____ _ __ _ __ _  __| | ___  ___
+### |  _  | | |/ _` / __|/ _ \/ __|   / _` | '_ \ / _` |  | | | \ \ / / _ \ '__| '__| |/ _` |/ _ \/ __|
+### | | | | | | (_| \__ \  __/\__ \  | (_| | | | | (_| |  \ \_/ /\ V /  __/ |  | |  | | (_| |  __/\__ \
+### \_| |_/_|_|\__,_|___/\___||___/   \__,_|_| |_|\__,_|   \___/  \_/ \___|_|  |_|  |_|\__,_|\___||___/
+## Allows using aliases after sudo (the ending space is what does teh trick)
+alias sudo='sudo '
+## Navigation
+alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+alias go="xdg-open"
+
+## True screen clearing
+function clear() {
+    echo -en "\033c"
+}
+
+##  +-+-+-+-+-+ +-+-+-+-+
+##  |S|p|i|c|y| |G|r|e|p|
+##  +-+-+-+-+-+ +-+-+-+-+
+## This makes grep run without the extra arguments unless it's being either piped:
+##   cat ~/.bashrc | grep "LESS"
+## or normally ran interactively:
+##   grep ~/.bashrc "^export"
+## This way it'll work for <(grep ..) or var=$(grep ..) or echo '' | grep
+## but won't affect scripts or other complex command chains.
+##
+## It also fixes errors when stupid programs like adb or docker use grep
+## to filter autocompletion results screwing the list when pressing TAB.
+##
+## This is a replacement for the old 'alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"'
+function grep {
+    if [ -t 0 ] || [ -t 1 ]; then
+        command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
+    elif { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 ||
+           [ "$(LC_ALL=C stat -c %F -)" = fifo ] ||
+           [ -t 2 ]; then
+        # t -2 fixes adb -s [TAB] and other autocompletion
+        command grep "$@"
+    else
+        command grep "$@"
+    fi
+}
+
+##  +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+##  |O|v|e|r|r|i|d|i|n|g| |A|l|i|a|s|e|s|
+##  +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+## Makes diff decent
+if _e colordiff; then
+    alias diff="colordiff -B -U 5 --suppress-common-lines"
+else
+    alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
+fi
+## Watch defaults
+if watch --help | grep -qm1 color; then
+    alias watch="watch --color -n 0.5"
+else
+    alias watch="watch -n 0.5"
+fi
+## Colors on DF
+alias df="${GRC}df -H"
+## Makes dd pretty and with progress bar
+alias dd="dd status=progress oflag=sync"
+## Makes ccze not stupid (fast and no output clearing)
+_e "ccze" && alias ccze='ccze -A -o nolookups'
+
+##  +-+-+-+-+ +-+-+
+##  |I|Q|4|7| |R|M|
+##  +-+-+-+-+ +-+-+
 ## Safe rm using gio trash
 ## Falls back to rm in any unsupported case
 ## Only caveat: ignores -r as gio trash already
 ## does it recursively, without option.
-if hash gio >&/dev/null; then
+if _e gio; then
     function rm() {
         use_gio=true
         local argv=("$@")
@@ -425,85 +650,28 @@ if hash gio >&/dev/null; then
     }
 fi
 
-#################
-# COLORS, LOTS! #
-#################
-## Magic with `less` (like colors and other cool stuff)
-export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
-
-## Magic with man pages (colors mainly)
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;31m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
-if [[ -x /usr/bin/dircolors ]]; then
-    if [[ -f ~/.dircolors ]]; then
-        eval "$(dircolors -b ~/.dircolors)"
-    else
-        eval "$(dircolors -b)"
-    fi
-    _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
-fi
-# GRC
-if hash "grc" >&/dev/null; then
-    GRC='grc -es'
-    if [[ -f /etc/profile.d/grc.sh ]]; then
-        source /etc/profile.d/grc.sh >&/dev/null
-    fi
-    alias cat="$GRC cat"
+##  +-+-+-+-+-+-+-+ +-+-+-+-+-+ +-+-+-+-+-+-+
+##  |a|n|d|r|o|i|d| |d|e|b|u|g| |b|r|i|d|g|e|
+##  +-+-+-+-+-+-+-+ +-+-+-+-+-+ +-+-+-+-+-+-+
+if _e "adb"; then
+    alias logcat_5min="adb logcat -v color,usec,uid -d -t \"\$(date \"+%F %T.000\" --date=\"5 minutes ago\")\""
+    alias logcat="adb logcat -T1000 -v color,usec,uid"
+    alias logcat_pogo=$'adb logcat -T10000 -b all -v color,usec,uid | egrep "( $(adb shell dumpsys package | \grep -C0 -A1 \'Package \[.*pokemo.*$\' | \grep userId | sed \'s/[^0-9]*//g\' | xargs | sed -e \'s/ / | /g\') |Unity|pokemongo|il2cpp|\[HAL)"'
+    alias logcat_giant="adb logcat -b all -v color,usec,uid"
+    function adb() {
+        if [[ $1 == "devices" && ($# == 1 || ($# == 2 && ($2 == "--long" || $2 == "-l" ))) ]]; then
+            _e grcat && while read -r a b c; do printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat .grc/conf.efibootmgr ||
+                        while read -r a b c; do printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/")
+        else
+            command adb "${@}"
+        fi
+    }
 fi
 
-## Pretty hostname
-_HOSTNAME="$(hostname)"
-# not posix / doesnt verk in windows
-# _HOSTNAME="$(hostname -f)"
-# _HOSTNAME=${_HOSTNAME%.*}
-# _HOSTNAME=${_HOSTNAME//.*./}
-
-###########
-# Aliases #
-###########
-
-## Allows using aliases after sudo (the ending space is what does teh trick)
-alias sudo='sudo '
-
-## Navigation
-alias ls="${GRC} ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
-alias go="xdg-open"
-alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"
-
-# Makes diff decent
-if hash colordiff >&/dev/null; then
-    alias diff="colordiff -B -U 5 --suppress-common-lines"
-else
-    alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
-fi
-
-## Logging
-alias watch="watch --color -n0.5"
-# Makes dmesg timestamps readable
-alias df="${GRC} df -H"
-# Makes dd pretty
-alias dd="dd status=progress oflag=sync"
-# Makes df$GRC
-
-# Btrfs aliases for usage and df
-if hash "btrfs" >&/dev/null; then
-    alias bdf="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem df /"
-    alias busage="grc -c ~/.local/share/grc/conf.btrfs sudo btrfs filesystem usage -H /"
-fi
-
-# Makes ccze not stupid (fast and no output clearing)
-if hash "ccze" >&/dev/null; then
-    alias ccze='ccze -A -o nolookups'
-fi
-
-# journalctl handy aliases
-if hash "journalctl" >&/dev/null; then
+##  +-+-+-+-+-+-+-+-+-+-+
+##  |j|o|u|r|n|a|l|c|t|l|
+##  +-+-+-+-+-+-+-+-+-+-+
+if _e "journalctl"; then
     alias je='journalctl -efn 50 -o short --no-hostname'
     alias jb='journalctl -eb -o short --no-hostname'
     complete -F _journalctl je
@@ -520,8 +688,106 @@ if hash "journalctl" >&/dev/null; then
 
 fi
 
-## Git
-if hash "git" >&/dev/null; then
+##  +-+-+-+-+-+-+-+-+-+
+##  |s|y|s|t|e|m|c|t|l|
+##  +-+-+-+-+-+-+-+-+-+
+if _e "systemctl"; then
+    alias start="systemctl start"
+    alias stop="systemctl stop"
+    alias restart="systemctl restart"
+    alias st="systemctl status -n9999 --no-legend -a -l"
+    complete -F _complete_alias start
+    complete -F _complete_alias stop
+    complete -F _complete_alias restart
+    complete -F _complete_alias st
+fi
+
+##  +-+-+-+-+-+-+-+-+-+-+
+##  |p|a|c|m|a|n|/|y|a|y|
+##  +-+-+-+-+-+-+-+-+-+-+
+if _e "pacman"; then
+    if _e "yay"; then
+        function yayedit() {
+            CURRDIR="$PWD"
+            if ! yay -Ss "$1" | grep "aur/$1 " -qm 1; then
+                echo "Package $1 does not exist."
+                return
+            fi
+            echo "Will edit PKGBUILD of package $1"
+            cd /tmp/yay/build/
+            yay -G "$1"
+            cd "$1"
+            $EDITOR PKGBUILD
+            echo "Press enter when done editing... Type 'n' and press enter if you don't want makepkg to overwrite changes in src!"
+            read overwrite
+            if [[ $overwrite == "n" ]]; then
+                echo "Not overwriting src"
+                makepkg -esi --skipchecksums
+            else
+                makepkg -si --skipchecksums
+            fi
+
+            cd "$CURRDIR"
+        }
+    fi
+    alias pacman="pacman "
+    alias pacs="sudo pacman -S --needed --asdeps"
+    alias pacr="sudo pacman -R --recursive --unneeded --cascade"
+    alias pacss="pacman -Ss"
+    alias paci="pacman -Qi"
+    alias pacl="pacman -Ql"
+    alias paccache_safedelete="sudo paccache -r && sudo paccache -ruk1"
+    complete -F _complete_alias pacs
+    complete -F _complete_alias pacr
+    complete -F _complete_alias pacss
+    complete -F _complete_alias paci
+    complete -F _complete_alias pacl
+    complete -F _complete_alias paccache_safedelete
+
+    ## Pacman Awesome Updater
+    function pacsyu() {
+        echo -e "\e[01;93mUpdating pacman repositories...\e[00m"
+        sudo pacman -Sy
+
+        mkdir -p "$HOME/.pacman-updated"
+        currentUpdatePkgs=$(\pacman -Qu --color never)
+        previousUpdatePkgs=$(cat .pacman-updated/$(\ls -L .pacman-updated/ | tail -n1))
+        if [[ "$currentUpdatePkgs" == "$previousUpdatePkgs" ]]; then
+            echo -e "\e[00;92\nThis is the same list that was previously saved, not saving again.\e[00m"
+        else
+            echo -e "\e[01;93m\nSaving log of packages to upgrade...\e[00m"
+            echo "$currentUpdatePkgs" >"$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
+        fi
+
+        echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
+        sudo yay -Syu --noconfirm
+    }
+
+    ## NOT REQUIRED ANYMORE BECAUSE BTRFS
+    # function pacman_rollback() {
+    #     echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST AND RUN MANUALLY.'
+    #     return 1
+    #     if [[ -f $1 ]]; then
+    #         while read line; do
+    #             pkg=$(echo "$i" | sed 's/ -> .+//' | sed 's/ /-/')
+    #             echo "Downgrading $pkg"
+    #             sudo pacman --noconfirm --needed -U /var/cache/pacman/pkg/$pkg*
+    #         done < <(cat $1)
+    #     fi
+    # }
+
+    # Optimizes pacman stuff (TODO: does it?)
+    alias pacfix='sudo pacman-optimize; sudo pacman -S $(pacman -Qkqn | sed -E "s/ .+$//" | uniq | xargs); paccache -k2 --min-mtime "60 days ago" -rv'
+fi
+
+
+###  _____ _____ _____
+### |  __ \_   _|_   _|
+### | |  \/ | |   | |
+### | | __  | |   | |
+### | |_\ \_| |_  | |
+###  \____/\___/  \_/
+if _e "git"; then
     # does not open editor when merging
     export GIT_MERGE_AUTOEDIT=no
     # alias gitl='git log --all --decorate=full --oneline'
@@ -530,10 +796,6 @@ if hash "git" >&/dev/null; then
     alias gits='git status'
     alias gitm='git commit --amend -m '
     alias gitcam='git commit -a -m '
-
-    function gitc {
-        git clone $1 && cd $(basename $1 .git)
-    }
 
     function gitcleanbranches() {
         git fetch --prune
@@ -623,6 +885,9 @@ if hash "git" >&/dev/null; then
             _git_sync
         elif [[ $1 == "commit" && $2 == "--amend" && $# == 2 ]]; then
             command git commit --amend --no-edit
+        elif [[ $1 == "clone" && $# == 2 ]]; then
+            command git clone "$1"
+            cd "$1" || return
         else
             command git "$@"
         fi
@@ -662,143 +927,23 @@ if hash "git" >&/dev/null; then
     __git_complete gitdelbranch _git_local_branches
 fi
 
-## Systemctl
-if hash "systemctl" >&/dev/null; then
-    alias start="systemctl start"
-    alias stop="systemctl stop"
-    alias restart="systemctl restart"
-    alias st="systemctl status -n9999 --no-legend -a -l"
-    complete -F _complete_alias start
-    complete -F _complete_alias stop
-    complete -F _complete_alias restart
-    complete -F _complete_alias st
-fi
 
-## Pacman
-if hash "pacman" >&/dev/null; then
-    if hash "yay" >&/dev/null; then
-        function yayedit() {
-            CURRDIR="$PWD"
-            if ! yay -Ss "$1" | tail -n2 | grep "/$1 " -qm 1; then
-                echo "Package $1 does not exist."
-                return
-            fi
-            echo "Will edit PKGBUILD of package $1"
-            cd /tmp
-            yay -G "$1"
-            cd "$1"
-            $EDITOR PKGBUILD
-            echo "Press enter when done editing..."
-            read
-            makepkg -esi --skipchecksums
-            cd "$CURRDIR"
-        }
-    fi
-    alias pacman="pacman "
-    alias pacs="sudo pacman -S --needed --asdeps"
-    alias pacr="sudo pacman -R --recursive --unneeded --cascade"
-    alias pacss="pacman -Ss"
-    alias paci="pacman -Qi"
-    alias pacl="pacman -Ql"
-    alias paccache_safedelete="sudo paccache -r && sudo paccache -ruk1"
-    complete -F _complete_alias pacs
-    complete -F _complete_alias pacr
-    complete -F _complete_alias pacss
-    complete -F _complete_alias paci
-    complete -F _complete_alias pacl
-    complete -F _complete_alias paccache_safedelete
 
-    ## Pacman Awesome Updater
-    function pacsyu() {
-        echo -e "\e[01;93mUpdating pacman repositories...\e[00m"
-        sudo pacman -Sy
 
-        mkdir -p "$HOME/.pacman-updated"
-        currentUpdatePkgs=$(\pacman -Qu --color never)
-        previousUpdatePkgs=$(cat .pacman-updated/$(\ls -L .pacman-updated/ | tail -n1))
-        if [[ "$currentUpdatePkgs" == "$previousUpdatePkgs" ]]; then
-            echo -e "\e[00;92\nThis is the same list that was previously saved, not saving again.\e[00m"
-        else
-            echo -e "\e[01;93m\nSaving log of packages to upgrade...\e[00m"
-            echo "$currentUpdatePkgs" >"$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
-        fi
 
-        echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
-        sudo yay -Syu --noconfirm
-    }
-
-    ## NOT REQUIRED ANYMORE BECAUSE BTRFS
-    # function pacman_rollback() {
-    #     echo 'WARNING THIS IS A WIP. CHECK THE SOURCE FIRST AND RUN MANUALLY.'
-    #     return 1
-    #     if [[ -f $1 ]]; then
-    #         while read line; do
-    #             pkg=$(echo "$i" | sed 's/ -> .+//' | sed 's/ /-/')
-    #             echo "Downgrading $pkg"
-    #             sudo pacman --noconfirm --needed -U /var/cache/pacman/pkg/$pkg*
-    #         done < <(cat $1)
-    #     fi
-    # }
-
-    # Optimizes pacman stuff (TODO: does it?)
-    alias pacfix='sudo pacman-optimize; sudo pacman -S $(pacman -Qkqn | sed -E "s/ .+$//" | uniq | xargs); paccache -k2 --min-mtime "60 days ago" -rv'
-fi
-
-# Pretty colorful and super verbose logcat for adb devices
-if hash "adb" >&/dev/null; then
-    alias logcat_5min="adb logcat -v color,usec,uid -d -t \"\$(date \"+%F %T.000\" --date=\"5 minutes ago\")\""
-    alias logcat="adb logcat -T1000 -v color,usec,uid"
-    alias logcat_pogo=$'adb logcat -T10000 -b all -v color,usec,uid | egrep "( $(adb shell dumpsys package | \grep -C0 -A1 \'Package \[.*pokemo.*$\' | \grep userId | sed \'s/[^0-9]*//g\' | xargs | sed -e \'s/ / | /g\') |Unity|pokemongo|il2cpp|\[HAL)"'
-    alias logcat_giant="adb logcat -b all -v color,usec,uid"
-    alias adl="adb devices -l | sed -E 's/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID:\3\tserial:\1\tdevice:\2/' | grcat .grc/conf.netstat"
-    alias adt="adb -t "
-fi
-
-# Sets default stuff for bat
-if hash "bat" >&/dev/null; then
-    export BAT_THEME="Monokai Extended Bright"
-    alias bat="bat --italic-text=always --decorations=always --color=always"
-fi
-
-## True screen clearing
-function clear() {
-    echo -en "\033c"
-}
-
-###################################
-# The Divine and Beautiful Prompt #
-###################################
+###                                                                                                                      .         .
+###  8888888 8888888888 8 8888        8 8 8888888888             8 888888888o   8 888888888o.      ,o888888o.           ,8.       ,8.          8 888888888o 8888888 8888888888
+###        8 8888       8 8888        8 8 8888                   8 8888    `88. 8 8888    `88.  . 8888     `88.        ,888.     ,888.         8 8888    `88.     8 8888
+###        8 8888       8 8888        8 8 8888                   8 8888     `88 8 8888     `88 ,8 8888       `8b      .`8888.   .`8888.        8 8888     `88     8 8888
+###        8 8888       8 8888        8 8 8888                   8 8888     ,88 8 8888     ,88 88 8888        `8b    ,8.`8888. ,8.`8888.       8 8888     ,88     8 8888
+###        8 8888       8 8888        8 8 888888888888           8 8888.   ,88' 8 8888.   ,88' 88 8888         88   ,8'8.`8888,8^8.`8888.      8 8888.   ,88'     8 8888
+###        8 8888       8 8888        8 8 8888                   8 888888888P'  8 888888888P'  88 8888         88  ,8' `8.`8888' `8.`8888.     8 888888888P'      8 8888
+###        8 8888       8 8888888888888 8 8888                   8 8888         8 8888`8b      88 8888        ,8P ,8'   `8.`88'   `8.`8888.    8 8888             8 8888
+###        8 8888       8 8888        8 8 8888                   8 8888         8 8888 `8b.    `8 8888       ,8P ,8'     `8.`'     `8.`8888.   8 8888             8 8888
+###        8 8888       8 8888        8 8 8888                   8 8888         8 8888   `8b.   ` 8888     ,88' ,8'       `8        `8.`8888.  8 8888             8 8888
+###        8 8888       8 8888        8 8 888888888888           8 8888         8 8888     `88.    `8888888P'  ,8'         `         `8.`8888. 8 8888             8 8888
 ## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
-[[ "$PS1" ]] && hash "fortune" "cowthink" "lolcat" >&/dev/null && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
-
-## Formats seconds into more pretty H:M:S
-## Stolen from: https://bit.ly/3nJQFwp
-function format-duration() {
-    T=$1
-    S=$((T % 60))
-    M=$((T / 60 % 60))
-    H=$((T / 60 / 60 % 24))
-    D=$((T / 60 / 60 / 24))
-    [[ $D -gt 0 ]] && printf '%dd%dh' $D $H ||
-        ([[ $H -gt 0 ]] && printf '%dh%dm' $H $M) ||
-        ([[ $M -gt 0 ]] && printf '%dm%ds' $M $S) ||
-        printf "%ds" $S
-}
-
-## Returns a truncated $PWD depending on window width
-function _get_truncated_pwd() {
-    local tilde="~"
-    local newPWD="${PWD/#${HOME}/${tilde}}"
-    local pwdmaxlen="$((${COLUMNS:-80} / 4))"
-    [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="…${newPWD:3-$pwdmaxlen}"
-    echo -n "${newPWD}"
-}
-
-## Lets disable the embedded venv prompt and make our own :)
-export VIRTUAL_ENV_DISABLE_PROMPT=0
-function _virtualenv_info() {
-    [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
-}
+[[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
@@ -974,10 +1119,10 @@ function _set_prompt() {
     trap '_pre_command' DEBUG
 }
 
-########################
-# BUG FIXES AND TWEAKS #
-########################
-## vte.sh
+
+##  +-+-+-+-+-+-+ +-+-+-+
+##  |v|t|e|.|s|h| |f|i|x|
+##  +-+-+-+-+-+-+ +-+-+-+
 # Fixes a bug (http://tinyurl.com/ohy3kmb) where spawning a new tab or window in gnome-terminal
 # does not keep the current PWD, and defaults back to HOME (http://tinyurl.com/y7yknu3r).
 # vte.sh replaces your PROMPT_COMMAND, so just source it and add it's function '__vte_prompt_command'
@@ -989,53 +1134,9 @@ else
     PROMPT_COMMAND='_set_prompt'
 fi
 
-## SSH Stuff (runs only if it's inside ssh)
-if is_ssh; then
-    if [[ $TERM =~ .*kitty.* ]]; then
-        export TERM=xterm-256color
-    fi
-    _HOSTNAME="\[\e[01;33m\]${_HOSTNAME} [SSH]"
-fi
-
-## GPG Signing TTY
-## I don't recall why but this is required for GPG signing in git
-GPG_TTY=$(tty)
-export GPG_TTY
-
-## This fixes a bug that happens when `sudo su USER`
-## inside a SSH shell that keeps loginctl envvars
-## making some commands not work.
-## @see: https://unix.stackexchange.com/questions/346841/why-does-sudo-i-not-set-xdg-runtime-dir-for-the-target-user
-if [[ -z $XDG_RUNTIME_DIR && $(is_ssh) ]]; then
-    export XDG_RUNTIME_DIR=/run/user/$UID
-fi
-
-## Asks for Ctrl+D to be pressed twice to exit the shell
-export IGNOREEOF=1
-
-## Sets default EDITOR environment variable
-## If logged as root or in a ssh shell uses only term editors.
-if [[ -n $DISPLAY && ! $EUID -eq 0 && ! $(is_ssh) ]]; then
-    for editor in "subl3" "subl" "code" "gedit"; do
-        if hash "$editor" >&/dev/null; then
-            export EDITOR=$editor
-            break
-        else
-            continue
-        fi
-        export EDITOR="vi"
-    done
-else
-    if hash "nano" >&/dev/null; then
-        export EDITOR="nano"
-    else
-        export EDITOR="vi"
-    fi
-fi
-
-################
-# CUSTOM STUFF #
-################
+##  +-+-+-+-+-+-+
+##  |c|u|s|t|o|m|
+##  +-+-+-+-+-+-+
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
