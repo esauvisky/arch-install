@@ -26,7 +26,7 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=1.0
+export _RCVERSION=11
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -1140,3 +1140,30 @@ fi
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
+
+function check_updates() {
+    if [[ ! -f ~/.emishrc_last_check ]]; then
+        date +%s > ~/.emishrc_last_check
+    fi
+
+    if [[ $(($(date +%s)-$(cat ~/.emishrc_last_check))) -gt 604800 ]]; then
+        echo -e "\E[01;38mChecking emishrc updates..."
+        date +%s > ~/.emishrc_last_check
+        _RCREMOTE=$(wget -q https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc -O- | grep 'export _RCVERSION=' | sed 's/[^0-9]*//g')
+        if [[ $_RCREMOTE -gt $_RCVERSION ]]; then
+            echo -en "\E[01;35mThere's an update for emishrc available! Do you want to update?\E[01;96m [Y/n] "
+            read -n 1 yn
+            case ${yn:0:1} in
+                n|N )
+                    echo -e "\nI'll remind you in one week."
+                ;;
+                * )
+                    echo -e "\nUpdating..."
+                    bash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"
+                    source ~/.bashrc
+                ;;
+            esac
+        fi
+    fi
+}
+check_updates || true
