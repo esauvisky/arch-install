@@ -23,3 +23,5 @@
 	rebase = true
 [diff]
 	colorMoved = zebra
+[credential]
+	helper = /usr/lib/git-core/git-credential-libsecret
