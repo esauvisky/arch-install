@@ -37,18 +37,6 @@ shopt -s extglob
 # Enables the ** glob
 shopt -s globstar
 
-## WIP:
-## This makes it only actually grep if it's not being piped
-## so it works for <(grep ..) or var=$(grep ..) or echo '' | grep
-# grep() {
-#     #
-#     # Another way is using [ -t 1 ] and [ -t 0 ]
-#     if { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 || [ "$(LC_ALL=C stat -c %F -)" = fifo ]; then
-#         command grep "$@"
-#     else
-#         command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
-#   fi
-# }
 
 ## WIP:
 # function cd() {
@@ -72,7 +60,7 @@ shopt -s globstar
 #     fi
 #     builtin cd "${1}"
 # }
-
+source <(cod init $$ bash)
 # Adds coloring output for the rest of the shit
 if [[ -d ~/.grc/ ]]; then
     for i in ~/.grc/*; do
