@@ -26,7 +26,7 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=11
+export _RCVERSION=12
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -1096,7 +1096,7 @@ function _set_prompt() {
 
     # Strip ANSI commands before counting length
     # From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
-    PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
+    PS1RHS_stripped=$(echo "$PS1RHS" | sed -e "s,\x1B\[[0-9;]*[a-zA-Z],,g")
 
     # Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
     local Save='\e[s' # Save cursor position
