@@ -70,7 +70,7 @@ sleep 2s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimiz
 sleep 5s && discord &
 
 syncthing-gtk &
-
+solaar -w hide &
 ## guake daemon
 # guake &
 

@@ -26,7 +26,7 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=12
+export _RCVERSION=13
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -541,6 +541,7 @@ function cdcool() {
 ## List of places to show when using 'cdcool [arg]'
 cool_places=(
     "~/.local/share/gnome-shell/extensions"
+    "~/.local/share/nautilus/scripts"
     "~/.local/share/applications"
     "~/.config/systemd/user/"
     "/etc/systemd/user/"
@@ -559,6 +560,9 @@ alias sudo='sudo '
 ## Navigation
 alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 alias go="xdg-open"
+
+## Uses system python as pip
+alias pip='python -m pip'
 
 ## True screen clearing
 function clear() {
@@ -885,9 +889,6 @@ if _e "git"; then
             _git_sync
         elif [[ $1 == "commit" && $2 == "--amend" && $# == 2 ]]; then
             command git commit --amend --no-edit
-        elif [[ $1 == "clone" && $# == 2 ]]; then
-            command git clone "$1"
-            cd "$1" || return
         else
             command git "$@"
         fi
