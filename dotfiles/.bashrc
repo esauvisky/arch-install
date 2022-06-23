@@ -323,7 +323,6 @@ if _e "grc"; then
     if [[ -f /etc/profile.d/grc.sh ]]; then
         source /etc/profile.d/grc.sh >&/dev/null
     fi
-    alias cat="${GRC}cat"
 fi
 
 ###  _____  _____ _      ______         _
@@ -569,6 +568,15 @@ function clear() {
     echo -en "\033c"
 }
 
+## use bat instead of cat if available
+function cat() {
+    if [[ -t 0 ]] && [[ $# == 1 ]] && _e bat && bat -L | grep -qm1 "[,:]${1##*.}($|,)"; then
+        command bat "$@"
+    else
+        command cat "$@"
+    fi
+}
+
 ##  +-+-+-+-+-+ +-+-+-+-+
 ##  |S|p|i|c|y| |G|r|e|p|
 ##  +-+-+-+-+-+ +-+-+-+-+
@@ -606,7 +614,7 @@ else
     alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
 fi
 ## Watch defaults
-if watch --help | grep -qm1 color; then
+if watch --help 2>/dev/null | grep -qm1 color; then
     alias watch="watch --color -n 0.5"
 else
     alias watch="watch -n 0.5"
