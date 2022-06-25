@@ -60,7 +60,6 @@ shopt -s globstar
 #     fi
 #     builtin cd "${1}"
 # }
-source <(cod init $$ bash)
 # Adds coloring output for the rest of the shit
 if [[ -d ~/.grc/ ]]; then
     for i in ~/.grc/*; do
@@ -69,6 +68,46 @@ if [[ -d ~/.grc/ ]]; then
         fi
     done
 fi
+
+source <(cod init $$ bash)
+function __cod_complete_bash() {
+	$cod_enable_trace && __cod_ref_trace
+
+	# First we want to get file completions.
+
+	local FILTEROPT
+	if [ -z "$2" ] ; then
+		# If user trying to complete empty string we want to filter out dot files.
+		FILTEROPT='.*'
+	fi
+
+	# local FILE_COMPLETIONS
+	local COD_COMPLETIONS
+	# Generate file completions
+	#readarray -t FILE_COMPLETIONS < <(compgen -f -X "$FILTEROPT" -- "$2")
+
+	# Generate cod completions.
+	readarray -t COD_COMPLETIONS < <(command $__COD_BINARY api complete-words -- $$ "$COMP_CWORD" "${COMP_WORDS[@]}" 2> /dev/null)
+
+	COMPREPLY=("${COD_COMPLETIONS[@]}")
+
+	local NAME
+	local ONLY_EQ=true
+	# Now we don't want bash to add trailing space for options that end with '='
+	for NAME in "${COD_COMPLETIONS[@]}" ; do
+		if [ "${NAME: -1}" != "=" ] ; then
+			ONLY_EQ=false
+			break
+		fi
+	done
+
+	if $ONLY_EQ ; then
+		compopt -o nospace
+	fi
+
+	$cod_enable_trace && __cod_unref_trace
+	return 0
+}
 
 ## Allows zsh-style completion for dirs
 ## Example:
