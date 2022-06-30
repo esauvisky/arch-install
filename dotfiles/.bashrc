@@ -26,7 +26,7 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=13
+export _RCVERSION=14
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -49,6 +49,22 @@ function _e() {
     (command -v "$1" >&/dev/null && return 0) ||
     (which "$1" >&/dev/null && return 0) || # doesn't work with built-ins
     return 1
+}
+
+## Checks if a binary or built-in command exists and has color support
+function _c() {
+    if (
+        (hash "$1" >&/dev/null) ||
+        (command -v "$1" >&/dev/null) ||
+        (which "$1" >&/dev/null)
+    ) && (
+        ($1 --help 2>&1 | grep -qm1 -- '--color') ||
+        ($1 -h 2>&1 | grep -qm1 -- '--color')
+    ); then
+        return 0
+    else
+        return 1
+    fi
 }
 
 ###  _____           _                                      _     _   _            _       _     _
@@ -741,6 +757,14 @@ if _e "pacman"; then
 
             cd "$CURRDIR"
         }
+        # function _yay() {
+        #     if [[ $# == 0 ]]; then
+        #         # if running simply `yay`, then ask for packages to ignore
+        #         command yay --noanswerupgrade -Syu
+        #     fi
+        #     command yay "$@"
+        # }
+        # alias yay="_yay"
     fi
     alias pacman="pacman "
     alias pacs="sudo pacman -S --needed --asdeps"
@@ -1158,8 +1182,8 @@ function check_updates() {
     if [[ $(($(date +%s)-$(cat ~/.emishrc_last_check))) -gt 604800 ]]; then
         echo -e "\E[01;38mChecking emishrc updates..."
         date +%s > ~/.emishrc_last_check
-        _RCREMOTE=$(wget -q https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc -O- | grep 'export _RCVERSION=' | sed 's/[^0-9]*//g')
-        if [[ $_RCREMOTE -gt $_RCVERSION ]]; then
+        _RCREMOTE=$(wget -q https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc -O- | grep -m1 'export _RCVERSION=' | sed 's/[^0-9]*//g;s/^0//')
+        if [ $(($_RCREMOTE-$_RCVERSION)) -gt 0 ]; then # needs single brackets for leading zeroes to work
             echo -en "\E[01;35mThere's an update for emishrc available! Do you want to update?\E[01;96m [Y/n] "
             read -n 1 yn
             case ${yn:0:1} in
