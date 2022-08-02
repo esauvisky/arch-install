@@ -23,7 +23,7 @@ for dep in "${dotfiles[@]}"; do
     if hash wget 2>/dev/null; then
         wget -q "$url" -O "$dep.1" 2>/dev/null
     else
-        curl -o "$dep.1" "$url" 2>/dev/null
+        curl -H "cache-control: max-age=0" -o "$dep.1" "$url" 2>/dev/null
     fi
 
     if hash gio 2>/dev/null; then
@@ -43,7 +43,7 @@ for conf in "${grcconfs[@]}"; do
     if hash wget 2>/dev/null; then
         wget -q "$url" -O ".grc/$conf.1" 2>/dev/null
     else
-        curl -o ".grc/$conf.1" "$url" 2>/dev/null
+        curl -H "cache-control: max-age=0" -o ".grc/$conf.1" "$url" 2>/dev/null
     fi
 
     if hash gio 2>/dev/null; then
@@ -75,5 +75,5 @@ elif hash apt 2>/dev/null; then
     fi
 fi
 
-source ./.bashrc
 echo -e "\n That's all! KTHXBYE"
+bash --rcfile $HOME/.bashrc
