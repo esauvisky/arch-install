@@ -26,7 +26,7 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=14
+export _RCVERSION=15
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -687,9 +687,8 @@ if _e "adb"; then
     alias logcat_pogo=$'adb logcat -T10000 -b all -v color,usec,uid | egrep "( $(adb shell dumpsys package | \grep -C0 -A1 \'Package \[.*pokemo.*$\' | \grep userId | sed \'s/[^0-9]*//g\' | xargs | sed -e \'s/ / | /g\') |Unity|pokemongo|il2cpp|\[HAL)"'
     alias logcat_giant="adb logcat -b all -v color,usec,uid"
     function adb() {
-        if [[ $1 == "devices" && ($# == 1) ]]; then
-            _e grcat && while read -r a b c; do printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat .grc/conf.efibootmgr ||
-                        while read -r a b c; do printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/")
+        if [[ $1 == "devices" && ($# == 1) ]] && _e grcat && [[ -f ~/.grc/conf.efibootmgr ]]; then
+            while read -r a b c; do [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat ~/.grc/conf.efibootmgr
         else
             command adb "${@}"
         fi
