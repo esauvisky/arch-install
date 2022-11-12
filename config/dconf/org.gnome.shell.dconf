@@ -1,18 +1,25 @@
 [/]
-command-history=['xsensors', 'copyq show', 'scrpcpy', 'nautilus', 'nautilus /home/emi', 'nautilus /home/emi -w', 'nautilus -w', 'go /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'xdg-open /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'superslicer', 'ghidra', 'sc', 'osu-lazer', 'code .bashrc', 'killall -9 chrome', 'r', 'peek', 'scrcpy', 'copyq']
+command-history=['xsensors', 'scrpcpy', 'nautilus', 'nautilus /home/emi', 'nautilus /home/emi -w', 'nautilus -w', 'go /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'xdg-open /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'sc', 'osu-lazer', 'code .bashrc', 'killall -9 chrome', 'scrpcy', 'copyq', '/home/emi/.config/Code/logs/20220412T182608/exthost1/ms-vscode.js-debug/vscode-debugadapter-90f66153.json.gz', 'co', 'co', 'scrcpyt', 'xtemp', 'scr', 'scrcpy 192.168.1.80', 'scrcpy -s 192.168.1.80', 'cura', 'sleep 3 && gnome-screenshot -w', 'scrcpy -s 192.168.1.81', 'scrcpy -s 192.168.1.82', 'srccpy', 'sc', 'xkill', 'ghid5ra', 'f', 'solaar', 'copyq show', 'sc', 'killall meld', 'splatmoji', 'splatmoji show', 'killall -9 blender', 'blender', 'ghidra[', 'telegram', 'hidra', 'fork', 'peek', 'spotify', 'killall -9 Forkgram', 'Forkgram', 'splatmoji copy', 'scrc', 'scrcpy -s', 'sc', 'sc', 'scrc', 'sc', 'sc', 's', 's', 'sac', 'sc', 'betterdiscord-installer', 'scr', 'adb c', 'scrcpy -s 192.168.1.20]', '4r', 're', 'r', 'killall discord', 'killall -9 ghidra', 'ghidrea', 'ghidrea', 'a', 'adb', 'ad', 'ad', 'android', 'android-studio', 'adb c', 'adb', 'emibemol', 'osud', 'a', 'sc', 'scrcpyad', 'adb c', 'androi', 'superslicer', 'killall -9 subl', 'scr', 'a', 'asd', 'asd', 'sc', 'obs', 'code', 'sc', 'adb connect 192.168.1.25', 'ghidra', 'scrcpy -s 192.168.1.25', 'goo', 'scr', 'subl', 'sc', 'sc', 'scrcpy', 'discord', 'gimp', 'ad', 'uridownload', 'adb connect 192.168.1.20', 'scrcpy -s 192.168.1.20', 'firefox']
+disable-extension-version-validation=true
 disable-user-extensions=false
-disabled-extensions=['workspace-indicator@gnome-shell-extensions.gcampax.github.com']
-enabled-extensions=['draw-on-your-screen@som.codeberg.org', 'tiling-assistant@leleat-on-github', 'extension-list@tu.berry', 'wsmatrix@martin.zurowietz.de', 'pop-shell@system76.com', 'native-window-placement@gnome-shell-extensions.gcampax.github.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'auto-move-windows@gnome-shell-extensions.gcampax.github.com']
-remember-mount-password=false
+disabled-extensions=['workspace-indicator@gnome-shell-extensions.gcampax.github.com', 'screenshot-window-sizer@gnome-shell-extensions.gcampax.github.com', 'auto-move-windows@gnome-shell-extensions.gcampax.github.com', 'native-window-placement@gnome-shell-extensions.gcampax.github.com', 'draw-on-your-screen@som.codeberg.org']
+enabled-extensions=['tiling-assistant@leleat-on-github', 'wsmatrix@martin.zurowietz.de', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'GoogleEarthWallpaper@neffo.github.com', 'text_translator@awamper.gmail.com', 'extension-list@tu.berry', 'pop-shell@system76.com', 'appindicatorsupport@rgcjonas.gmail.com', 'at4dm-reanimatorzon@github.com', 'color-picker@tuberry', 'draw-on-your-screen2@zhrexl.github.com']
+had-bluetooth-devices-setup=true
+remember-mount-password=true
 welcome-dialog-last-shown-version='41.4'
 
 [extensions/auto-move-windows]
 application-list=['spotify.desktop:12']
 
+[extensions/color-picker]
+colors-history='#020203|#404552|#36393f|#404552|#242933|#141414|#e53d1b|#eeeeec'
+
 [extensions/draw-on-your-screen]
 erase-drawings=['<Super>e']
-indicator-disabled=false
-osd-disabled=false
+indicator-disabled=true
+osd-disabled=true
+persistent-over-restarts=false
+persistent-over-toggles=true
 toggle-drawing=['<Super>d']
 toggle-modal=['<Super>f']
 
@@ -25,6 +32,7 @@ palettes=[('GNOME HIG lighter', ['rgb(153,193,241):Blue 1', 'rgb(143,240,164):Gr
 
 [extensions/draw-on-your-screen/internal-shortcuts]
 delete-last-element=['KP_7']
+open-preferences=['KP_Subtract']
 pick-color=['p']
 select-ellipse-shape=['c']
 select-image-shape=['i']
@@ -41,15 +49,33 @@ switch-dash=['KP_0']
 switch-fill=['KP_8']
 switch-linecap=['KP_5']
 switch-linejoin=['KP_4']
+toggle-help=['KP_Multiply']
+
+[extensions/extension-list]
+unpin-button=false
+unpin-list=['windowsNavigator@gnome-shell-extensions.gcampax.github.com']
+
+[extensions/googleearthwallpaper]
+download-folder='/home/emi/Media/GoogleEarthWallpaper/'
+image-details='10, 2483, Chabana, Yoron, Oshima District, Kagoshima Prefecture, Japan|©2019 Maxar Technologies|27.057869|128.406614|17'
+image-filepath='/home/emi/Media/GoogleEarthWallpaper/2120_10_2483_chabana_yoron_oshima_district_kagoshima_prefecture_japan.jpg'
+image-id=2120
+next-refresh=1665608634
 
 [extensions/pop-shell]
 active-hint=true
 gap-inner=uint32 1
 gap-outer=uint32 1
 show-skip-taskbar=false
-show-title=false
+show-title=true
 smart-gaps=true
 tile-by-default=true
+
+[extensions/text-translator]
+enable-instant-translation=false
+languages-stats='{"Google.Translate-undefined-pt":{"lang_name":"Portuguese","lang_code":"pt","count":6},"Google.Translate-undefined-en":{"lang_name":"English","lang_code":"en","count":6},"Google.Translate-source-pt":{"lang_name":"Portuguese","lang_code":"pt","count":10},"Google.Translate-target-en":{"lang_name":"English","lang_code":"en","count":10},"Google.Translate-source-en":{"lang_name":"English","lang_code":"en","count":2},"Google.Translate-target-pt":{"lang_name":"Portuguese","lang_code":"pt","count":2}}'
+last-translator='Google.Translate'
+translators-prefs='{"Google.Translate":{"default_source":"pt","default_target":"en","last_source":"pt","last_target":"en","remember_last_lang":true},"Yandex.Translate":{"default_source":"pt","default_target":"en","last_source":"","last_target":"","remember_last_lang":true}}'
 
 [extensions/tiling-assistant]
 activate-layout0=@as []
@@ -92,9 +118,17 @@ toggle-always-on-top=['<Shift><Control><Alt>a']
 toggle-tiling-popup=@as []
 window-gap=0
 
+[extensions/user-theme]
+name='Arc-Dark'
+
 [extensions/wsmatrix]
-num-columns=4
-popup-timeout=200
+multi-monitor=true
+num-columns=5
+num-rows=3
+popup-timeout=350
+show-overview-grid=true
+show-thumbnails=true
+show-workspace-names=true
 
 [keybindings]
 focus-active-notification=@as []

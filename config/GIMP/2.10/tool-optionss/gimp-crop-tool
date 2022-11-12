@@ -1,0 +1,10 @@
+# GIMP gimp-crop-tool options
+
+(fixed-rule-active yes)
+(guide golden)
+(overridden-fixed-aspect yes)
+(foreground (color-rgb 0.50024097659198363 0 0.73000282049179077))
+(pattern "Pine")
+(delete-pixels yes)
+
+# end of gimp-crop-tool options

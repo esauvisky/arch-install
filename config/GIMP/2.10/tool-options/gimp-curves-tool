@@ -1,0 +1,5 @@
+# GIMP gimp-curves-tool options
+
+(histogram-scale logarithmic)
+
+# end of gimp-curves-tool options

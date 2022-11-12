@@ -1,0 +1,12 @@
+[Unit]
+Description=dailyChores
+After=network.target
+
+[Service]
+WorkingDirectory=/home/emi/Pokemod/luminosity/venik
+ExecStart=/usr/bin/bash /home/emi/Pokemod/luminosity/venik/daily-chores.sh
+Restart=on-failure
+SuccessExitStatus=KILL
+
+[Install]
+WantedBy=default.target

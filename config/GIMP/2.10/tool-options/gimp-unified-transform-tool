@@ -1,0 +1,6 @@
+# GIMP gimp-unified-transform-tool options
+
+(grid-type n-lines)
+(grid-size 18)
+
+# end of gimp-unified-transform-tool options

@@ -13,8 +13,8 @@ move-to-workspace-1=@as []
 move-to-workspace-last=@as []
 move-to-workspace-left=['<Primary><Shift><Alt>Left']
 move-to-workspace-right=['<Primary><Shift><Alt>Right']
-switch-applications=@as []
-switch-applications-backward=@as []
+switch-applications=['<Control><Alt>Tab']
+switch-applications-backward=['<Shift><Control><Alt>Tab']
 switch-group=@as []
 switch-group-backward=@as []
 switch-input-source=@as []
@@ -32,5 +32,5 @@ unmaximize=@as []
 
 [preferences]
 action-double-click-titlebar='none'
-num-workspaces=12
+num-workspaces=15
 workspace-names=@as []

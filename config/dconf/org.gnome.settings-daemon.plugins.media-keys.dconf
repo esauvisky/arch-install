@@ -1,7 +1,7 @@
 [/]
 area-screenshot=@as []
 area-screenshot-clip=['Print']
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/']
 help=@as []
 logout=@as []
 magnifier=@as []
@@ -28,7 +28,7 @@ name='Open Terminal'
 
 [custom-keybindings/custom1]
 binding='<Shift><Alt>w'
-command='shortenurl'
+command='shortenurl -c'
 name='Shorten Url'
 
 [custom-keybindings/custom2]
@@ -38,10 +38,25 @@ name='splatmoji'
 
 [custom-keybindings/custom3]
 binding='<Shift><Alt>e'
-command='nautilus -w'
-name='Open home folder in a new window'
+command='nautilus -w Waste'
+name='Open waste folder in a new window'
 
 [custom-keybindings/custom4]
 binding='<Primary><Shift><Alt>c'
 command='gnome-calculator'
 name='Open Calculator'
+
+[custom-keybindings/custom5]
+binding='<Shift><Alt>q'
+command='copyq show'
+name='copyq'
+
+[custom-keybindings/custom6]
+binding='<Shift><Alt>r'
+command='uridownload'
+name='URI Download'
+
+[custom-keybindings/custom7]
+binding='<Super>h'
+command="bash -c 'xclip -o -selection clipboard | haste | tr -d \"\\n\" | xclip -i -selection clipboard'"
+name='upload to hastebin'

@@ -1,0 +1,10 @@
+[print-page-setup]
+PPDName=A4
+DisplayName=A4
+Width=210
+Height=297
+MarginTop=3.1749999999999998
+MarginBottom=3.1749999999999998
+MarginLeft=3.1749999999999998
+MarginRight=3.1749999999999998
+Orientation=portrait
