@@ -76,5 +76,5 @@ elif hash apt 2>/dev/null; then
 fi
 
 echo -e "\n That's all! KTHXBYE"
-rm "$HOME/.emishrc_last_check" 2>/dev/null || true
+rm -f "$HOME/.emishrc_last_check" 2>/dev/null || true
 bash --rcfile $HOME/.bashrc
