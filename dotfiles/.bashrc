@@ -1,15 +1,13 @@
 #!/usr/bin/env bash
 #                          .         .
-####   8888888888            ,8.       ,8.           8 8888    d888888o.   8 8888        8 8 888888888o.      ,o888888o.      ####
-####   8888                 ,888.     ,888.          8 8888  .`8888:' `88. 8 8888        8 8 8888    `88.    8888     `88.    ####
-####   8888                .`8888.   .`8888.         8 8888  8.`8888.   Y8 8 8888        8 8 8888     `88 ,8 8888       `8.   ####
-####   8888               ,8.`8888. ,8.`8888.        8 8888  `8.`8888.     8 8888        8 8 8888     ,88 88 8888             ####
-####   888888888888      ,8'8.`8888,8^8.`8888.       8 8888   `8.`8888.    8 8888        8 8 8888.   ,88' 88 8888             ####
-####   8888             ,8' `8.`8888' `8.`8888.      8 8888    `8.`8888.   8 8888        8 8 888888888P'  88 8888             ####
-####   8888            ,8'   `8.`88'   `8.`8888.     8 8888     `8.`8888.  8 8888888888888 8 8888`8b      88 8888             ####
-####   8888           ,8'     `8.`'     `8.`8888.    8 8888 8b   `8.`8888. 8 8888        8 8 8888 `8b.    `8 8888       .8'   ####
-####   8888          ,8'       `8        `8.`8888.   8 8888 `8b.  ;8.`8888 8 8888        8 8 8888   `8b.     8888     ,88'    ####
-####   888888888888 ,8'         `         `8.`8888.  8 8888  `Y8888P ,88P' 8 8888        8 8 8888     `88.    `8888888P'      ####
+##  /$$$$$$$$               /$$ /$$              /$$$$$$$   /$$$$$$   /$$$$$$  /$$   /$$ /$$$$$$$   /$$$$$$
+## | $$_____/              |__/| $/             | $$__  $$ /$$__  $$ /$$__  $$| $$  | $$| $$__  $$ /$$__  $$
+## | $$       /$$$$$$/$$$$  /$$|_//$$$$$$$      | $$  \ $$| $$  \ $$| $$  \__/| $$  | $$| $$  \ $$| $$  \__/
+## | $$$$$   | $$_  $$_  $$| $$  /$$_____/      | $$$$$$$ | $$$$$$$$|  $$$$$$ | $$$$$$$$| $$$$$$$/| $$
+## | $$__/   | $$ \ $$ \ $$| $$ |  $$$$$$       | $$__  $$| $$__  $$ \____  $$| $$__  $$| $$__  $$| $$
+## | $$      | $$ | $$ | $$| $$  \____  $$      | $$  \ $$| $$  | $$ /$$  \ $$| $$  | $$| $$  \ $$| $$    $$
+## | $$$$$$$$| $$ | $$ | $$| $$  /$$$$$$$/      | $$$$$$$/| $$  | $$|  $$$$$$/| $$  | $$| $$  | $$|  $$$$$$/
+## |________/|__/ |__/ |__/|__/ |_______/       |_______/ |__/  |__/ \______/ |__/  |__/|__/  |__/ \______/
 
 ##  +-+-+-+-+-+-+-+-+-+ +-+-+-+-+
 ##  |D|e|b|u|g|g|i|n|g| |I|n|f|o|
@@ -26,7 +24,25 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=15
+export _RCVERSION=16
+function _changelog() {
+    echo $'\e[32;01mEmi\'s .bashrc version '$_RCVERSION$'\n\e[34;01mChangelog:\e[00m\e[38m
+- Added changelog
+- Improved \e[37;03mh()\e[00m history function (searches history commands by regex)
+    Try it out:
+        \e[37;03mh "git.*add"\e[00m
+    You can get context by number too:
+        \e[37;03mh 1342\e[00m
+- Improved version checking
+- Added gitl and gits to ignore list on history
+- Improved \e[37;03madb devices\e[00m
+- \e[37;03mnode\e[00m now runs by default with some good params
+- \e[37;03mnpm\e[00m and \e[37;03mnode\e[00m now have autocompletion
+- \e[37;03mgits\e[00m now show the number of stashes
+- \e[37;03myayedit<package>\e[00m now works better, opens the PKGBUILD for editing,
+  rebuilds the package and you can choose to keep or not the previous sources.\e[00m
+'
+}
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -46,20 +62,20 @@ function is_ssh() {
 ## Checks if a binary or built-in command exists on PATH with failovers
 function _e() {
     (hash "$1" >&/dev/null && return 0) ||
-    (command -v "$1" >&/dev/null && return 0) ||
-    (which "$1" >&/dev/null && return 0) || # doesn't work with built-ins
-    return 1
+        (command -v "$1" >&/dev/null && return 0) ||
+        (which "$1" >&/dev/null && return 0) || # doesn't work with built-ins
+        return 1
 }
 
 ## Checks if a binary or built-in command exists and has color support
 function _c() {
     if (
         (hash "$1" >&/dev/null) ||
-        (command -v "$1" >&/dev/null) ||
-        (which "$1" >&/dev/null)
+            (command -v "$1" >&/dev/null) ||
+            (which "$1" >&/dev/null)
     ) && (
         ($1 --help 2>&1 | grep -qm1 -- '--color') ||
-        ($1 -h 2>&1 | grep -qm1 -- '--color')
+            ($1 -h 2>&1 | grep -qm1 -- '--color')
     ); then
         return 0
     else
@@ -151,7 +167,7 @@ export HISTSIZE=5000000
 # Maximum number of lines in HISTFILE (nothing is infinite).
 export HISTFILESIZE=10000000
 # Commands to ignore and skip saving
-export HISTIGNORE="clear:exit:history:ls"
+export HISTIGNORE="clear:exit:history:ls:gitl:gits"
 # Ignores dupes and deletes old ones (latest doesn't work _quite_ properly, but does the trick)
 export HISTCONTROL=ignoredups:erasedups
 # Custom history time prefix format
@@ -193,6 +209,10 @@ if [ -f /usr/share/bash-completion/completions/git ]; then
     # The STDERR redirection is to not print an annoying bug on
     # GCP VMs that make sed error out for some stupid reason and bad coding
     source /usr/share/bash-completion/completions/git #2>/dev/null
+fi
+## Node autocompletions
+if _e node; then
+    source <(node --completion-bash)
 fi
 
 ###  _   _ _   _ _
@@ -360,32 +380,63 @@ fi
 ## is the command history position, meaning that if you want to
 ## replay a particular entry with the number 4513, you can run:
 ##   !!4513
+## You can also get context around a particular entry with:
+##   h 4513
 function h() {
+    GET_NEARBY=0
+    if [[ $1 =~ ^[0-9][0-9]*$ ]]; then
+        GET_NEARBY=1
+    fi
     # Workaround for the lack of
     # multidimensional arrays in bash.
     local results_cmds=()
     local results_nums=()
     local query="${@}"
 
-    readarray -d '' grepped_history < <(history | \grep -ZE -- "$query")
+    if [[ $GET_NEARBY == 1 ]]; then
+        readarray -d '' grepped_history < <(history | \grep -ZEC10 "\s$1 ")
+    else
+        readarray -d '' grepped_history < <(history | \grep -ZEC0 -- "$query")
+    fi
+    # echo $
     while read -r entry; do
         local number="${entry// */}"
         local datetime="${entry#*[}"
         datetime="${datetime%] *}"
         local cmd="${entry##$number*$datetime] }"
-        # Strips repeated results
-        if [[ ! "${results_cmds[*]}" =~ $cmd ]]; then
+        # # Strips repeated results
+        if [[ $GET_NEARBY == 0 ]]; then
+            if [[ ! "${results_cmds[*]}" =~ $cmd ]]; then
+                results_cmds+=("$cmd")
+                results_nums+=("$number")
+            fi
+        else
             results_cmds+=("$cmd")
             results_nums+=("$number")
         fi
     done < <(echo "${grepped_history[@]}")
 
-    local string
+    num=0
     for r in "${!results_cmds[@]}"; do
-        cmd=$(echo "${results_cmds[$r]}" | \grep -E --color=always "$query")
+        if [[ $GET_NEARBY == 1 ]]; then
+            cmd="${results_cmds[$r]}"
+            if [[ "${results_nums[$r]}" -eq $1 ]]; then
+                cmd=$'\e[33m'"${results_cmds[$r]}"$'\e[00m'
+            fi
+        else
+            cmd="$(echo "${results_cmds[$r]}" | sed "s/\($query\)/"$'\e[33m'"\1"$'\e[00m'"/g")"
+            if [[ cmd == "" ]]; then
+                cmd="${results_cmds[$r]}"
+            fi
+        fi
+        if [[ ${results_nums[$r]} -gt $((num+1)) ]]; then
+            printf "\e[01;95m============\e[00m\n"
+        fi
+        num=${results_nums[$r]}
         line="\e[01;96m${results_nums[$r]} \e[00m$cmd\e[00m"
         printf "$line\n"
     done
+    printf "\e[01;95m============\e[00m\n"
 }
 
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+
@@ -579,6 +630,9 @@ alias go="xdg-open"
 ## Uses system python as pip
 alias pip='python -m pip'
 
+## Node
+alias node='node --experimental-modules  --experimental-repl-await  --experimental-vm-modules  --experimental-worker --experimental-import-meta-resolve'
+
 ## True screen clearing
 function clear() {
     echo -en "\033c"
@@ -611,8 +665,8 @@ function grep {
     if [ -t 0 ] || [ -t 1 ]; then
         command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
     elif { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 ||
-           [ "$(LC_ALL=C stat -c %F -)" = fifo ] ||
-           [ -t 2 ]; then
+        [ "$(LC_ALL=C stat -c %F -)" = fifo ] ||
+        [ -t 2 ]; then
         # t -2 fixes adb -s [TAB] and other autocompletion
         command grep "$@"
     else
@@ -688,7 +742,7 @@ if _e "adb"; then
     alias logcat_giant="adb logcat -b all -v color,usec,uid"
     function adb() {
         if [[ $1 == "devices" && ($# == 1) ]] && _e grcat && [[ -f ~/.grc/conf.efibootmgr ]]; then
-            while read -r a b c; do [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat ~/.grc/conf.efibootmgr
+            while read -r a b c; do [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E $'s/(.+) +offline .+device:(.+) transport_id:([0-9]+)/TID=\\3\tserial=\\1\tproduct=\\2\E[31;01mOFFLINE\E[00m/' | sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat ~/.grc/conf.efibootmgr
         else
             command adb "${@}"
         fi
@@ -815,22 +869,44 @@ if _e "pacman"; then
     alias pacfix='sudo pacman-optimize; sudo pacman -S $(pacman -Qkqn | sed -E "s/ .+$//" | uniq | xargs); paccache -k2 --min-mtime "60 days ago" -rv'
 fi
 
-
-###  _____ _____ _____
-### |  __ \_   _|_   _|
-### | |  \/ | |   | |
-### | | __  | |   | |
-### | |_\ \_| |_  | |
-###  \____/\___/  \_/
+#    ___ ___ _____
+#   / __|_ _|_   _|
+#  | (_ || |  | |
+#   \___|___| |_|
 if _e "git"; then
     # does not open editor when merging
     export GIT_MERGE_AUTOEDIT=no
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gitw="git log --no-merges --pretty=format:'------------> %C(bold red)%h%Creset -%C(bold yellow)%d%C(bold white) %s %C(bold green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -p"
-    alias gits='git status'
     alias gitm='git commit --amend -m '
+    alias gits='git status --show-stash --no-renames'
     alias gitcam='git commit -a -m '
+
+    function gitd() {
+        local -A files
+
+        readarray diffs < <(git diff --color --stat=60 HEAD | sed '$d; s/^ //')
+        for line in "${diffs[@]}"; do
+            key=${line// |*/}
+            files[${key// /}]=$line
+        done
+        readarray status < <(git status --show-stash --no-renames | sed '/  (use..*)$/d')
+        for line in "${status[@]}"; do
+            key=${line//* /}
+            if [[ $line =~ modified: ]]; then
+                echo -en "\e[93m\tmodified: \e[01m${files[${key%?}]}\e[00m"
+            elif [[ $line =~ deleted: ]]; then
+                echo -en "\e[91m\tdeleted:  \e[01m${files[${key%?}]}\e[00m"
+            elif [[ $line =~ new\ file: ]]; then
+                echo -en "\e[92m\tnew file: \e[01m${files[${key%?}]}\e[00m"
+            elif [[ $line =~ On\ branch ]]; then
+                echo -en "${line//On branch/On branch\\e[01;94m}\e[00m"
+            else
+                echo -en "$line"
+            fi
+        done
+    }
 
     function gitcleanbranches() {
         git fetch --prune
@@ -958,10 +1034,6 @@ if _e "git"; then
     }
     __git_complete gitdelbranch _git_local_branches
 fi
-
-
-
-
 
 ###                                                                                                                      .         .
 ###  8888888 8888888888 8 8888        8 8 8888888888             8 888888888o   8 888888888o.      ,o888888o.           ,8.       ,8.          8 888888888o 8888888 8888888888
@@ -1151,7 +1223,6 @@ function _set_prompt() {
     trap '_pre_command' DEBUG
 }
 
-
 ##  +-+-+-+-+-+-+ +-+-+-+
 ##  |v|t|e|.|s|h| |f|i|x|
 ##  +-+-+-+-+-+-+ +-+-+-+
@@ -1174,29 +1245,31 @@ if [[ -f "$HOME/.bash_custom" ]]; then
 fi
 
 function check_updates() {
-    if [[ ! -f ~/.emishrc_last_check ]]; then
-        date +%s > ~/.emishrc_last_check
+    if [[ ! -s ~/.emishrc_last_check ]]; then
+        _changelog
+        date +%s >~/.emishrc_last_check
     fi
 
-    if [[ $(($(date +%s)-$(cat ~/.emishrc_last_check))) -gt 604800 ]]; then
-        echo -e "\E[01;38mChecking emishrc updates..."
-        date +%s > ~/.emishrc_last_check
+    if [[ $(($(date +%s) - $(cat ~/.emishrc_last_check))) -gt 86400 ]]; then
+        date +%s >~/.emishrc_last_check
         _RCREMOTE=$(wget -q https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc -O- | grep -m1 'export _RCVERSION=' | sed 's/[^0-9]*//g;s/^0//')
-        if [ $(($_RCREMOTE-$_RCVERSION)) -gt 0 ]; then # needs single brackets for leading zeroes to work
+        if [ $(($_RCREMOTE - $_RCVERSION)) -gt 0 ]; then # needs single brackets for leading zeroes to work
             echo -en "\E[01;35mThere's an update for emishrc available! Do you want to update?\E[01;96m [Y/n] "
             read -n 1 yn
             case ${yn:0:1} in
-                n|N )
-                    echo -e "\nI'll remind you in one week."
+            n | N)
+                echo -e "\nI'll remind you in one week."
+                date +%s --date="+ 6 days" >~/.emishrc_last_check
                 ;;
-                * )
-                    echo -e "\nUpdating..."
-                    bash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"
-                    source ~/.bashrc
+            *)
+                echo -e "\nUpdating..."
+                rm ~/.emishrc_last_check
+                bash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"
+                clear
+                source ~/.bashrc
                 ;;
             esac
         fi
     fi
 }
 check_updates || true
-
