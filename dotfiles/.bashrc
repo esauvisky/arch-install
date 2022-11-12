@@ -24,10 +24,11 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=16
+export _RCVERSION=17
 function _changelog() {
     echo $'\e[32;01mEmi\'s .bashrc version '$_RCVERSION$'\n\e[34;01mChangelog:\e[00m\e[38m
 - Added changelog
+- Hotfix for internal functions
 - Improved \e[37;03mh()\e[00m history function (searches history commands by regex)
     Try it out:
         \e[37;03mh "git.*add"\e[00m
@@ -62,8 +63,8 @@ function is_ssh() {
 ## Checks if a binary or built-in command exists on PATH with failovers
 function _e() {
     (hash "$1" >&/dev/null && return 0) ||
-        (command -v "$1" >&/dev/null && return 0) ||
-        (which "$1" >&/dev/null && return 0) || # doesn't work with built-ins
+        ([[ $(command -v "$1" >&/dev/null) == "$1" ]] && return 0) || # returns true for aliases therefore the ==
+        (which --skip-alias --skip-functions "$1" >&/dev/null && return 0) || # doesn't work with built-ins
         return 1
 }
 
@@ -71,8 +72,8 @@ function _e() {
 function _c() {
     if (
         (hash "$1" >&/dev/null) ||
-            (command -v "$1" >&/dev/null) ||
-            (which "$1" >&/dev/null)
+            [[ $(command -v "$1" >&/dev/null) == "$1" ]] ||
+            (which --skip-alias --skip-functions "$1" >&/dev/null)
     ) && (
         ($1 --help 2>&1 | grep -qm1 -- '--color') ||
             ($1 -h 2>&1 | grep -qm1 -- '--color')
