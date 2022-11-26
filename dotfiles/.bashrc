@@ -24,13 +24,18 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=18
+export _RCVERSION=19
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
     echo $'\e[32;01mEmi\'s .bashrc version '$_RCVERSION$'\n\e[34;01mChangelog:\e[00m\e[38m
 - Fixed '"${c}h()${r}"$' history grepper function
 - Added '"${c}stu${r}"$' function to get systemd status for --user units
+- Added Conventional Commits autocompletion for commits messages when using:
+    - '"${c}gitcam${r}"$' (an alias for git commit -a -m, that doesn\'t require quotes around the message)
+    - '"${c}git commit -m ${r}"$' (with auto quote)
+    - '"${c}git commit --message=${r}"$' (with auto quote)
+    - '"${c}gitm ${r}"$' (an alias for git commit --ammend -m, usually used to quickly change the previous commit message)
 '
 }
 
@@ -870,9 +875,16 @@ if _e "git"; then
     # alias gitl='git log --all --decorate=full --oneline'
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
     alias gitw="git log --no-merges --pretty=format:'------------> %C(bold red)%h%Creset -%C(bold yellow)%d%C(bold white) %s %C(bold green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -p"
-    alias gitm='git commit --amend -m '
     alias gits='git status --show-stash --no-renames'
-    alias gitcam='git commit -a -m '
+    # alias gitcam='git commit -a -m '
+
+    function gitcam() {
+        git commit -a -m "$(printf "%q\n" "$@")"
+    }
+
+    function gitm() {
+        git commit --amend -m "$(printf "%q\n" "$@")"
+    }
 
     function gitd() {
         local -A files
@@ -1019,11 +1031,57 @@ if _e "git"; then
         fi
     }
 
-    # Autocomplete local branches only
+    # Autocomplete custom commands
     function _git_local_branches() {
         __gitcomp_direct "$(__git_heads)"
     }
+    function _git_conventional_commits_prefixes() {
+        __gitcomp "feat: fix: style: refactor: build: perf: ci: docs: test: chore: revert:"
+    }
     __git_complete gitdelbranch _git_local_branches
+    __git_complete gitcam _git_conventional_commits_prefixes
+
+    # Overwrite git commit autocompletion
+    _git_commit() {
+        case "$prev" in
+        -c | -C)
+            __git_complete_refs
+            return
+            ;;
+        -m)
+            __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert: "
+            return ;;
+        esac
+
+        case "$cur" in
+        --cleanup=*)
+            __gitcomp "default scissors strip verbatim whitespace
+                " "" "${cur##--cleanup=}"
+            return ;;
+        --message=*)
+            __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert:
+                " "" "${cur##--message=}"
+            return ;;
+        --reuse-message=* | --reedit-message=* | \
+            --fixup=* | --squash=*)
+            __git_complete_refs --cur="${cur#*=}"
+            return ;;
+        --untracked-files=*)
+            __gitcomp "$__git_untracked_file_modes" "" "${cur##--untracked-files=}"
+            return ;;
+        --*)
+            __gitcomp_builtin commit
+            return ;;
+        esac
+
+        if __git rev-parse --verify --quiet HEAD >/dev/null; then
+            __git_complete_index_file "--committable"
+        else
+            # This is the first commit
+            __git_complete_index_file "--cached"
+        fi
+    }
+
 fi
 
 ###                                                                                                                      .         .
