@@ -24,24 +24,13 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=17
+export _RCVERSION=18
 function _changelog() {
+    local c=$'\e[37;03m'
+    local r=$'\e[00m'
     echo $'\e[32;01mEmi\'s .bashrc version '$_RCVERSION$'\n\e[34;01mChangelog:\e[00m\e[38m
-- Added changelog
-- Hotfix for internal functions
-- Improved \e[37;03mh()\e[00m history function (searches history commands by regex)
-    Try it out:
-        \e[37;03mh "git.*add"\e[00m
-    You can get context by number too:
-        \e[37;03mh 1342\e[00m
-- Improved version checking
-- Added gitl and gits to ignore list on history
-- Improved \e[37;03madb devices\e[00m
-- \e[37;03mnode\e[00m now runs by default with some good params
-- \e[37;03mnpm\e[00m and \e[37;03mnode\e[00m now have autocompletion
-- \e[37;03mgits\e[00m now show the number of stashes
-- \e[37;03myayedit<package>\e[00m now works better, opens the PKGBUILD for editing,
-  rebuilds the package and you can choose to keep or not the previous sources.\e[00m
+- Fixed '"${c}h()${r}"$' history grepper function
+- Added '"${c}stu${r}"$' function to get systemd status for --user units
 '
 }
 
@@ -426,13 +415,13 @@ function h() {
             fi
         else
             cmd="$(echo "${results_cmds[$r]}" | sed "s/\($query\)/"$'\e[33m'"\1"$'\e[00m'"/g")"
-            if [[ cmd == "" ]]; then
+            if [[ $cmd == "" ]]; then
                 cmd="${results_cmds[$r]}"
             fi
         fi
-        if [[ ${results_nums[$r]} -gt $((num+1)) ]]; then
-            printf "\e[01;95m============\e[00m\n"
-        fi
+        # if [[ "${results_nums[$r]}" -gt "$((num+1))" ]]; then
+        #     printf "\e[01;95m============\e[00m\n"
+        # fi
         num=${results_nums[$r]}
         line="\e[01;96m${results_nums[$r]} \e[00m$cmd\e[00m"
         printf "$line\n"
@@ -778,6 +767,7 @@ if _e "systemctl"; then
     alias stop="systemctl stop"
     alias restart="systemctl restart"
     alias st="systemctl status -n9999 --no-legend -a -l"
+    alias stu="systemctl status --user -n9999 --no-legend -a -l"
     complete -F _complete_alias start
     complete -F _complete_alias stop
     complete -F _complete_alias restart
