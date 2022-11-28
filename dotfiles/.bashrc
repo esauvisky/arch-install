@@ -24,12 +24,13 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=19
+export _RCVERSION=20
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
     echo $'\e[32;01mEmi\'s .bashrc version '$_RCVERSION$'\n\e[34;01mChangelog:\e[00m\e[38m
 Version 20:
+- Fixed gitcam and gitm aliases when using several words without quotes
 - Fixed autocompletion for aliases
 - Refactored systemd units and journalctl alias and functions:
     - '"${c}st${r}"$': get real time logs of a systemd unit (using journalctl)
@@ -892,11 +893,11 @@ if _e "git"; then
     # alias gitcam='git commit -a -m '
 
     function gitcam() {
-        git commit -a -m "$(printf "%q\n" "$@")"
+        git commit -a -m "$*"
     }
 
     function gitm() {
-        git commit --amend -m "$(printf "%q\n" "$@")"
+        git commit --amend -m "$*"
     }
 
     function gitd() {
