@@ -1110,7 +1110,7 @@ fi
 ###        8 8888       8 8888        8 8 8888                   8 8888         8 8888   `8b.   ` 8888     ,88' ,8'       `8        `8.`8888.  8 8888             8 8888
 ###        8 8888       8 8888        8 8 888888888888           8 8888         8 8888     `88.    `8888888P'  ,8'         `         `8.`8888. 8 8888             8 8888
 ## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
-[[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && fortune -s -n 200 | cowthink | lolcat -F 0.1 -p 30 -S 1
+[[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
