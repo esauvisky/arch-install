@@ -60,14 +60,16 @@ shopt -s globstar
 #     fi
 #     builtin cd "${1}"
 # }
+
 # Adds coloring output for the rest of the shit
-if [[ -d ~/.grc/ ]]; then
-    for i in ~/.grc/*; do
-        if [[ ${i//*\//} != "grc.conf" && ! $(alias "${i##*conf.}" 2>/dev/null) ]]; then
-            alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
-        fi
-    done
-fi
+# BREAKS AUTOCOMPLETION OF ALIASES (like systemctl 'start' or 'st')
+# if [[ -d ~/.grc/ ]]; then
+#     for i in ~/.grc/*; do
+#         if [[ ${i//*\//} != "grc.conf" && ! $(alias "${i##*conf.}" 2>/dev/null) ]]; then
+#             alias "${i##*conf.}=$GRC -c ${i} ${i##*conf.}"
+#         fi
+#     done
+# fi
 
 # source <(cod init $$ bash)
 # function __cod_complete_bash() {

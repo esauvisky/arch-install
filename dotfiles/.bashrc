@@ -29,13 +29,28 @@ function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
     echo $'\e[32;01mEmi\'s .bashrc version '$_RCVERSION$'\n\e[34;01mChangelog:\e[00m\e[38m
-- Fixed '"${c}h()${r}"$' history grepper function
+Version 20:
+- Fixed autocompletion for aliases
+- Refactored systemd units and journalctl alias and functions:
+    - '"${c}st${r}"$': get real time logs of a systemd unit (using journalctl)
+                       detects if it\'s an user or system unit.
+                       has autocompletion for units.
+    - '"${c}sstart${r}"$': starts a systemd unit. requires --user for user units.
+    - '"${c}sstop${r}"$': stops a systemd unit. requires --user for user units.
+    - '"${c}srestart${r}"$': restarts a systemd unit. requires --user for user units.
+    - '"${c}senable${r}"$': enables a systemd unit. requires --user for user units.
+    - '"${c}sdisable${r}"$': disables a systemd unit. requires --user for user units.
+    - '"${c}sstatus${r}"$': gets logs and status of a systemd unit (using systemctl).
+                            requires --user for user units.
+Version 19:
 - Added '"${c}stu${r}"$' function to get systemd status for --user units
 - Added Conventional Commits autocompletion for commits messages when using:
     - '"${c}gitcam${r}"$' (an alias for git commit -a -m, that doesn\'t require quotes around the message)
     - '"${c}git commit -m ${r}"$' (with auto quote)
     - '"${c}git commit --message=${r}"$' (with auto quote)
     - '"${c}gitm ${r}"$' (an alias for git commit --ammend -m, usually used to quickly change the previous commit message)
+Version 18:
+- Fixed '"${c}h()${r}"$' history grepper function
 '
 }
 
@@ -749,34 +764,32 @@ fi
 ##  +-+-+-+-+-+-+-+-+-+-+
 if _e "journalctl"; then
     alias je='journalctl -efn 50 -o short --no-hostname'
-    alias jb='journalctl -eb -o short --no-hostname'
-    complete -F _journalctl je
-    complete -F _journalctl jb
-    # alias js='journalctl -lx _SYSTEMD_UNIT='
-    function js() {
-        if [[ $# -eq 0 ]]; then
-            echo -e 'js is a handy script to monitor systemd logs in real time,\nmany orders of magnitude better than using systemctl status.'
-            echo -e "Usage:\n\t$0 SYSTEMD_UNIT"
-        fi
-        # TODO: autocomplete js
-        journalctl -lx _SYSTEMD_UNIT="${1}"
+    alias jb='journalctl -b -o short --no-hostname'
+    function _systemctl_exists_user() {
+        [ "$(systemctl --user list-unit-files "${1}*" | wc -l)" -gt 3 ]
     }
-
+    function st() {
+        if _systemctl_exists_user "${1}"; then
+            journalctl --output cat -lxef _SYSTEMD_USER_UNIT="${1}"
+        else
+            journalctl --output cat -lxef _SYSTEMD_UNIT="${1}"
+        fi
+    }
+    complete -W "$(journalctl -F _SYSTEMD_UNIT) $(journalctl -F _SYSTEMD_USER_UNIT)" st
+    complete -F _complete_alias je jb
 fi
 
 ##  +-+-+-+-+-+-+-+-+-+
 ##  |s|y|s|t|e|m|c|t|l|
 ##  +-+-+-+-+-+-+-+-+-+
 if _e "systemctl"; then
-    alias start="systemctl start"
-    alias stop="systemctl stop"
-    alias restart="systemctl restart"
-    alias st="systemctl status -n9999 --no-legend -a -l"
-    alias stu="systemctl status --user -n9999 --no-legend -a -l"
-    complete -F _complete_alias start
-    complete -F _complete_alias stop
-    complete -F _complete_alias restart
-    complete -F _complete_alias st
+    alias sstart="systemctl start"
+    alias sstop="systemctl stop"
+    alias srestart="systemctl restart"
+    alias senable="systemctl enable"
+    alias sdisable="systemctl disable"
+    alias sstatus="systemctl status -n9999 --no-legend -a -l"
+    complete -F _complete_alias sstart sstop srestart senable sdisable sstatus
 fi
 
 ##  +-+-+-+-+-+-+-+-+-+-+
