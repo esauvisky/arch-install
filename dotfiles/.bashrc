@@ -24,35 +24,53 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=20
+export _RCVERSION=21
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
-    echo $'\e[32;01mEmi\'s .bashrc version '$_RCVERSION$'\n\e[34;01mChangelog:\e[00m\e[38m
-Version 20:
+    local y=$'\e[33;01m'
+    local g=$'\e[00m\e[96;03m'
+    echo -e "\e[32;01memi's .bashrc changelog\e[00m
+${y}Version 21:${r}
+- Much faster autoupdates
+- Better GRC support, colorizes docker, efibootmgr and other commands by default
+- Systemctl aliases are now amazing:
+    - Autocompletion for system units is better than vanilla (only units, sockets and timers)
+    - Autocompletes both user and system units
+    - Works with either user or system units without having to specify --user
+    - The list of aliases is on Version 20 changelog below.
+    - ${g}Bonus: you can use the even shorter ${c}st${g} alias for a better status output,
+             as it will use ${c}journalctl${g} instead of ${c}systemctl${g} to show
+             a live log that follows, instead of a static one-shot status.${r}
+- Fixes an issue with ${c}cowsay${r} that only a single person ever had but it was his birthday
+
+${y}Version 20:${r}
 - Fixed gitcam and gitm aliases when using several words without quotes
 - Fixed autocompletion for aliases
 - Refactored systemd units and journalctl alias and functions:
-    - '"${c}st${r}"$': get real time logs of a systemd unit (using journalctl)
-                       detects if it\'s an user or system unit.
-                       has autocompletion for units.
-    - '"${c}sstart${r}"$': starts a systemd unit. requires --user for user units.
-    - '"${c}sstop${r}"$': stops a systemd unit. requires --user for user units.
-    - '"${c}srestart${r}"$': restarts a systemd unit. requires --user for user units.
-    - '"${c}senable${r}"$': enables a systemd unit. requires --user for user units.
-    - '"${c}sdisable${r}"$': disables a systemd unit. requires --user for user units.
-    - '"${c}sstatus${r}"$': gets logs and status of a systemd unit (using systemctl).
+    - ${c}st${r}: get real time logs of a systemd unit (using journalctl)
+                  detects if it\'s an user or system unit.
+                  has autocompletion for units.
+    - ${c}sstart${r}: starts a systemd unit. requires --user for user units.
+    - ${c}sstop${r}: stops a systemd unit. requires --user for user units.
+    - ${c}srestart${r}: restarts a systemd unit. requires --user for user units.
+    - ${c}senable${r}: enables a systemd unit. requires --user for user units.
+    - ${c}sdisable${r}: disables a systemd unit. requires --user for user units.
+    - ${c}sstatus${r}: gets logs and status of a systemd unit (using systemctl).
                             requires --user for user units.
-Version 19:
-- Added '"${c}stu${r}"$' function to get systemd status for --user units
-- Added Conventional Commits autocompletion for commits messages when using:
-    - '"${c}gitcam${r}"$' (an alias for git commit -a -m, that doesn\'t require quotes around the message)
-    - '"${c}git commit -m ${r}"$' (with auto quote)
-    - '"${c}git commit --message=${r}"$' (with auto quote)
-    - '"${c}gitm ${r}"$' (an alias for git commit --ammend -m, usually used to quickly change the previous commit message)
-Version 18:
-- Fixed '"${c}h()${r}"$' history grepper function
-'
+
+${g}Did you know? You can call ${c}_changelog${g} to show this message at any time${r}
+"
+# ${y}Version 19:${r}
+# - Added ${c}stu${r} function to get systemd status for --user units
+# - Added Conventional Commits autocompletion for commits messages when using:
+#     - ${c}gitcam${r} (an alias for git commit -a -m, that doesn\'t require quotes around the message)
+#     - ${c}git commit -m ${r} (with auto quote)
+#     - ${c}git commit --message=${r} (with auto quote)
+#     - ${c}gitm ${r} (an alias for git commit --ammend -m, usually used to quickly change the previous commit message)
+
+# ${y}Version 18:${r}
+# - Fixed ${c}h()${r} history grepper function"
 }
 
 ## Returns if the current shell is a SSH shell.
@@ -367,9 +385,40 @@ fi
 ## Global colouriser used all around to make everything even gayer
 if _e "grc"; then
     GRC='grc -es '
-    if [[ -f /etc/profile.d/grc.sh ]]; then
-        source /etc/profile.d/grc.sh >&/dev/null
-    fi
+    alias colourify="$GRC -es"
+    alias blkid='colourify blkid'
+    alias configure='colourify ./configure'
+    alias docker='colourify docker'
+    alias docker-compose='colourify docker-compose'
+    alias docker-machine='colourify docker-machine'
+    alias efibootmgr='colourify efibootmgr'
+    alias du='colourify du -h'
+    alias free='colourify free'
+    alias fdisk='colourify fdisk'
+    alias findmnt='colourify findmnt'
+    alias make='colourify make'
+    alias gcc='colourify gcc'
+    alias g++='colourify g++'
+    alias id='colourify id'
+    alias ip='colourify ip'
+    alias iptables='colourify iptables'
+    alias journalctl='colourify journalctl'
+    alias kubectl='colourify kubectl'
+    alias lsof='colourify lsof'
+    alias lsblk='colourify lsblk'
+    alias lspci='colourify lspci'
+    alias netstat='colourify netstat'
+    alias ping='colourify ping'
+    alias traceroute='colourify traceroute'
+    alias traceroute6='colourify traceroute6'
+    alias dig='colourify dig'
+    alias mount='colourify mount'
+    alias ps='colourify ps'
+    alias mtr='colourify mtr'
+    alias semanage='colourify semanage'
+    alias getsebool='colourify getsebool'
+    alias ifconfig='colourify ifconfig'
+    alias sockstat='colourify sockstat'
 fi
 
 ###  _____  _____ _      ______         _
@@ -763,12 +812,15 @@ fi
 ##  +-+-+-+-+-+-+-+-+-+-+
 ##  |j|o|u|r|n|a|l|c|t|l|
 ##  +-+-+-+-+-+-+-+-+-+-+
+function _systemctl_exists_user() {
+    service="${1//.service/}"
+    [ "$(systemctl --user list-unit-files "${service}.service" | wc -l)" -gt 3 ] &&
+    [ "$(systemctl list-unit-files "${service}.service" | wc -l)" -eq 3 ]
+}
+
 if _e "journalctl"; then
     alias je='journalctl -efn 50 -o short --no-hostname'
     alias jb='journalctl -b -o short --no-hostname'
-    function _systemctl_exists_user() {
-        [ "$(systemctl --user list-unit-files "${1}*" | wc -l)" -gt 3 ]
-    }
     function st() {
         if _systemctl_exists_user "${1}"; then
             journalctl --output cat -lxef _SYSTEMD_USER_UNIT="${1}"
@@ -784,13 +836,52 @@ fi
 ##  |s|y|s|t|e|m|c|t|l|
 ##  +-+-+-+-+-+-+-+-+-+
 if _e "systemctl"; then
-    alias sstart="systemctl start"
-    alias sstop="systemctl stop"
-    alias srestart="systemctl restart"
-    alias senable="systemctl enable"
-    alias sdisable="systemctl disable"
-    alias sstatus="systemctl status -n9999 --no-legend -a -l"
-    complete -F _complete_alias sstart sstop srestart senable sdisable sstatus
+    function _scomps() {
+        local cur
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        if [[ $1 == "loaded" ]]; then
+            user_units=$(systemctl --user list-unit-files --type socket,service,timer --all | grep -E '(service|socket|timer)' | awk '{print $1}')
+            system_units=$(systemctl list-unit-files --type socket,service,timer --all | grep -E '(service|socket|timer)' | awk '{print $1}')
+        elif [[ $1 == "enabled" || $1 == "disabled" ]]; then
+            user_units=$(systemctl --user list-unit-files --type socket,service,timer --all --state=$1 | grep -E '(service|socket|timer)' | awk '{print $1}')
+            system_units=$(systemctl list-unit-files --type socket,service,timer --all --state=$1 | grep -E '(service|socket|timer)' | awk '{print $1}')
+        else
+            user_units=$(systemctl --user list-units --type socket,service,timer --state=$1 | grep -E '(service|socket|timer).*loaded' | awk '{print $1}')
+            system_units=$(systemctl list-units --type socket,service,timer --state=$1 | grep -E '(service|socket|timer).*loaded' | awk '{print $1}')
+        fi
+        # user_units
+        COMPREPLY=( $( compgen -W "$user_units $system_units" -- $cur ) )
+    }
+    function _sstart() {
+        _scomps inactive
+    }
+    function _sstop() {
+        _scomps running
+    }
+    function _srestart() {
+        _scomps loaded
+    }
+    function _sstatus() {
+        _scomps loaded
+    }
+    function _senable() {
+        _scomps disabled
+    }
+    function _sdisable() {
+        _scomps enabled
+    }
+
+    for operation in "start" "stop" "restart" "status" "enable" "disable"; do
+        eval "function s$operation() {
+            if _systemctl_exists_user \"\${1}\"; then
+                systemctl --user $operation \"\${1}\"
+            else
+                systemctl $operation \"\${1}\"
+            fi
+        }"
+        complete -F _s$operation s$operation
+    done
 fi
 
 ##  +-+-+-+-+-+-+-+-+-+-+
@@ -1095,7 +1186,6 @@ if _e "git"; then
             __git_complete_index_file "--cached"
         fi
     }
-
 fi
 
 ###                                                                                                                      .         .
@@ -1110,7 +1200,7 @@ fi
 ###        8 8888       8 8888        8 8 8888                   8 8888         8 8888   `8b.   ` 8888     ,88' ,8'       `8        `8.`8888.  8 8888             8 8888
 ###        8 8888       8 8888        8 8 888888888888           8 8888         8 8888     `88.    `8888888P'  ,8'         `         `8.`8888. 8 8888             8 8888
 ## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
-[[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
+[[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s ~/.emishrc_last_check ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
