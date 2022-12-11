@@ -22,9 +22,9 @@
 ##  +-+-+-+-+
 ## If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-
 ## Used for version checking
-export _RCVERSION=21
+
+export _RCVERSION=22
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
@@ -32,52 +32,35 @@ function _changelog() {
     local g=$'\e[00m\e[96;03m'
     echo -e "\e[32;01memi's .bashrc changelog\e[00m
 ${y}Version 22:${r}
-- Major performance improvements (40%)
+- Huge performance improvements (992-like levels)
 - Updates are done in the background without user input
+- You can now easily remember the install command: ${c}curl pk.md/bashrc | bash${r}
 - Colors for the username and hostname change depending on the type of environment
-  instead of exit code (Local, SSH, ADB, Virtual Env, Docker (TODO), etc.). The actual
+  instead of exit code (Local, SSH, ADB, GIT, Virtual Env (TODO), Docker (TODO), etc.). The actual
   three-digit code now is green or red depending on the exit code alongside the checkmark.
-${y}Version 21:${r}
-- Much faster autoupdates
-- Better GRC support, colorizes docker, efibootmgr and other commands by default
-- Systemctl aliases are now amazing:
-    - Autocompletion for system units is better than vanilla (only units, sockets and timers)
-    - Autocompletes both user and system units
-    - Works with either user or system units without having to specify --user
-    - The list of aliases is on Version 20 changelog below.
-    - ${g}Bonus: you can use the even shorter ${c}st${g} alias for a better status output,
-             as it will use ${c}journalctl${g} instead of ${c}systemctl${g} to show
-             a live log that follows, instead of a static one-shot status.${r}
-- Fixes an issue with ${c}cowsay${r} that only a single person ever had but it was his birthday
 
-${g}Havent you heard? You can call ${c}_changelog${g} to show this message at any time${r}
+${g}\e]8;;https://www.youtube.com/watch?v=uXbYq9JvGVI\aHavent you heard?\e]8;;\a (yes that's an actual link). You can call ${c}_changelog${g} to show this message at any time.${r}
 "
-# ${y}Version 19:${r}
-# - Added ${c}stu${r} function to get systemd status for --user units
-# - Added Conventional Commits autocompletion for commits messages when using:
-#     - ${c}gitcam${r} (an alias for git commit -a -m, that doesn\'t require quotes around the message)
-#     - ${c}git commit -m ${r} (with auto quote)
-#     - ${c}git commit --message=${r} (with auto quote)
-#     - ${c}gitm ${r} (an alias for git commit --ammend -m, usually used to quickly change the previous commit message)
+    # ${y}Version 19:${r}
+    # - Added ${c}stu${r} function to get systemd status for --user units
+    # - Added Conventional Commits autocompletion for commits messages when using:
+    #     - ${c}gitcam${r} (an alias for git commit -a -m, that doesn\'t require quotes around the message)
+    #     - ${c}git commit -m ${r} (with auto quote)
+    #     - ${c}git commit --message=${r} (with auto quote)
+    #     - ${c}gitm ${r} (an alias for git commit --ammend -m, usually used to quickly change the previous commit message)
 
-# ${y}Version 18:${r}
-# - Fixed ${c}h()${r} history grepper function"
+    # ${y}Version 18:${r}
+    # - Fixed ${c}h()${r} history grepper function"
 }
 
-
 function check_updates() {
-    if [[ ! -s $HOME/.emishrc_last_check ]]; then
-        _changelog
-        date +%s >$HOME/.emishrc_last_check
-    fi
-
-    if [[ $(($(date +%s) - $(cat $HOME/.emishrc_last_check))) -gt 86400 ]]; then
-        date +%s >$HOME/.emishrc_last_check
+    if [[ $(($(date +%s) - $(cat "$HOME/.emishrc_last_check"))) -gt 86400 ]]; then
+        date +%s > "$HOME/.emishrc_last_check"
 
         _RCREMOTE=$(curl -sL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc | grep -m1 'export _RCVERSION=' | sed 's/[^0-9]*//g;s/^0//')
         if [ $(($_RCREMOTE - $_RCVERSION)) -gt 0 ]; then # needs single brackets for leading zeroes to work
             # echo -en "\E[01;35mThere's an update for emishrc available! Updating..."
-            rm $HOME/.emishrc_last_check
+            rm "$HOME/.emishrc_last_check"
             curl -sL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh | bash -s -- --quiet
         fi
     fi
@@ -103,7 +86,7 @@ function is_ssh() {
 ## Checks if a binary or built-in command exists on PATH with failovers
 function _e() {
     (hash "$1" >&/dev/null && return 0) ||
-        ([[ $(command -v "$1" >&/dev/null) == "$1" ]] && return 0) || # returns true for aliases therefore the ==
+        ([[ $(command -v "$1" >&/dev/null) == "$1" ]] && return 0) ||         # returns true for aliases therefore the ==
         (which --skip-alias --skip-functions "$1" >&/dev/null && return 0) || # doesn't work with built-ins
         return 1
 }
@@ -134,7 +117,7 @@ function _c() {
 export IGNOREEOF=1
 
 ## Adds .local/bin to the path
-if [[ -d ~/.local/bin ]]; then
+if [[ -d $HOME/.local/bin ]]; then
     export PATH="$PATH:$HOME/.local/bin"
 fi
 
@@ -144,8 +127,8 @@ _HOSTNAME=$(hostname | sed 's/localhost//')
 _e "getprop" && _HOSTNAME=${_HOSTNAME:-$(getprop "net.hostname")}
 _e "getprop" && _HOSTNAME=${_HOSTNAME:-$(getprop "ro.product.device")}
 _HOSTNAME=${_HOSTNAME:-"bielefeld"}
-is_ssh && _HOSTNAME="${_HOSTNAME} \[\e[01;95m\][SSH]"
-_e getprop && _HOSTNAME="${_HOSTNAME} \[\e[01;95m\][ADB]"
+is_ssh && _HOSTNAME="${_HOSTNAME} [SSH]" && _ENV_COLOR='\[\e[01;93m\]'
+_e getprop && _HOSTNAME="${_HOSTNAME} [ADB]" && _ENV_COLOR='\[\e[00;91m\]'
 
 ## GPG Signing TTY: required for GPG signing in git
 GPG_TTY=$(tty)
@@ -174,22 +157,20 @@ if [[ -d $ANDROID_NDK ]]; then
 fi
 
 if [[ -d "/opt/android-sdk" ]]; then
-    if [[ ! -d $ANDROID_SDK_ROOT && ! -d $ANDROID_HOME ]]; then
-        export ANDROID_SDK_ROOT="/opt/android-sdk"
-        export ANDROID_HOME="$ANDROID_SDK_ROOT"
-    elif [[ ! -d $ANDROID_SDK_ROOT ]]; then
-        export ANDROID_SDK_ROOT="$ANDROID_HOME"
-    fi
+    export ANDROID_SDK_ROOT=${ANDROID_SDK_ROOT:="/opt/android-sdk"}
+    export ANDROID_HOME=${ANDROID_HOME:=$ANDROID_SDK_ROOT}
 
-    # adds build tools (aapt, dexdump, etc)
-    # only adds the highest version
-    build_tools="$(find "$ANDROID_HOME/build-tools" -maxdepth 1 -type d | sort --numeric-sort --reverse | head -n1)"
-    if [[ -d "$build_tools" ]]; then
-        export PATH="$PATH:$build_tools"
-    fi
+    if [[ -d $ANDROID_HOME ]]; then
+        # adds build tools (aapt, dexdump, etc)
+        # only adds the highest version
+        build_tools="$(find "$ANDROID_HOME/build-tools" -maxdepth 1 -type d | sort --numeric-sort --reverse | head -n1)"
+        if [[ -d "$build_tools" ]]; then
+            export PATH="$PATH:$build_tools"
+        fi
 
-    if [[ -d "$ANDROID_HOME/platform-tools" ]]; then
-        export PATH="${PATH}:$ANDROID_HOME/platform-tools"
+        if [[ -d "$ANDROID_HOME/platform-tools" ]]; then
+            export PATH="${PATH}:$ANDROID_HOME/platform-tools"
+        fi
     fi
 fi
 
@@ -202,7 +183,7 @@ fi
 ###                                                                                        __/ |
 ###                                                                                       |___/
 # Change the file location because certain bash sessions truncate .bash_history file upon close:
-export HISTFILE=~/.bash_eternal_history
+export HISTFILE=$HOME/.bash_eternal_history
 # Maximum number of entries on the current session (nothing is infinite):
 export HISTSIZE=5000000
 # Maximum number of lines in HISTFILE (nothing is infinite).
@@ -386,10 +367,10 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 
 ## Colors at file types when autocompleting and more
 if [[ -x /usr/bin/dircolors ]]; then
-    if [[ -f ~/.dircolors ]]; then
-        eval "$(dircolors -b ~/.dircolors)"
+    if [[ -f $HOME/.dircolors ]]; then
+        . <(dircolors -b $HOME/.dircolors)
     else
-        eval "$(dircolors -b)"
+        . <(dircolors -b $HOME/.dircolors)
     fi
     _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
 fi
@@ -561,7 +542,7 @@ function extract() {
 ##
 ## Example:
 ## Suppose you have this structure:
-## - ~/Coding/
+## - $HOME/Coding/
 ##   - Projects/
 ##       - project_1/
 ##       - project_2/
@@ -573,11 +554,11 @@ function extract() {
 ## If you add to this file,
 ##   alias cdp='_magicCD 2 $HOME/Coding/'
 ## then if you run,
-## cdp: will send you to ~/Coding/
+## cdp: will send you to $HOME/Coding/
 ## cdp proj: will show you a selector with all the dirs containing 'proj',
-##           i.e.: ~/Coding/Projects/project_1 and 2 and wip_project from Personal
+##           i.e.: $HOME/Coding/Projects/project_1 and 2 and wip_project from Personal
 ## cdp wip: will directly send you to the only dir containing 'wip'
-##           i.e.: ~/Coding/Projects/wip_project
+##           i.e.: $HOME/Coding/Projects/wip_project
 function _magicCD() {
     if [[ ! -d "$2" && ! "$1" -ge 2 ]]; then
         echo "Error in the syntax."
@@ -665,7 +646,7 @@ function cdcool() {
         selected_index="$?"
     fi
 
-    final_path="${cool_places[$selected_index]/#\~/$HOME}"
+    final_path="${cool_places[$selected_index]/#\$HOME/$HOME}"
 
     if [[ ! -d "$final_path" ]]; then
         echo "The selected path does not exist. Fix your script." && return 1
@@ -678,10 +659,10 @@ function cdcool() {
 }
 ## List of places to show when using 'cdcool [arg]'
 cool_places=(
-    "~/.local/share/gnome-shell/extensions"
-    "~/.local/share/nautilus/scripts"
-    "~/.local/share/applications"
-    "~/.config/systemd/user/"
+    "$HOME/.local/share/gnome-shell/extensions"
+    "$HOME/.local/share/nautilus/scripts"
+    "$HOME/.local/share/applications"
+    "$HOME/.config/systemd/user/"
     "/etc/systemd/user/"
     "/var/lib/docker/volumes"
     "/usr/share/bash-completion/completions"
@@ -723,9 +704,9 @@ function cat() {
 ##  |S|p|i|c|y| |G|r|e|p|
 ##  +-+-+-+-+-+ +-+-+-+-+
 ## This makes grep run without the extra arguments unless it's being either piped:
-##   cat ~/.bashrc | grep "LESS"
+##   cat $HOME/.bashrc | grep "LESS"
 ## or normally ran interactively:
-##   grep ~/.bashrc "^export"
+##   grep $HOME/.bashrc "^export"
 ## This way it'll work for <(grep ..) or var=$(grep ..) or echo '' | grep
 ## but won't affect scripts or other complex command chains.
 ##
@@ -813,8 +794,8 @@ if _e "adb"; then
     alias logcat_pogo=$'adb logcat -T10000 -b all -v color,usec,uid | egrep "( $(adb shell dumpsys package | \grep -C0 -A1 \'Package \[.*pokemo.*$\' | \grep userId | sed \'s/[^0-9]*//g\' | xargs | sed -e \'s/ / | /g\') |Unity|pokemongo|il2cpp|\[HAL)"'
     alias logcat_giant="adb logcat -b all -v color,usec,uid"
     function adb() {
-        if [[ $1 == "devices" && ($# == 1) ]] && _e grcat && [[ -f ~/.grc/conf.efibootmgr ]]; then
-            while read -r a b c; do [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E $'s/(.+) +offline .+device:(.+) transport_id:([0-9]+)/TID=\\3\tserial=\\1\tproduct=\\2\E[31;01mOFFLINE\E[00m/' | sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat ~/.grc/conf.efibootmgr
+        if [[ $1 == "devices" && ($# == 1) ]] && _e grcat && [[ -f $HOME/.grc/conf.efibootmgr ]]; then
+            while read -r a b c; do [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"; done < <(command adb devices -l | sed "1d" | sed -E $'s/(.+) +offline .+device:(.+) transport_id:([0-9]+)/TID=\\3\tserial=\\1\tproduct=\\2\E[31;01mOFFLINE\E[00m/' | sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' | sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat $HOME/.grc/conf.efibootmgr
         else
             command adb "${@}"
         fi
@@ -827,7 +808,7 @@ fi
 function _systemctl_exists_user() {
     service="${1//.service/}"
     [ "$(systemctl --user list-unit-files "${service}.service" | wc -l)" -gt 3 ] &&
-    [ "$(systemctl list-unit-files "${service}.service" | wc -l)" -eq 3 ]
+        [ "$(systemctl list-unit-files "${service}.service" | wc -l)" -eq 3 ]
 }
 
 if _e "journalctl"; then
@@ -840,7 +821,13 @@ if _e "journalctl"; then
             journalctl --output cat -lxef _SYSTEMD_UNIT="${1}"
         fi
     }
-    complete -W "$(journalctl -F _SYSTEMD_UNIT) $(journalctl -F _SYSTEMD_USER_UNIT)" st
+    function _complete_journalctl() {
+        local cur
+        COMPREPLY=()
+        cur=${COMP_WORDS[COMP_CWORD]}
+        COMPREPLY=( $(compgen -W "$(journalctl -F _SYSTEMD_UNIT) $(journalctl -F _SYSTEMD_USER_UNIT)" -- $cur) )
+    }
+    complete -F _complete_journalctl st
     complete -F _complete_alias je jb
 fi
 
@@ -863,7 +850,7 @@ if _e "systemctl"; then
             system_units=$(systemctl list-units --type socket,service,timer --state=$1 | grep -E '(service|socket|timer).*loaded' | awk '{print $1}')
         fi
         # user_units
-        COMPREPLY=( $( compgen -W "$user_units $system_units" -- $cur ) )
+        COMPREPLY=($(compgen -W "$user_units $system_units" -- $cur))
     }
     function _sstart() {
         _scomps inactive
@@ -884,16 +871,54 @@ if _e "systemctl"; then
         _scomps enabled
     }
 
-    for operation in "start" "stop" "restart" "status" "enable" "disable"; do
-        eval "function s$operation() {
-            if _systemctl_exists_user \"\${1}\"; then
-                systemctl --user $operation \"\${1}\"
-            else
-                systemctl $operation \"\${1}\"
-            fi
-        }"
-        complete -F _s$operation s$operation
-    done
+    sstart() {
+        if _systemctl_exists_user "${1}"; then
+            systemctl --user start "${1}"
+        else
+            systemctl start "${1}"
+        fi
+    }
+    complete -F _sstart sstart
+    sstop() {
+        if _systemctl_exists_user "${1}"; then
+            systemctl --user stop "${1}"
+        else
+            systemctl stop "${1}"
+        fi
+    }
+    complete -F _sstop sstop
+    srestart() {
+        if _systemctl_exists_user "${1}"; then
+            systemctl --user restart "${1}"
+        else
+            systemctl restart "${1}"
+        fi
+    }
+    complete -F _srestart srestart
+    sstatus() {
+        if _systemctl_exists_user "${1}"; then
+            systemctl --user status "${1}"
+        else
+            systemctl status "${1}"
+        fi
+    }
+    complete -F _sstatus sstatus
+    senable() {
+        if _systemctl_exists_user "${1}"; then
+            systemctl --user enable "${1}"
+        else
+            systemctl enable "${1}"
+        fi
+    }
+    complete -F _senable senable
+    sdisable() {
+        if _systemctl_exists_user "${1}"; then
+            systemctl --user disable "${1}"
+        else
+            systemctl disable "${1}"
+        fi
+    }
+    complete -F _sdisable sdisable
 fi
 
 ##  +-+-+-+-+-+-+-+-+-+-+
@@ -1167,28 +1192,34 @@ if _e "git"; then
             ;;
         -m)
             __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert: "
-            return ;;
+            return
+            ;;
         esac
 
         case "$cur" in
         --cleanup=*)
             __gitcomp "default scissors strip verbatim whitespace
                 " "" "${cur##--cleanup=}"
-            return ;;
+            return
+            ;;
         --message=*)
             __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert:
                 " "" "${cur##--message=}"
-            return ;;
+            return
+            ;;
         --reuse-message=* | --reedit-message=* | \
             --fixup=* | --squash=*)
             __git_complete_refs --cur="${cur#*=}"
-            return ;;
+            return
+            ;;
         --untracked-files=*)
             __gitcomp "$__git_untracked_file_modes" "" "${cur##--untracked-files=}"
-            return ;;
+            return
+            ;;
         --*)
             __gitcomp_builtin commit
-            return ;;
+            return
+            ;;
         esac
 
         if __git rev-parse --verify --quiet HEAD >/dev/null; then
@@ -1212,7 +1243,12 @@ fi
 ###        8 8888       8 8888        8 8 8888                   8 8888         8 8888   `8b.   ` 8888     ,88' ,8'       `8        `8.`8888.  8 8888             8 8888
 ###        8 8888       8 8888        8 8 888888888888           8 8888         8 8888     `88.    `8888888P'  ,8'         `         `8.`8888. 8 8888             8 8888
 ## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
-[[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s ~/.emishrc_last_check ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
+
+if [[ ! -s $HOME/.emishrc_last_check ]]; then
+    [[ "$PS1" ]] && _changelog && date +%s > "$HOME/.emishrc_last_check"
+else
+    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s $HOME/.emishrc_last_check ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
+fi
 
 function _pre_command() {
     # Show the currently running command in the terminal title:
@@ -1255,20 +1291,27 @@ function _set_prompt() {
     # history -n; history -w; history -c; history -r;
 
     # Colors
+    local Bold='\[\e[01m\]'
+    local ResetBold='\[\e[22m\]'
     local Blue='\[\e[01;34m\]'
     local Bluelly='\[\e[38;5;31;1m\]'
-    local White='\[\e[01;37m\]'
+    local BluellyLight='\[\e[1;34m\]'
+    local BluellyLight='\[\e[22;38;5;31;25m\]'
+    local WhiteBold='\[\e[01;37m\]'
+    local White='\[\e[22;37m\]'
     local Violet='\[\e[01;35m\]'
     local Magenta='\[\e[01;36m\]'
     local Red='\[\e[00;31m\]'
-    local RedBold='\[\e[01;31m\]'
+    local RedBold='\[\e[31;01m\]'
+    local RedBoldLight='\[\e[91;01m\]'
     local Green='\[\e[00;32m\]'
     local GreenBold='\[\e[01;32m\]'
+    local RedLight='\[\e[22;91m\]'
     local GreenLight='\[\e[01;92m\]'
     local YellowLight='\[\e[01;93m\]'
-    local VioletLight='\[\e[01;95m\]'
-    local PinkLight='\[\e[00;91m\]'
-    local GrayBold='\[\e[01;98m\]'
+    local VioletLight='\[\e[95m\]'
+    local Gray='\[\e[00;38m\]'
+    local GrayBoldLight='\[\e[01;98m\]'
     local GrayBackground='\[\e[01;40m\]'
     local Yellow='\[\e[00;33m\]'
     local YellowBold='\[\e[01;33m\]'
@@ -1288,12 +1331,18 @@ function _set_prompt() {
 
     # Prints the error code
     if [[ $_last_command == 0 ]]; then
-        PS1+="$GreenBold$Checkmark ${White}000 "
-        PS1+="$GreenBold\\u${__cHost}@${_HOSTNAME}"
+        PS1+="$GreenBold$Checkmark 000 "
     else
-        PS1+="$RedBold$FancyX ${White}$(printf "%03d" $_last_command) "
-        PS1+="$RedBold\\u${__cHost}@${_HOSTNAME}"
+        PS1+="$RedBold$FancyX $(printf "%03d" $_last_command) "
     fi
+
+    local __env_color="$Gray"
+    readarray -t repo_info <<< "$(git rev-parse --show-toplevel --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
+    if [[ ${#repo_info[@]} -eq 6 ]]; then
+        __env_color="${_ENV_COLOR:-$VioletLight}"
+    fi
+
+    PS1+="${__env_color}${Bold}\\u${ResetBold}@${_HOSTNAME}"
 
     ## Nicely shows you're in a python virtual environment
     if [[ -n $VIRTUAL_ENV ]]; then
@@ -1305,19 +1354,13 @@ function _set_prompt() {
     # more robust implementations.
     # FIXME: **this is slow**. depending on what you're doing, it might
     # hang when inside dirs of big projects (3gb+)
-    repo_info="$(git rev-parse --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
-    rev_parse_exit_code="$?"
-
-    if [[ -n $repo_info ]]; then
-        if [ "$rev_parse_exit_code" = "0" ]; then
-            short_sha="${repo_info##*$'\n'}"
-            repo_info="${repo_info%$'\n'*}"
-        fi
+    if [[ ${#repo_info[@]} -eq 6 ]]; then
+        local short_sha="${repo_info[5]}"
         branch_name=$(git symbolic-ref -q HEAD)
         branch_name=${branch_name##refs/heads/}
         branch_name=${branch_name:-$short_sha}
 
-        PS1+=" ${Violet}["
+        PS1+=" ${__env_color}["
 
         # TODO: stop using git status here, it lags like fuck when
         #       lots of files are deleted
@@ -1325,7 +1368,7 @@ function _set_prompt() {
         # see: https://github.com/koalaman/shellcheck/wiki/SC2155)
         if echo "${git_status}" | grep -qm1 'nothing to commit'; then
             if [[ $branch_name == "$short_sha" ]]; then
-                PS1+="${GrayBackground}${White}• $branch_name•$Reset" # DETACHED HEAD
+                PS1+="${GrayBackground}${WhiteBold}• $branch_name•$Reset" # DETACHED HEAD
             else
                 PS1+="$GreenLight✔ $branch_name•$Reset"
             fi
@@ -1337,17 +1380,23 @@ function _set_prompt() {
             PS1+="$Blue→ $branch_name*$Reset"
         fi
         if echo "${git_status}" | grep -qm1 'Untracked files'; then
-            PS1+="$GrayBold?$Reset"
+            PS1+="$GrayBoldLight?$Reset"
         fi
-        PS1+="$Violet]$Reset"
+        local -r root_path="$(git rev-parse --show-toplevel)"
+        local relative_path="${PWD/#${root_path}/}"
+
+        local tilde="~"
+        PS1+="$__env_color]$Reset $Bluelly${root_path/#${HOME}/${tilde}}$BluellyLight$relative_path"
+    else
+        PS1+="$__env_color$Reset $Bluelly\\w"
     fi
 
     # Sets the prompt color according to
     # user (if logged in as root gets red)
     if [[ $(id -u) -eq 0 ]]; then
-        PS1+=" $Bluelly\\w\\n${RedBold}\\\$ ${Red}"
+        PS1+="\\n${RedBoldLight}\\\$ ${RedLight}"
     else
-        PS1+=" $Bluelly\\w\\n${YellowBold}\\\$ ${Yellow}"
+        PS1+="\\n${YellowBold}\\\$ ${Yellow}"
     fi
 
     # Aligns stuff when you don't close quotes
@@ -1408,4 +1457,3 @@ fi
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
-check_updates || true
