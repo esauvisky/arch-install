@@ -1336,7 +1336,7 @@ function _set_prompt() {
         PS1+="$RedBold$FancyX $(printf "%03d" $_last_command) "
     fi
 
-    local __env_color="$Gray"
+    local __env_color="${_ENV_COLOR:-Gray}"
     readarray -t repo_info <<< "$(git rev-parse --show-toplevel --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
     if [[ ${#repo_info[@]} -eq 6 ]]; then
         __env_color="${_ENV_COLOR:-$VioletLight}"
