@@ -13,9 +13,9 @@
 ##  |D|e|b|u|g|g|i|n|g| |I|n|f|o|
 ##  +-+-+-+-+-+-+-+-+-+ +-+-+-+-+
 ## Perf. optimization: https://stackoverflow.com/questions/18039751/how-to-debug-a-bash-script-and-get-execution-time-per-command
-## Uncomment one of the following line for debugging this file
+## Uncomment the first to enable debug mode, the second to optimize performance
 # PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
-# N=`date +%s%N`; export PS4='+[$(((`date +%s%N`-$N)/1000000))ms][${BASH_SOURCE}:${LINENO}]: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'; set -x;
+# date +%s%N > /tmp/bash_last_debug; export PS4='+[$(P=$(date +%s%N) && N=$(cat /tmp/bash_last_debug) && echo "$(((P-N)/1000000))ms" && echo $P > /tmp/bash_last_debug)][${BASH_SOURCE}:${LINENO}]: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'; set -x;
 
 ##  +-+-+-+-+
 ##  |I|n|i|t|
@@ -31,6 +31,12 @@ function _changelog() {
     local y=$'\e[33;01m'
     local g=$'\e[00m\e[96;03m'
     echo -e "\e[32;01memi's .bashrc changelog\e[00m
+${y}Version 22:${r}
+- Major performance improvements (40%)
+- Updates are done in the background without user input
+- Colors for the username and hostname change depending on the type of environment
+  instead of exit code (Local, SSH, ADB, Virtual Env, Docker (TODO), etc.). The actual
+  three-digit code now is green or red depending on the exit code alongside the checkmark.
 ${y}Version 21:${r}
 - Much faster autoupdates
 - Better GRC support, colorizes docker, efibootmgr and other commands by default
@@ -44,22 +50,7 @@ ${y}Version 21:${r}
              a live log that follows, instead of a static one-shot status.${r}
 - Fixes an issue with ${c}cowsay${r} that only a single person ever had but it was his birthday
 
-${y}Version 20:${r}
-- Fixed gitcam and gitm aliases when using several words without quotes
-- Fixed autocompletion for aliases
-- Refactored systemd units and journalctl alias and functions:
-    - ${c}st${r}: get real time logs of a systemd unit (using journalctl)
-                  detects if it\'s an user or system unit.
-                  has autocompletion for units.
-    - ${c}sstart${r}: starts a systemd unit. requires --user for user units.
-    - ${c}sstop${r}: stops a systemd unit. requires --user for user units.
-    - ${c}srestart${r}: restarts a systemd unit. requires --user for user units.
-    - ${c}senable${r}: enables a systemd unit. requires --user for user units.
-    - ${c}sdisable${r}: disables a systemd unit. requires --user for user units.
-    - ${c}sstatus${r}: gets logs and status of a systemd unit (using systemctl).
-                            requires --user for user units.
-
-${g}Did you know? You can call ${c}_changelog${g} to show this message at any time${r}
+${g}Havent you heard? You can call ${c}_changelog${g} to show this message at any time${r}
 "
 # ${y}Version 19:${r}
 # - Added ${c}stu${r} function to get systemd status for --user units
@@ -72,6 +63,27 @@ ${g}Did you know? You can call ${c}_changelog${g} to show this message at any ti
 # ${y}Version 18:${r}
 # - Fixed ${c}h()${r} history grepper function"
 }
+
+
+function check_updates() {
+    if [[ ! -s $HOME/.emishrc_last_check ]]; then
+        _changelog
+        date +%s >$HOME/.emishrc_last_check
+    fi
+
+    if [[ $(($(date +%s) - $(cat $HOME/.emishrc_last_check))) -gt 86400 ]]; then
+        date +%s >$HOME/.emishrc_last_check
+
+        _RCREMOTE=$(curl -sL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc | grep -m1 'export _RCVERSION=' | sed 's/[^0-9]*//g;s/^0//')
+        if [ $(($_RCREMOTE - $_RCVERSION)) -gt 0 ]; then # needs single brackets for leading zeroes to work
+            # echo -en "\E[01;35mThere's an update for emishrc available! Updating..."
+            rm $HOME/.emishrc_last_check
+            curl -sL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh | bash -s -- --quiet
+        fi
+    fi
+}
+
+check_updates 2>/dev/null &
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -1396,33 +1408,4 @@ fi
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
-
-function check_updates() {
-    if [[ ! -s ~/.emishrc_last_check ]]; then
-        _changelog
-        date +%s >~/.emishrc_last_check
-    fi
-
-    if [[ $(($(date +%s) - $(cat ~/.emishrc_last_check))) -gt 86400 ]]; then
-        date +%s >~/.emishrc_last_check
-        _RCREMOTE=$(wget -q https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc -O- | grep -m1 'export _RCVERSION=' | sed 's/[^0-9]*//g;s/^0//')
-        if [ $(($_RCREMOTE - $_RCVERSION)) -gt 0 ]; then # needs single brackets for leading zeroes to work
-            echo -en "\E[01;35mThere's an update for emishrc available! Do you want to update?\E[01;96m [Y/n] "
-            read -n 1 yn
-            case ${yn:0:1} in
-            n | N)
-                echo -e "\nI'll remind you in one week."
-                date +%s --date="+ 6 days" >~/.emishrc_last_check
-                ;;
-            *)
-                echo -e "\nUpdating..."
-                rm ~/.emishrc_last_check
-                bash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"
-                clear
-                source ~/.bashrc
-                ;;
-            esac
-        fi
-    fi
-}
 check_updates || true

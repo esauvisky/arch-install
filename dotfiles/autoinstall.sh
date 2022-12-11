@@ -11,6 +11,11 @@ if [[ ! -t 0 ]]; then
     echo -e '\n\nPlease run like this instead:\nbash -c "$(curl -sSL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/autoinstall.sh)"' && exit 1
 fi
 
+QUIET=false
+if [[ $1 == "--quiet" ]]; then
+    QUIET=true
+fi
+
 dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc")
 grcconfs=(conf.efibootmgr conf.free conf.log grc.conf)
 
@@ -29,34 +34,33 @@ progress() {
 }
 
 cd "$HOME"
-
 _count=0
-echo -e "\e[34;01m\rDownloading scripts from esauvisky/arch-install/master/dotfiles\e[00m"
+[[ $QUIET == "true" ]] || echo -e "\e[34;01m\rDownloading scripts from esauvisky/arch-install/master/dotfiles\e[00m"
 for dep in "${dotfiles[@]}"; do
-    progress $((_count++)) "${#dotfiles[@]}"
+    [[ $QUIET == "true" ]] || progress $((_count++)) "${#dotfiles[@]}"
     url="https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/$dep"
 
     if hash wget 2>/dev/null; then
-        wget -q "$url" -O "$dep.1"
+        wget -q "$url" -O "$dep.1" 2>/dev/null
     else
-        curl -H "cache-control: max-age=0" -o "$dep.1" "$url"
+        curl -H "cache-control: max-age=0" -o "$dep.1" "$url" 2>/dev/null
     fi
 
     if hash gio; then
-        gio trash -f "./$dep"
+        gio trash -f "./$dep" 2>/dev/null || true
     else
-        mv "./$dep" "./$dep.bak" || true
+        mv "./$dep" "./$dep.bak" 2>/dev/null || true
     fi
 
-    mv "./$dep.1" "./$dep"
+    mv "./$dep.1" "./$dep" 2>/dev/null || true
 done
 
 _count=0
-echo -en "\n\e[34;01mDownloading GRC config files from esauvisky/arch-install/master/dotfiles/.grc\n\e[00m"
+[[ $QUIET == "true" ]] || echo -en "\n\e[34;01mDownloading GRC config files from esauvisky/arch-install/master/dotfiles/.grc\n\e[00m"
 for conf in "${grcconfs[@]}"; do
-    progress $((_count++)) "${#grcconfs[@]}"
+    [[ $QUIET == "true" ]] || progress $((_count++)) "${#grcconfs[@]}"
     url="https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.grc/$conf"
-    mkdir -p .grc
+    mkdir -p .grc 2>/dev/null || true
 
     if hash wget 2>/dev/null; then
         wget -q "$url" -O ".grc/$conf.1" 2>/dev/null
@@ -65,34 +69,36 @@ for conf in "${grcconfs[@]}"; do
     fi
 
     if hash gio 2>/dev/null; then
-        gio trash -f ".grc/$dep"
+        gio trash -f ".grc/$dep" 2>/dev/null || true
     else
         mv "./$dep" "./$dep.bak" 2>/dev/null || true
     fi
 
-    mv ".grc/$conf.1" ".grc/$conf"
+    mv ".grc/$conf.1" ".grc/$conf" || true
 done
 
-if hash gio 2>/dev/null; then
-    echo -e "Everything went well! Previous files are in the trash bin."
-else
-    echo -e "Everything went well! Previous files (if any) were backed up with a .bak extension!"
-fi
-
-if hash pacman 2>/dev/null; then
-    echo -en "\n\nBtw, you use Arch. Might I install a couple cool shit for this to work even better?"
-    read -p " [Y/n] "
-    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils
+if [[ $QUIET == "false" ]]; then
+    if hash gio 2>/dev/null; then
+        echo -e "Everything went well! Previous files are in the trash bin."
+    else
+        echo -e "Everything went well! Previous files (if any) were backed up with a .bak extension!"
     fi
-elif hash apt 2>/dev/null; then
-    echo -en "\n\nI see you're not an Arch user, but at least it's linux.\nMight I install a couple cool shit for this to work even better?"
-    read -p " [Y/n] "
-    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-        sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
-    fi
-fi
 
-echo -e "That's all! KTHXBYE\n\n"
+    if hash pacman 2>/dev/null; then
+        echo -en "\n\nBtw, you use Arch. Might I install a couple cool shit for this to work even better?"
+        read -p " [Y/n] "
+        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+            sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils
+        fi
+    elif hash apt 2>/dev/null; then
+        echo -en "\n\nI see you're not an Arch user, but at least it's linux.\nMight I install a couple cool shit for this to work even better?"
+        read -p " [Y/n] "
+        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+            sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
+        fi
+    fi
+
+    echo -e "That's all! KTHXBYE\n\n"
+    bash --rcfile $HOME/.bashrc
+fi
 rm -f "$HOME/.emishrc_last_check" 2>/dev/null || true
-bash --rcfile $HOME/.bashrc
