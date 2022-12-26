@@ -24,13 +24,17 @@
 [[ $- != *i* ]] && return
 ## Used for version checking
 
-export _RCVERSION=22
+export _RCVERSION=23
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
     local y=$'\e[33;01m'
     local g=$'\e[00m\e[96;03m'
     echo -e "\e[32;01memi's .bashrc changelog\e[00m
+${y}Version 23:${r}
+- Fixed history grepper function:
+    - Type ${c}h any.*regex${r} to search for any regex in your history
+    - Type ${c}h 00000${r} to show context around a particular entry
 ${y}Version 22:${r}
 - Huge performance improvements (992-like levels)
 - Updates are done in the background without user input
@@ -447,7 +451,7 @@ function h() {
     local query="${@}"
 
     if [[ $GET_NEARBY == 1 ]]; then
-        readarray -d '' grepped_history < <(history | \grep -ZEC10 "\s$1 ")
+        readarray -d '' grepped_history < <(history | \grep -ZEC30 "^$1 ")
     else
         readarray -d '' grepped_history < <(history | \grep -ZEC0 -- "$query")
     fi
