@@ -330,6 +330,45 @@ function format_duration() {
         printf "%ds" $S
 }
 
+## +-+-+-+-+-+-+-+-+-+-+-+-+-+
+## |b|a|s|h|_|p|r|o|f|i|l|e|r|
+## +-+-+-+-+-+-+-+-+-+-+-+-+-+
+profile_command() {
+    if [[ $# -eq 0 || $# -ne 2 ]]; then
+        echo "Usage: profile_command number_of_times 'command [args]'"
+        echo -e "\nExample: profile_command 10 'sleep 1'"
+        echo -e "This will run 'sleep 1' 10 times and print statistics about the performance."
+        echo -e "Note: you must quote the command to be profiled. Bash builtins aren't supported."
+        return 1
+    fi
+    local high_precision=false
+    local date_cmd='date +%s'
+    if _e bc && [[ $(date '+%N') != "+%N" ]]; then
+        high_precision=true
+        date_cmd='date +%s.%N'
+    fi
+
+    start_time=0
+    end_time=0
+    start_time="$($date_cmd)"
+    for round in $(seq 1 "$1"); do
+        $2 >/dev/null
+        echo -en "\rRound $round/$1"
+    done
+    end_time="$($date_cmd)"
+    local elapsed_time
+    local time_per_round
+    if $high_precision; then
+        elapsed_time=$(echo "scale=13; $end_time-$start_time" | bc -l)
+        time_per_round=$(echo "scale=8; ${elapsed_time} * 1000 / ${1}" | bc -l)
+    else
+        elapsed_time=$((end_time - start_time))
+        time_per_round=$((elapsed_time / $1))
+    fi
+
+    echo -e "\nTotal time:\t$elapsed_time seconds.\nTime per round:\t$time_per_round ms."
+}
+
 ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 ##  |g|e|t|_|t|r|u|n|c|a|t|e|d|_|p|w|d|
 ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
