@@ -28,14 +28,27 @@ export _RCVERSION=23
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
+    local b=$'\e[1m'
     local y=$'\e[33;01m'
     local g=$'\e[00m\e[96;03m'
     echo -e "\e[32;01memi's .bashrc changelog\e[00m
-${y}Version 23:${r}
+${y}Version 23 (2022-12-27):${r}
+- ${b}${g}New feature!${r} You can now easily measure the performance of a command:
+    - Usage: ${c}profile_command number_of_times 'command [args]'${r}
+    - Example: ${c}profile_command 10 'sleep 1'${r}
+    - This will run ${c}'sleep 1'${r} 10 times and print a summary of the results. Try it out!
+- Colors for git repositories changed and are now more consistent:
+    - Fixed an issue when you were inside a git repo directory that was a symbolic link.
+    - If you're inside a git repository, the path will be colored in violet, just like the username and hostname.
+      Additionally, if the current working directory is a subdirectory of a git repo, it will be highlighted in bold.
+      Expect more changes to git features in the future, specially on performance and in the current branch preview.
+- Colors for the current working directory changed, it's not bold anymore and it's a light blue. This is to make it
+  more consistent with the git repo path color change.
+- Fixed a bug in which some terminals would not display grey colors, so changed those to white.
 - Fixed history grepper function:
     - Type ${c}h any.*regex${r} to search for any regex in your history
     - Type ${c}h 00000${r} to show context around a particular entry
-${y}Version 22:${r}
+${y}Version 22 (2022-12-11):${r}
 - Huge performance improvements (992-like levels)
 - Updates are done in the background without user input
 - You can now easily remember the install command: ${c}curl pk.md/bashrc | bash${r}
@@ -1334,15 +1347,17 @@ function _set_prompt() {
     # history -n; history -w; history -c; history -r;
 
     # Colors
+    # TODO: refactor this legacy mess
     local Bold='\[\e[01m\]'
     local ResetBold='\[\e[22m\]'
-    local Blue='\[\e[01;34m\]'
-    local Bluelly='\[\e[38;5;31;1m\]'
-    local BluellyLight='\[\e[1;34m\]'
-    local BluellyLight='\[\e[22;38;5;31;25m\]'
+    local Blue='\[\e[00;34m\]'
+    local BlueLight='\[\e[00;94m\]'
+    # local Bluelly='\[\e[38;5;31;1m\]'
+    # local BluellyLight='\[\e[22;38;5;31;25m\]'
+
     local WhiteBold='\[\e[01;37m\]'
     local White='\[\e[22;37m\]'
-    local Violet='\[\e[01;35m\]'
+    local Violet='\[\e[35m\]'
     local Magenta='\[\e[01;36m\]'
     local Red='\[\e[00;31m\]'
     local RedBold='\[\e[31;01m\]'
@@ -1353,13 +1368,11 @@ function _set_prompt() {
     local GreenLight='\[\e[01;92m\]'
     local YellowLight='\[\e[01;93m\]'
     local VioletLight='\[\e[95m\]'
-    local Gray='\[\e[00;38m\]'
-    local GrayBoldLight='\[\e[01;98m\]'
-    local GrayBackground='\[\e[01;40m\]'
+    local White='\[\e[00;37m\]'
+    local WhiteBoldLight='\[\e[01;97m\]'
+    local WhiteBackground='\[\e[01;40m\]'
     local Yellow='\[\e[00;33m\]'
     local YellowBold='\[\e[01;33m\]'
-    # 1337 users get different colors
-    # a.k.a: warns if you're in a root shell
 
     local Reset='\[\e[00m\]'
     # local FancyX='\342\234\227'
@@ -1379,9 +1392,9 @@ function _set_prompt() {
         PS1+="$RedBold$FancyX $(printf "%03d" $_last_command) "
     fi
 
-    local __env_color="${_ENV_COLOR:-$Gray}"
-    readarray -t repo_info <<< "$(git rev-parse --show-toplevel --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
-    if [[ ${#repo_info[@]} -eq 6 ]]; then
+    local __env_color="${_ENV_COLOR:-$White}"
+    readarray -t repo_info <<< "$(git rev-parse --show-toplevel --show-prefix --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
+    if [[ ${#repo_info[@]} -eq 7 ]]; then
         __env_color="${_ENV_COLOR:-$VioletLight}"
     fi
 
@@ -1397,8 +1410,8 @@ function _set_prompt() {
     # more robust implementations.
     # FIXME: **this is slow**. depending on what you're doing, it might
     # hang when inside dirs of big projects (3gb+)
-    if [[ ${#repo_info[@]} -eq 6 ]]; then
-        local short_sha="${repo_info[5]}"
+    if [[ ${#repo_info[@]} -eq 7 ]]; then
+        local short_sha="${repo_info[6]}"
         branch_name=$(git symbolic-ref -q HEAD)
         branch_name=${branch_name##refs/heads/}
         branch_name=${branch_name:-$short_sha}
@@ -1411,7 +1424,7 @@ function _set_prompt() {
         # see: https://github.com/koalaman/shellcheck/wiki/SC2155)
         if echo "${git_status}" | grep -qm1 'nothing to commit'; then
             if [[ $branch_name == "$short_sha" ]]; then
-                PS1+="${GrayBackground}${WhiteBold}• $branch_name•$Reset" # DETACHED HEAD
+                PS1+="${WhiteBackground}${WhiteBold}• $branch_name•$Reset" # DETACHED HEAD
             else
                 PS1+="$GreenLight✔ $branch_name•$Reset"
             fi
@@ -1420,18 +1433,26 @@ function _set_prompt() {
         elif echo "${git_status}" | grep -qm1 'Changes to be committed'; then
             PS1+="$Violet→ $branch_name+$Reset"
         else
-            PS1+="$Blue→ $branch_name*$Reset"
+            PS1+="$BlueLight→ $branch_name*$Reset"
         fi
         if echo "${git_status}" | grep -qm1 'Untracked files'; then
-            PS1+="$GrayBoldLight?$Reset"
+            PS1+="$WhiteBoldLight?$Reset"
         fi
-        local -r root_path="$(git rev-parse --show-toplevel)"
-        local relative_path="${PWD/#${root_path}/}"
 
-        local tilde="~"
-        PS1+="$__env_color]$Reset $Bluelly${root_path/#${HOME}/${tilde}}$BluellyLight$relative_path"
+        # DIRECTORY DEBUGGING:
+        # echo -e "repo_info[0]: \t${repo_info[0]}"         repo_info[0]: 	/home/emi/Coding/gnome-shell-wsmatrix
+        # echo -e "repo_info[1]: \t${repo_info[1]}"         $(dirs +0): 	~/.local/share/gnome-shell/extensions/wsmatrix@martin.zurowietz.de/overview
+        # echo -e "\$(dirs +0): \t$(dirs +0)"               repo_info[1]: 	wsmatrix@martin.zurowietz.de/overview/
+        # echo -e "PWD:     \t${PWD}"                       PWD:     	    /home/emi/.local/share/gnome-shell/extensions/wsmatrix@martin.zurowietz.de/overview
+        # echo -e "\$(pwd -L): \t$(pwd -L)"                 $(pwd -L): 	    /home/emi/.local/share/gnome-shell/extensions/wsmatrix@martin.zurowietz.de/overview
+        # echo -e "\$(pwd -P): \t$(pwd -P)"                 $(pwd -P): 	    /home/emi/Coding/gnome-shell-wsmatrix/wsmatrix@martin.zurowietz.de/overview
+        local relative_path="${repo_info[1]%\/}"
+        local root_path; root_path="$(dirs +0)"
+        root_path="${root_path%"$relative_path"}"
+
+        PS1+="$__env_color]$Reset $VioletLight$root_path$Bold$VioletLight$relative_path"
     else
-        PS1+="$__env_color$Reset $Bluelly\\w"
+        PS1+="$__env_color$Reset $BlueLight\\w"
     fi
 
     # Sets the prompt color according to
