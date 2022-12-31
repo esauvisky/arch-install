@@ -266,6 +266,7 @@ function urldecode() {
 # Taken from http://tinyurl.com/y5vgfon7
 # Further edits by @emi
 function select_option() {
+# This returns 255 when SIGINT (Ctrl+C) is pressed
     ESC=$(printf "\033")
     cursor_blink_on() { printf "${ESC}[?25h"; }
     cursor_blink_off() { printf "${ESC}[?25l"; }
@@ -840,24 +841,12 @@ if _e "adb"; then
         # this is how they actually do it officially lol:
         # _adb_devices=$(command adb devices 2> /dev/null | grep -v "List of devices" | awk '{ print $1 }');
         # this is more robust and works with offline devices sorry
-        readarray -t _adb_devices < <(command adb devices -l 2>/dev/null | sed -E $'1d;$d;s/(.+) +offline .+device:(.+)$/\1 \2/' | awk '{print $1}')
-    }
-    function _adb_complete_devices() {
-        # we don't call _adb_get_devices here because it's slow
-        # and we don't want to call it every time we press TAB
-        local cur prev opts
-        COMPREPLY=()
-        cur="${COMP_WORDS[COMP_CWORD]}"
-        prev="${COMP_WORDS[COMP_CWORD - 1]}"
-        opts=("${_adb_devices[@]}")
-        read -r -a COMPREPLY <<<"$(compgen -W "${opts[*]}" -- "$cur")"
-        return 0
+        readarray -t _adb_devices < <(command adb devices -l 2>/dev/null | sed -E $'1d;$d;/.+offline.+/d' | awk '{print $1}')
     }
     function _adb_get_target_device() {
         # if there are multiple devices connected,
         # show a selector using select_option
         # otherwise, just return the first device
-        _adb_get_devices
         if [[ ${#_adb_devices[@]} -gt 1 ]]; then
             echo "Multiple devices connected, please select one:"
             select_option "${_adb_devices[@]}"
@@ -873,30 +862,31 @@ if _e "adb"; then
             while read -r a b c; do
                 [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"
             done < <(command adb devices -l | sed '1d;$d' |
-                sed -E $'s/(.+) +offline .+device:(.+) transport_id:([0-9]+)/TID=\\3\tserial=\\1\tproduct=\\2\E[31;01mOFFLINE\E[00m/' |
+                sed -E $'s/(.+) +offline .+device:(.+) transport_id:([0-9]+)/TID=\\3\tserial=\\1\tproduct=\\2\E[31;01m OFFLINE\E[00m/' |
                 sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' |
                 sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat "$HOME/.grc/conf.efibootmgr"
         else
+            _adb_get_devices
             # if there is no device specified
             # and the command is in the list of commands to show a selector for
-            if [[ ($1 != "-s" && $1 != "-d" && $1 != "-e" && $1 != "-t") &&
-                " ${_ADB_CMDS_TO_SHOW_SELECTOR[*]} " =~ " $1 " ]]; then
-                _adb_get_devices
+            if [[ ($1 != "-s" && $1 != "-d" && $1 != "-e" && $1 != "-t") && " ${_ADB_CMDS_TO_SHOW_SELECTOR[*]} " =~ " $1 " && ${#_adb_devices[@]} -gt 1 ]]; then
                 # if there are multiple devices connected
-                if [[ ${#_adb_devices[@]} -gt 2 ]]; then
-                    _adb_get_target_device
-                    local device="${_adb_devices[$?]}"
-                    if [[ $device != "" ]]; then
-                        command adb -s "$device" "${@:1}"
-                    else
-                        command adb "${@}"
-                    fi
+                _adb_get_target_device
+                local ret=$?
+                if [[ ${_adb_devices[$ret]} != "" ]]; then
+                    command adb -s "${_adb_devices[$ret]}" "${@:1}"
+                elif [[ $ret -eq 255 ]]; then
+                    echo "Maybe next time."
+                else
+                    command adb "${@}"
                 fi
             else
                 command adb "${@}"
             fi
         fi
     }
+    alias logcat=$'adb logcat -b all -v color,usec,uid -T "$(date \'+%F %T.000\' --date=\'5 minutes ago\')"'
+    complete -F _complete_alias logcat
 fi
 
 ##  +-+-+-+-+-+-+-+-+-+-+
