@@ -24,41 +24,43 @@
 [[ $- != *i* ]] && return
 ## Used for version checking
 
-export _RCVERSION=23
+export _RCVERSION=25
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
     local b=$'\e[1m'
     local y=$'\e[33;01m'
-    local g=$'\e[00m\e[96;03m'
-    echo -e "\e[32;01memi's .bashrc changelog\e[00m
-${y}Version 23 (2022-12-27):${r}
-- ${b}${g}New feature!${r} You can now easily measure the performance of a command:
-    - Usage: ${c}profile_command number_of_times 'command [args]'${r}
-    - Example: ${c}profile_command 10 'sleep 1'${r}
-    - This will run ${c}'sleep 1'${r} 10 times and print a summary of the results. Try it out!
-- Colors for git repositories changed and are now more consistent:
-    - Fixed an issue when you were inside a git repo directory that was a symbolic link.
-    - If you're inside a git repository, the path will be colored in violet, just like the username and hostname.
-      Additionally, if the current working directory is a subdirectory of a git repo, it will be highlighted in bold.
-      Expect more changes to git features in the future, specially on performance and in the current branch preview.
-- Colors for the current working directory changed, it's not bold anymore and it's a light blue. This is to make it
-  more consistent with the git repo path color change.
-- Fixed a bug in which some terminals would not display grey colors, so changed those to white.
-- Fixed history grepper function:
-    - Type ${c}h any.*regex${r} to search for any regex in your history
-    - Type ${c}h 00000${r} to show context around a particular entry
-${y}Version 22 (2022-12-11):${r}
-- Huge performance improvements (992-like levels)
-- Updates are done in the background without user input
-- You can now easily remember the install command: ${c}curl pk.md/bashrc | bash${r}
-- Colors for the username and hostname change depending on the type of environment
-  instead of exit code (Local, SSH, ADB, GIT, Virtual Env (TODO), Docker (TODO), etc.). The actual
-  three-digit code now is green or red depending on the exit code alongside the checkmark.
+    local i=$'\e[00m\e[96;03m'
+    local g=$'\e[32;01m'
+    echo "${g}emi's .bashrc${r}
+${y}Changelog v25 (2022-12-30)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+    echo -e "
+  ${b}- ADB new features!${r}
+      - When using adb with multiple devices you don't need to point it to a specific one anymore.
+        If there are multiple devices connected, it will detect it and ask you to choose one.
+        This will work with any adb command that targets a device. It'll work like usual if
+        there's only one device connected or if you specify one with the -s, -d, -t or -e flags.
+      - ${c}logcat${r} commands were removed and only one remains: ${c}logcat${r}. This will show the
+        logs of the device you selected or passed as an argument since 5 minutes before onwards.
 
-${g}\e]8;;https://www.youtube.com/watch?v=uXbYq9JvGVI\aHavent you heard?\e]8;;\a (yes that's an actual link). You can call ${c}_changelog${g} to show this message at any time.${r}
-"
+  ${i}\e]8;;https://www.youtube.com/watch?v=dQw4w9WgXcQ\aJust the tip:\e]8;;\a If you have ${c}grc${r}${i} installed, ${c}adb devices${r}${i} will be very gay (highly recommended!).${r}"
 }
+# ${y}Version 23 (2022-12-27):${r}
+# - ${b}${i}New feature!${r} You can now easily measure the performance of a command:
+#     - Usage: ${c}profile_command number_of_times 'command [args]'${r}
+#     - Example: ${c}profile_command 10 'sleep 1'${r}
+#     - This will run ${c}'sleep 1'${r} 10 times and print a summary of the results. Try it out!
+# - Colors for git repositories changed and are now more consistent:
+#     - Fixed an issue when you were inside a git repo directory that was a symbolic link.
+#     - If you're inside a git repository, the path will be colored in violet, just like the username and hostname.
+#       Additionally, if the current working directory is a subdirectory of a git repo, it will be highlighted in bold.
+#       Expect more changes to git features in the future, specially on performance and in the current branch preview.
+# - Colors for the current working directory changed, it's not bold anymore and it's a light blue. This is to make it
+#   more consistent with the git repo path color change.
+# - Fixed a bug in which some terminals would not display grey colors, so changed those to white.
+# - Fixed history grepper function:
+#     - Type ${c}h any.*regex${r} to search for any regex in your history
+#     - Type ${c}h 00000${r} to show context around a particular entry
 
 function check_updates() {
     if [[ $(($(date +%s) - $(cat "$HOME/.emishrc_last_check"))) -gt 86400 ]]; then
@@ -266,7 +268,7 @@ function urldecode() {
 # Taken from http://tinyurl.com/y5vgfon7
 # Further edits by @emi
 function select_option() {
-# This returns 255 when SIGINT (Ctrl+C) is pressed
+    # This returns 255 when SIGINT (Ctrl+C) is pressed
     ESC=$(printf "\033")
     cursor_blink_on() { printf "${ESC}[?25h"; }
     cursor_blink_off() { printf "${ESC}[?25l"; }
