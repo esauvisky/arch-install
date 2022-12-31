@@ -238,7 +238,7 @@ split_before_closing_bracket=False
 #       variable: 'Hello world, have a nice day!'
 #       for variable in bar if variable != 42
 #   }
-split_before_dict_set_generator=True
+split_before_dict_set_generator=False
 
 # Split before the '.' if we need to split a longer expression:
 #
@@ -302,14 +302,14 @@ split_penalty_bitwise_operator=300
 
 # The penalty for splitting a list comprehension or generator
 # expression.
-split_penalty_comprehension=30
+split_penalty_comprehension=300
 
 # The penalty for characters over the column limit.
-split_penalty_excess_character=50
+split_penalty_excess_character=5
 
 # The penalty incurred by adding a line split to the unwrapped line. The
 # more line splits added the higher the penalty.
-split_penalty_for_added_line_split=2000
+split_penalty_for_added_line_split=20000
 
 # The penalty of splitting a list of "import as" names. For example:
 #

@@ -58,21 +58,11 @@ ${y}Version 22 (2022-12-11):${r}
 
 ${g}\e]8;;https://www.youtube.com/watch?v=uXbYq9JvGVI\aHavent you heard?\e]8;;\a (yes that's an actual link). You can call ${c}_changelog${g} to show this message at any time.${r}
 "
-    # ${y}Version 19:${r}
-    # - Added ${c}stu${r} function to get systemd status for --user units
-    # - Added Conventional Commits autocompletion for commits messages when using:
-    #     - ${c}gitcam${r} (an alias for git commit -a -m, that doesn\'t require quotes around the message)
-    #     - ${c}git commit -m ${r} (with auto quote)
-    #     - ${c}git commit --message=${r} (with auto quote)
-    #     - ${c}gitm ${r} (an alias for git commit --ammend -m, usually used to quickly change the previous commit message)
-
-    # ${y}Version 18:${r}
-    # - Fixed ${c}h()${r} history grepper function"
 }
 
 function check_updates() {
     if [[ $(($(date +%s) - $(cat "$HOME/.emishrc_last_check"))) -gt 86400 ]]; then
-        date +%s > "$HOME/.emishrc_last_check"
+        date +%s >"$HOME/.emishrc_last_check"
 
         _RCREMOTE=$(curl -sL https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles/.bashrc | grep -m1 'export _RCVERSION=' | sed 's/[^0-9]*//g;s/^0//')
         if [ $(($_RCREMOTE - $_RCVERSION)) -gt 0 ]; then # needs single brackets for leading zeroes to work
@@ -811,7 +801,7 @@ _e "ccze" && alias ccze='ccze -A -o nolookups'
 ## Safe rm using gio trash
 ## Falls back to rm in any unsupported case
 ## Only caveat: ignores -r as gio trash already
-## does it recursively, without option.
+## does it recursively without choice
 if _e gio; then
     function rm() {
         use_gio=true
@@ -878,18 +868,19 @@ if _e "adb"; then
     }
     function adb() {
         local _ADB_CMDS_TO_SHOW_SELECTOR=("push" "pull" "shell" "install" "install-multiple" "install-multi-package" "uninstall"
-                                          "bugreport" "logcat" "lolcat" "sideload" "usb" "tcpip" "root" "unroot" "reboot" "remount")
+            "bugreport" "logcat" "lolcat" "sideload" "usb" "tcpip" "root" "unroot" "reboot" "remount")
         if [[ $1 == "devices" && ($# == 1) ]] && _e grcat && [[ -f $HOME/.grc/conf.efibootmgr ]]; then
-            while read -r a b c; do [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c";
-                done < <(command adb devices -l | sed '1d;$d' |
+            while read -r a b c; do
+                [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"
+            done < <(command adb devices -l | sed '1d;$d' |
                 sed -E $'s/(.+) +offline .+device:(.+) transport_id:([0-9]+)/TID=\\3\tserial=\\1\tproduct=\\2\E[31;01mOFFLINE\E[00m/' |
                 sed -E $'s/(.+) +unauthorized +transport_id:([0-9]+)/TID=\\2\tserial=\\1\t\E[31;01mUNAUTHORIZED\E[00m/' |
                 sed -E "s/([^ ]+) +device .+device:(.+) transport_id:([0-9]+)/TID=\3\tserial=\1\tproduct=\2/") | grcat "$HOME/.grc/conf.efibootmgr"
         else
             # if there is no device specified
             # and the command is in the list of commands to show a selector for
-            if [[ ($1 != "-s" && $1 != "-d" && $1 != "-e" && $1 != "-t")
-                  && " ${_ADB_CMDS_TO_SHOW_SELECTOR[*]} " =~ " $1 " ]]; then
+            if [[ ($1 != "-s" && $1 != "-d" && $1 != "-e" && $1 != "-t") &&
+                " ${_ADB_CMDS_TO_SHOW_SELECTOR[*]} " =~ " $1 " ]]; then
                 _adb_get_devices
                 # if there are multiple devices connected
                 if [[ ${#_adb_devices[@]} -gt 2 ]]; then
@@ -931,7 +922,7 @@ if _e "journalctl"; then
         local cur
         COMPREPLY=()
         cur=${COMP_WORDS[COMP_CWORD]}
-        COMPREPLY=( $(compgen -W "$(journalctl -F _SYSTEMD_UNIT) $(journalctl -F _SYSTEMD_USER_UNIT)" -- $cur) )
+        COMPREPLY=($(compgen -W "$(journalctl -F _SYSTEMD_UNIT) $(journalctl -F _SYSTEMD_USER_UNIT)" -- $cur))
     }
     complete -F _complete_journalctl st
     complete -F _complete_alias je jb
@@ -1348,10 +1339,9 @@ fi
 ###        8 8888       8 8888        8 8 8888                   8 8888         8 8888 `8b.    `8 8888       ,8P ,8'     `8.`'     `8.`8888.   8 8888             8 8888
 ###        8 8888       8 8888        8 8 8888                   8 8888         8 8888   `8b.   ` 8888     ,88' ,8'       `8        `8.`8888.  8 8888             8 8888
 ###        8 8888       8 8888        8 8 888888888888           8 8888         8 8888     `88.    `8888888P'  ,8'         `         `8.`8888. 8 8888             8 8888
-## Install 'fortune', 'cowsay' and 'lolcat' and have fun every time you open up a terminal.
 
 if [[ ! -s $HOME/.emishrc_last_check ]]; then
-    [[ "$PS1" ]] && _changelog && date +%s > "$HOME/.emishrc_last_check"
+    [[ "$PS1" ]] && _changelog && date +%s >"$HOME/.emishrc_last_check"
 else
     [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s $HOME/.emishrc_last_check ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
 fi
@@ -1443,7 +1433,7 @@ function _set_prompt() {
     fi
 
     local __env_color="${_ENV_COLOR:-$White}"
-    readarray -t repo_info <<< "$(git rev-parse --show-toplevel --show-prefix --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
+    readarray -t repo_info <<<"$(git rev-parse --show-toplevel --show-prefix --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
     if [[ ${#repo_info[@]} -eq 7 ]]; then
         __env_color="${_ENV_COLOR:-$VioletLight}"
     fi
@@ -1497,7 +1487,8 @@ function _set_prompt() {
         # echo -e "\$(pwd -L): \t$(pwd -L)"                 $(pwd -L): 	    /home/emi/.local/share/gnome-shell/extensions/wsmatrix@martin.zurowietz.de/overview
         # echo -e "\$(pwd -P): \t$(pwd -P)"                 $(pwd -P): 	    /home/emi/Coding/gnome-shell-wsmatrix/wsmatrix@martin.zurowietz.de/overview
         local relative_path="${repo_info[1]%\/}"
-        local root_path; root_path="$(dirs +0)"
+        local root_path
+        root_path="$(dirs +0)"
         root_path="${root_path%"$relative_path"}"
 
         PS1+="$__env_color]$Reset $VioletLight$root_path$Bold$VioletLight$relative_path"
