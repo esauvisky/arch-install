@@ -5,7 +5,7 @@ set -o pipefail # Exit on errors
 # Uncomment line below for debugging:
 #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
 __deps=("sed" "grep")
-for dep in "${__deps[@]}"; do hash $dep >&/dev/null || (echo "$dep was not found. Please install it and try again." && exit 1); done
+for dep in "${__deps[@]}"; do hash "$dep" >&/dev/null || (echo "$dep was not found. Please install it and try again." && exit 1); done
 
 QUIET=false
 if [[ $1 == "--quiet" ]]; then
@@ -42,7 +42,7 @@ for dep in "${dotfiles[@]}"; do
         curl -H "cache-control: max-age=0" -o "$dep.1" "$url" 2>/dev/null
     fi
 
-    if hash gio; then
+    if hash gio 2>/dev/null; then
         gio trash -f "./$dep" 2>/dev/null || true
     else
         mv "./$dep" "./$dep.bak" 2>/dev/null || true
@@ -82,19 +82,19 @@ if [[ $QUIET == "false" ]]; then
 
     if hash pacman 2>/dev/null; then
         echo -en "\n\nBtw, you use Arch. Might I install a couple cool shit for this to work even better?"
-        read -p " [Y/n] "
+        read -rp " [Y/n] "
         if [[ ! $REPLY =~ ^[Nn]$ ]]; then
             sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils
         fi
     elif hash apt 2>/dev/null; then
         echo -en "\n\nI see you're not an Arch user, but at least it's linux.\nMight I install a couple cool shit for this to work even better?"
-        read -p " [Y/n] "
+        read -rp " [Y/n] "
         if [[ ! $REPLY =~ ^[Nn]$ ]]; then
             sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
         fi
     fi
 
     echo -e "That's all! KTHXBYE\n\n"
-    bash --rcfile $HOME/.bashrc
+    bash --rcfile "$HOME/.bashrc"
 fi
 rm -f "$HOME/.emishrc_last_check" 2>/dev/null || true
