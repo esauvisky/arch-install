@@ -73,6 +73,16 @@ for conf in "${grcconfs[@]}"; do
     mv ".grc/$conf.1" ".grc/$conf" || true
 done
 
+echo -e '\e[0m'
+if [[ $SHELL != "/bin/bash" ]]; then
+    # change default shell to bash
+    if ! chsh -s /bin/bash; then
+        echo -e "\e[31;01mFailed to change default shell to bash. Please do it manually.\e[00m"
+    else
+        echo -e "\e[31;01mYOUR SHELL WAS CHANGED TO BASH. PLEASE LOG OUT AND LOG IN AGAIN FOR IT TO WORK!\e[00m"
+    fi
+fi
+
 if [[ $QUIET == "false" ]]; then
     if hash gio 2>/dev/null; then
         echo -e "Everything went well! Previous files are in the trash bin."
@@ -81,17 +91,13 @@ if [[ $QUIET == "false" ]]; then
     fi
 
     if hash pacman 2>/dev/null; then
-        echo -en "\n\nBtw, you use Arch. Might I install a couple cool shit for this to work even better?"
-        read -rp " [Y/n] "
-        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils
-        fi
+        echo -en "\n\nBtw, you use Arch. I can install a couple cool shit for this to work even better, just type your password."
+        echo -e "If you don't want to, just press Ctrl+C"
+        sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils 2>/dev/null || true
     elif hash apt 2>/dev/null; then
-        echo -en "\n\nI see you're not an Arch user, but at least it's linux.\nMight I install a couple cool shit for this to work even better?"
-        read -rp " [Y/n] "
-        if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
-        fi
+        echo -en "\n\nI see you're not an Arch user, but at least it's linux. Type your password and I'll install some software for this to work better."
+        echo -e "If you don't want to, just press Ctrl+C"
+        sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano 2>/dev/null || true
     fi
 
     echo -e "That's all! KTHXBYE\n\n"
