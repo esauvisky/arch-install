@@ -1,0 +1,30 @@
+[compression]
+default-compression-format='zip'
+
+[icon-view]
+default-zoom-level='small-plus'
+
+[list-view]
+default-column-order=['name', 'size', 'type', 'owner', 'group', 'permissions', 'mime_type', 'where', 'date_modified', 'date_modified_with_time', 'date_accessed', 'date_created']
+default-visible-columns=['name', 'size', 'date_accessed']
+default-zoom-level='small'
+
+[preferences]
+always-use-location-entry=true
+default-folder-viewer='list-view'
+default-sort-in-reverse-order=true
+default-sort-order='mtime'
+fts-enabled=false
+install-mime-activation=false
+migrated-gtk-settings=true
+open-folder-on-dnd-hover=false
+search-filter-time-type='last_modified'
+search-view='list-view'
+show-create-link=true
+show-image-thumbnails='always'
+
+[window-state]
+initial-size=(1024, 1080)
+maximized=false
+sidebar-width=100
+start-with-sidebar=true

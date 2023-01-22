@@ -1,6 +1,26 @@
+[/]
+new-tab-position='next'
+new-terminal-mode='tab'
+theme-variant='light'
+
 [keybindings]
 next-tab='<Primary>Tab'
 prev-tab='<Primary><Shift>Tab'
+
+[profiles:/:]
+allow-bold=false
+background-color='rgb(27,24,44)'
+bold-color='rgb(203,227,231)'
+bold-color-same-as-fg=false
+cursor-background-color='rgb(203,227,231)'
+cursor-colors-set=true
+cursor-foreground-color='rgb(27,24,44)'
+foreground-color='rgb(203,227,231)'
+highlight-background-color='rgb(144,108,255)'
+highlight-colors-set=true
+highlight-foreground-color='rgb(203,227,231)'
+palette=['rgb(16,14,35)', 'rgb(255,128,128)', 'rgb(149,255,164)', 'rgb(255,233,170)', 'rgb(145,221,255)', 'rgb(201,145,225)', 'rgb(170,255,228)', 'rgb(203,227,231)', 'rgb(86,85,117)', 'rgb(255,84,88)', 'rgb(98,209,150)', 'rgb(255,179,120)', 'rgb(101,178,255)', 'rgb(144,108,255)', 'rgb(99,242,241)', 'rgb(166,179,204)']
+use-theme-colors=false
 
 [profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
 background-color='rgb(0,43,54)'
@@ -9,5 +29,8 @@ default-size-columns=120
 default-size-rows=35
 foreground-color='rgb(131,148,150)'
 palette=['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(78,154,6)', 'rgb(196,160,0)', 'rgb(52,101,164)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']
+scroll-on-keystroke=true
+scroll-on-output=false
 scrollback-unlimited=true
+scrollbar-policy='always'
 use-theme-colors=false

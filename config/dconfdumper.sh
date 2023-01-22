@@ -8,6 +8,7 @@ dirs=("/org/gnome/shell/"
     "/org/gnome/settings-daemon/plugins/media-keys/"
     "/org/gnome/mutter/"
     "/org/gnome/mutter/wayland/"
+    "/org/gnome/nautilus/"
     "/org/gnome/terminal/legacy/")
 
 if [[ $1 == "dump" ]]; then

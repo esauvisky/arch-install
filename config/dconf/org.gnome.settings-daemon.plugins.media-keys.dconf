@@ -48,7 +48,7 @@ name='Open Calculator'
 
 [custom-keybindings/custom5]
 binding='<Shift><Alt>q'
-command='copyq show'
+command="copyq 'show(\"Clipboard\")'"
 name='copyq'
 
 [custom-keybindings/custom6]
