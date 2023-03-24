@@ -24,7 +24,7 @@
 [[ $- != *i* ]] && return
 ## Used for version checking
 
-export _RCVERSION=25
+export _RCVERSION=26
 function _changelog() {
     local c=$'\e[37;03m'
     local r=$'\e[00m'
@@ -33,17 +33,16 @@ function _changelog() {
     local i=$'\e[00m\e[96;03m'
     local g=$'\e[32;01m'
     echo "${g}emi's .bashrc${r}
-${y}Changelog v25 (2022-12-30)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog v26 (2023-24-03)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
-  ${b}- ADB new features!${r}
-      - When using adb with multiple devices you don't need to point it to a specific one anymore.
-        If there are multiple devices connected, it will detect it and ask you to choose one.
-        This will work with any adb command that targets a device. It'll work like usual if
-        there's only one device connected or if you specify one with the -s, -d, -t or -e flags.
-      - ${c}logcat${r} commands were removed and only one remains: ${c}logcat${r}. This will show the
-        logs of the device you selected or passed as an argument since 5 minutes before onwards.
+  ${b}The ${c}'go'${r}${b} alias to ${c}'xdg-open'${r}${b} was replaced with simply ${c}g${r}. This solves conflicts with ${c}'go'${r}${b} from ${c}'golang'${r}${b} package.${r}
+  ${i}Tip: if you had no idea what it's for, try:${r}
+      - ${c}g https://www.youtube.com/watch?v=dQw4w9WgXcQ${r}
+      - ${c}g .${r}
+      - ${c}g [any file whatsoever]${r}
 
-  ${i}\e]8;;https://www.youtube.com/watch?v=dQw4w9WgXcQ\aJust the tip:\e]8;;\a If you have ${c}grc${r}${i} installed, ${c}adb devices${r}${i} will be very gay (highly recommended!).${r}"
+  ${y}In my defense, ${c}golang${r}${y} did not exist when I first wrote this script.${r} Yeah it's old."
+    # ${i}\e]8;;https://www.youtube.com/watch?v=dQw4w9WgXcQ\aJust the tip:\e]8;;\a If you have ${c}grc${r}${i} installed, ${c}adb devices${r}${i} will be very gay (highly recommended!).${r}"
 }
 # ${y}Version 23 (2022-12-27):${r}
 # - ${b}${i}New feature!${r} You can now easily measure the performance of a command:
@@ -727,7 +726,7 @@ cool_places=(
 alias sudo='sudo '
 ## Navigation
 alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
-alias go="xdg-open"
+alias g="xdg-open"
 
 ## Uses system python as pip
 alias pip='python -m pip'
