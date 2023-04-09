@@ -854,7 +854,7 @@ if _e "adb"; then
     function adb() {
         local _ADB_CMDS_TO_SHOW_SELECTOR=("push" "pull" "shell" "install" "install-multiple" "install-multi-package" "uninstall"
             "bugreport" "logcat" "lolcat" "sideload" "usb" "tcpip" "root" "unroot" "reboot" "remount")
-        if [[ $1 == "devices" && ($# == 1) ]] && _e grcat && [[ -f $HOME/.grc/conf.efibootmgr ]]; then
+        if [[ $1 == "devices" && ($# == 1) ]] && _e grcat && [[ -f "$HOME/.grc/conf.efibootmgr" ]]; then
             while read -r a b c; do
                 [[ $a != "" || $b != "" || $c != "" ]] && printf "%-7s %-28s%s\n" "$a" "$b" "$c"
             done < <(command adb devices -l | sed '1d;$d' |
