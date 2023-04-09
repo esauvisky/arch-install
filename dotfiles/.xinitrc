@@ -61,13 +61,17 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=1
 #    sleep 10s && slack -u &
 # fi
 
-## Starts Telegram and immediatly closes it
-sleep 2s && xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
-sleep 5s && telegram-desktop &
+## Starts Telegram
+# sleep 5s && xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
+sleep 2s && telegram-desktop &
 
-## Starts discord and immediatly closes it
-sleep 2s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
-sleep 5s && discord &
+## Starts discord
+# sleep 5s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
+sleep 2s && discord &
+
+## Starts spotify
+# sleep 5s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
+sleep 2s && spotify &
 
 syncthing-gtk &
 solaar -w hide &
