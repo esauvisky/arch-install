@@ -24,25 +24,20 @@
 [[ $- != *i* ]] && return
 ## Used for version checking
 
-export _RCVERSION=26
+export _RCVERSION=27
 function _changelog() {
-    local c=$'\e[37;03m'
-    local r=$'\e[00m'
-    local b=$'\e[1m'
-    local y=$'\e[33;01m'
-    local i=$'\e[00m\e[96;03m'
-    local g=$'\e[32;01m'
+    local c=$'\e[37;03m'       # cyan
+    local r=$'\e[00m'          # reset
+    local b=$'\e[1m'           # bold
+    local y=$'\e[33;01m'       # yellow
+    local i=$'\e[00m\e[96;03m' # italic
+    local g=$'\e[32;01m'       # green
     echo "${g}emi's .bashrc${r}
-${y}Changelog v26 (2023-24-03)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog v27 (2023-09-04)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
-  ${b}The ${c}'go'${r}${b} alias to ${c}'xdg-open'${r}${b} was replaced with simply ${c}g${r}. This solves conflicts with ${c}'go'${r}${b} from ${c}'golang'${r}${b} package.${r}
-  ${i}Tip: if you had no idea what it's for, try:${r}
-      - ${c}g https://www.youtube.com/watch?v=dQw4w9WgXcQ${r}
-      - ${c}g .${r}
-      - ${c}g [any file whatsoever]${r}
+  ${b}- Fixed home directories with spaces in the path${r}
 
-  ${y}In my defense, ${c}golang${r}${y} did not exist when I first wrote this script.${r} Yeah it's old."
-    # ${i}\e]8;;https://www.youtube.com/watch?v=dQw4w9WgXcQ\aJust the tip:\e]8;;\a If you have ${c}grc${r}${i} installed, ${c}adb devices${r}${i} will be very gay (highly recommended!).${r}"
+  ${i}\e]8;;https://www.youtube.com/watch?v=dQw4w9WgXcQ\aHello GHSASH\e]8;;\a Tip: type the beginning of a command (e.g.: echo) and press arrow-up to browse it's history.${r}"
 }
 # ${y}Version 23 (2022-12-27):${r}
 # - ${b}${i}New feature!${r} You can now easily measure the performance of a command:
