@@ -1326,10 +1326,10 @@ fi
 ###        8 8888       8 8888        8 8 8888                   8 8888         8 8888   `8b.   ` 8888     ,88' ,8'       `8        `8.`8888.  8 8888             8 8888
 ###        8 8888       8 8888        8 8 888888888888           8 8888         8 8888     `88.    `8888888P'  ,8'         `         `8.`8888. 8 8888             8 8888
 
-if [[ ! -s $HOME/.emishrc_last_check ]]; then
+if [[ ! -s "$HOME/.emishrc_last_check" ]]; then
     [[ "$PS1" ]] && _changelog && date +%s >"$HOME/.emishrc_last_check"
 else
-    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s $HOME/.emishrc_last_check ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
+    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s "$HOME/.emishrc_last_check" ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
 fi
 
 function _pre_command() {
