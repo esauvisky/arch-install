@@ -411,9 +411,9 @@ export LESS_TERMCAP_us=$'\E[01;32m'
 ## Colors at file types when autocompleting and more
 if [[ -x /usr/bin/dircolors ]]; then
     if [[ -f $HOME/.dircolors ]]; then
-        . <(dircolors -b $HOME/.dircolors)
+        . <(dircolors -b "$HOME/.dircolors")
     else
-        . <(dircolors -b $HOME/.dircolors)
+        . <(dircolors -b "$HOME/.dircolors")
     fi
     _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
 fi
