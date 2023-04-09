@@ -74,7 +74,7 @@ for conf in "${grcconfs[@]}"; do
 done
 
 echo -e '\e[0m'
-if [[ $SHELL != "/bin/bash" ]]; then
+if [[ $SHELL != "/bin/bash" && $SHELL != "/usr/bin/bash" ]]; then
     # change default shell to bash
     if ! chsh -s /bin/bash; then
         echo -e "\e[31;01mFailed to change default shell to bash. Please do it manually.\e[00m"
