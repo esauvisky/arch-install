@@ -88,6 +88,11 @@ solaar -w hide &
 ## Gnome: turns on bluetooth automatically
 sleep 5s && rfkill unblock bluetooth &
 
+## Loads XKB custom symbols map:
+if [ -f ${HOME}/.config/xkb/symbols/br ]; then
+    setxkbmap -print | sed 's/\+br/+modelm/' | xkbcomp -I${HOME}/.config/xkb - $DISPLAY
+fi
+
 ############
 # SESSIONS #
 ############
