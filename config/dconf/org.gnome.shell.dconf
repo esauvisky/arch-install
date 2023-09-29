@@ -1,9 +1,10 @@
 [/]
-command-history=['xsensors', 'scrpcpy', 'nautilus /home/emi', 'nautilus /home/emi -w', 'nautilus -w', 'go /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'xdg-open /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'sc', 'osu-lazer', 'code .bashrc', 'killall -9 chrome', 'scrpcy', 'copyq', '/home/emi/.config/Code/logs/20220412T182608/exthost1/ms-vscode.js-debug/vscode-debugadapter-90f66153.json.gz', 'co', 'co', 'scrcpyt', 'xtemp', 'scr', 'scrcpy 192.168.1.80', 'scrcpy -s 192.168.1.80', 'cura', 'sleep 3 && gnome-screenshot -w', 'scrcpy -s 192.168.1.81', 'scrcpy -s 192.168.1.82', 'sc', 'xkill', 'ghid5ra', 'solaar', 'copyq show', 'sc', 'killall meld', 'splatmoji', 'splatmoji show', 'killall -9 blender', 'blender', 'ghidra[', 'telegram', 'hidra', 'fork', 'peek', 'splatmoji copy', 'scrc', 'scrcpy -s', 'sc', 'sc', 'scrc', 'sc', 'sc', 's', 's', 'sac', 'sc', 'scr', 'adb c', 'scrcpy -s 192.168.1.20]', '4r', 're', 'killall discord', 'killall -9 ghidra', 'ghidrea', 'ghidrea', 'a', 'adb', 'ad', 'ad', 'android', 'adb c', 'adb', 'emibemol', 'osud', 'a', 'sc', 'scrcpyad', 'adb c', 'androi', 'killall -9 subl', 'scr', 'a', 'asd', 'asd', 'sc', 'obs', 'sc', 'adb connect 192.168.1.25', 'scr', 'sc', 'sc', 'ad', 'uridownload', 'firefox', 'osu', 'scrcpy -s 192.168.1.25', 'syncthing', 'sleep 2 && gnome-screenshot', 'srcpy', 'a', 'scr', 'a', 'asd', 'betterdiscord-installer', 'discord', 'openscad', 'adb connect 192.168.1.20', 'scrcpy -s 192.168.1.20', '/tmp/j8deme46oTClHMR4VNU_317525338688_mp4_264_hd.mp4', 'google', 'Forkgram', 'android-studio', 'superslicer', 'scrcpy -s 8217530e', 'meld', 'sc', 'super', 'scrcpyu', 'goo', 'spotify', 'gimp', 'killall -9 Forkgram', 'inkscape', 'telegram-', 'ode', 'nautilus', 'ghidr', 'srccpy', 'sc', 'subl', 'go /home/emi/.local/lib/python3.10/site-packages/frida_tools/repl.py', 'subl /home/emi/.local/lib/python3.10/site-packages/frida_tools/repl.py', 'code /home/emi/.local/lib/python3.10/site-packages/frida_tools/repl.py', 'ghidra', 'killall code', 'tye', 'telegram-desktop', 'code', 'f', 'scrcpy', 'r', 'nautilus -q']
+command-history=['xsensors', 'scrpcpy', 'nautilus /home/emi', 'nautilus /home/emi -w', 'nautilus -w', 'go /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'xdg-open /home/emi/.config/Code/logs/20220315T001500/exthost1/ms-vscode.js-debug/vscode-debugadapter-3c27ed66.json.gz', 'sc', 'scrpcy', '/home/emi/.config/Code/logs/20220412T182608/exthost1/ms-vscode.js-debug/vscode-debugadapter-90f66153.json.gz', 'co', 'co', 'scrcpyt', 'xtemp', 'scr', 'scrcpy 192.168.1.80', 'scrcpy -s 192.168.1.80', 'cura', 'sleep 3 && gnome-screenshot -w', 'scrcpy -s 192.168.1.81', 'scrcpy -s 192.168.1.82', 'sc', 'xkill', 'ghid5ra', 'solaar', 'sc', 'killall meld', 'killall -9 blender', 'blender', 'ghidra[', 'telegram', 'hidra', 'fork', 'scrc', 'scrcpy -s', 'sc', 'sc', 'scrc', 'sc', 'sc', 's', 's', 'sac', 'sc', 'scr', 'adb c', 'scrcpy -s 192.168.1.20]', '4r', 're', 'killall discord', 'killall -9 ghidra', 'ghidrea', 'ghidrea', 'a', 'adb', 'ad', 'ad', 'android', 'adb c', 'adb', 'emibemol', 'osud', 'a', 'sc', 'scrcpyad', 'adb c', 'androi', 'killall -9 subl', 'scr', 'a', 'asd', 'asd', 'sc', 'obs', 'sc', 'adb connect 192.168.1.25', 'scr', 'sc', 'sc', 'ad', 'uridownload', 'firefox', 'scrcpy -s 192.168.1.25', 'syncthing', 'sleep 2 && gnome-screenshot', 'a', 'scr', 'a', 'asd', 'betterdiscord-installer', 'discord', 'openscad', 'adb connect 192.168.1.20', 'scrcpy -s 192.168.1.20', '/tmp/j8deme46oTClHMR4VNU_317525338688_mp4_264_hd.mp4', 'google', 'Forkgram', 'superslicer', 'scrcpy -s 8217530e', 'meld', 'sc', 'super', 'scrcpyu', 'goo', 'spotify', 'gimp', 'killall -9 Forkgram', 'inkscape', 'telegram-', 'ode', 'nautilus', 'srccpy', 'sc', 'go /home/emi/.local/lib/python3.10/site-packages/frida_tools/repl.py', 'subl /home/emi/.local/lib/python3.10/site-packages/frida_tools/repl.py', 'code /home/emi/.local/lib/python3.10/site-packages/frida_tools/repl.py', 'killall code', 'tye', 'telegram-desktop', 'f', 'nautilus -q', 'scrcpy -s 192.168.1.250', '/tmp/BDV1IR.png', 'gh8dra', 'avidemux /tmp/arec-21:04:35.webm', 'peek', 'srcpy', 'scrcpy --prefer-text-events=non-alpha', 'scrcpy --prefer-text', 'eog /tmp/image.jpg', '/tmp/image.png', 'scrcpu', 's rcpy', 'eog /tmp/aweful_tmp.png', '/tmp/aweful_tmp.jpg', 'eog /tmp/arec-21:59:11.mp4', 'vlc /tmp/arec-21:59:11.mp4', 'eog /data/test.png', 'eog /tmp/test.jpg', 'eog /tmp/aweful_tmp.jpg', 'eog /tmp/test.png', 'key-mon', 'subl /tmp/a.ipynb', 'eog', "git push origin --force 'refs/heads/*'", 'code .bashrc', '/tmp/test.png', 'geecie/tmp/test.png', 'geecie /tmp/test.png', 'geekie /tmp/test.png', 'geeqie /tmp/test.png', '/tmp/arec-18:50:57.mp4', '/tmp/arec-19:33:37.mp4', 'killall -9 audacity', 'asdasd', '0', 'killall -9 vlc', '/home/emi/Pokemod/misc/pokemod-meta/images/logos/', 'subll', 'clipq', 'killall -9 meld', 'killall -9 chrome', 'sacrcpy', 'killall -9 code', 'killall -9 vscode', 'code', 'osu', 'osu-lazer', 'killall -9 discord', 'workrave', 'killall -9 Discord', 'splatmo', '/tmp/out.js', 'splatmoji', 'splatmoji show', 'splatmoji copy', 'sublo', 'copyq', 'copyq show', 'dconf-editor', 'android-studio', 'subl', 'ghidr', 'gitg.', 'r', 'ghidra', 'gitg .', 'scrcpuy', 'scrcpy', 'gitg']
 disable-extension-version-validation=true
 disable-user-extensions=false
-disabled-extensions=['workspace-indicator@gnome-shell-extensions.gcampax.github.com', 'screenshot-window-sizer@gnome-shell-extensions.gcampax.github.com', 'draw-on-your-screen@som.codeberg.org', 'color-picker@tuberry', 'advanced-alt-tab@G-dH.github.com']
-enabled-extensions=['tiling-assistant@leleat-on-github', 'GoogleEarthWallpaper@neffo.github.com', 'text_translator@awamper.gmail.com', 'extension-list@tu.berry', 'draw-on-your-screen2@zhrexl.github.com', 'appindicatorsupport@rgcjonas.gmail.com', 'switchWorkSpace@sun.wxg@gmail.com', 'at4dm-reanimatorzon@github.com', 'apps-menu@gnome-shell-extensions.gcampax.github.com', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'native-window-placement@gnome-shell-extensions.gcampax.github.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'wsmatrix@martin.zurowietz.de', 'no-title-bar@franglais125.gmail.com', 'focus-follows-workspace@christopher.luebbemeier.gmail.com', 'gtktitlebar@velitasali.github.io', 'system-monitor-next@paradoxxx.zero.gmail.com', 'EasyScreenCast@iacopodeenosee.gmail.com', 'pop-shell@system76.com']
+disabled-extensions=['workspace-indicator@gnome-shell-extensions.gcampax.github.com', 'screenshot-window-sizer@gnome-shell-extensions.gcampax.github.com', 'draw-on-your-screen@som.codeberg.org', 'color-picker@tuberry', 'native-window-placement@gnome-shell-extensions.gcampax.github.com', 'todolist@bsaleil.org', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'auto-move-windows@gnome-shell-extensions.gcampax.github.com', 'advanced-alt-tab@G-dH.github.com', 'gtktitlebar@velitasali.github.io', 'user-theme@gnome-shell-extensions.gcampax.github.com']
+enabled-extensions=['tiling-assistant@leleat-on-github', 'text_translator@awamper.gmail.com', 'extension-list@tu.berry', 'switchWorkSpace@sun.wxg@gmail.com', 'apps-menu@gnome-shell-extensions.gcampax.github.com', 'no-title-bar@franglais125.gmail.com', 'EasyScreenCast@iacopodeenosee.gmail.com', 'chatgpt-gnome-desktop@chatgpt-gnome-desktop', 'appindicatorsupport@rgcjonas.gmail.com', 'GoogleEarthWallpaper@neffo.github.com', 'draw-on-your-screen2@zhrexl.github.com', 'system-monitor-next@paradoxxx.zero.gmail.com', 'wsmatrix@martin.zurowietz.de', 'at4dm-reanimatorzon@github.com', 'castcontrol@hello.lukearran.com', 'cast-to-tv@rafostar.github.com', 'focus-follows-workspace@christopher.luebbemeier.gmail.com', 'pop-shell@system76.com']
+favorite-apps=['org.gnome.Epiphany.desktop', 'org.gnome.Calendar.desktop', 'org.gnome.Nautilus.desktop', 'org.gnome.Software.desktop', 'org.gnome.Music.desktop']
 had-bluetooth-devices-setup=true
 remember-mount-password=true
 welcome-dialog-last-shown-version='41.4'
@@ -14,40 +15,106 @@ current-workspace-only=false
 [extensions/EasyScreenCast]
 active-custom-gsp=false
 active-shortcut=true
-draw-cursor=true
+area-screen=3
+draw-cursor=false
 execute-post-cmd=true
 execute-pre-cmd=false
-file-container=1
+file-container=2
 file-folder='/tmp'
 file-name='arec-%t'
 file-resolution-height=1080
 file-resolution-kar=true
 file-resolution-type=-1
 file-resolution-width=1920
-fps=60
+fps=30
+height-rec=1016
+input-audio-source=0
 pipeline='vp9enc min_quantizer=0 max_quantizer=5 cpu-used=3 deadline=1000000 threads=%T ! queue max-size-buffers=0 max-size-time=0 max-size-bytes=0 ! webmmux'
-post-cmd="bash -c 'xclip -i -selection clipboard <(echo \"_dirpath/_fname\")'"
+post-cmd='convert-screen-rec _dirpath/_fname'
 pre-cmd=''
-quality-index=3
+quality-index=2
 quality-webcam=''
 shortcut-key=['<Super>r']
 show-area-rec=false
 show-notify-alert=false
 status-indicators=0
 verbose-debug=true
+width-rec=505
+x-pos=3974
+y-pos=297
+
+[extensions/advanced-alt-tab-window-switcher]
+app-switcher-popup-fav-apps=false
+app-switcher-popup-filter=1
+app-switcher-popup-hide-win-counter-for-single-window=false
+app-switcher-popup-icon-size=32
+app-switcher-popup-include-show-apps-icon=false
+app-switcher-popup-mid-click-item=0
+app-switcher-popup-prim-click-item=0
+app-switcher-popup-raise-first-only=true
+app-switcher-popup-scroll-item=0
+app-switcher-popup-search-pref-running=true
+app-switcher-popup-sec-click-item=0
+app-switcher-popup-titles=false
+app-switcher-popup-win-counter=false
+enable-super=true
+input-source-id='us+intl'
+remember-input=false
+show-dash=2
+super-double-press-action=2
+super-key-mode=2
+switcher-popup-hot-keys=false
+switcher-popup-hover-select=false
+switcher-popup-interactive-indicators=false
+switcher-popup-mid-click-in=0
+switcher-popup-mid-click-out=0
+switcher-popup-monitor=2
+switcher-popup-position=2
+switcher-popup-preview-selected=2
+switcher-popup-prim-click-in=0
+switcher-popup-prim-click-out=0
+switcher-popup-scroll-in=0
+switcher-popup-scroll-out=0
+switcher-popup-sec-click-in=0
+switcher-popup-sec-click-out=0
+switcher-popup-shift-hotkeys=false
+switcher-popup-start-search=true
+switcher-popup-status=false
+switcher-popup-sync-filter=false
+switcher-popup-theme=3
+switcher-popup-timeout=0
+switcher-popup-tooltip-label-scale=120
+switcher-popup-tooltip-title=3
+switcher-popup-up-down-action=1
+switcher-popup-wrap=true
+switcher-ws-thumbnails=1
+win-switch-include-modals=false
+win-switch-mark-minimized=false
+win-switch-minimized-to-end=false
+win-switcher-popup-filter=1
+win-switcher-popup-icon-size=32
+win-switcher-popup-mid-click-item=0
+win-switcher-popup-order=2
+win-switcher-popup-preview-size=256
+win-switcher-popup-prim-click-item=0
+win-switcher-popup-scroll-item=0
+win-switcher-popup-search-all=true
+win-switcher-popup-search-apps=false
+win-switcher-popup-sec-click-item=0
+win-switcher-popup-sorting=3
+win-switcher-single-prev-size=512
 
 [extensions/auto-move-windows]
-application-list=['spotify.desktop:12']
+application-list=['spotify.desktop:16', 'org.telegram.desktop.desktop:9', 'discord.desktop:13']
 
 [extensions/color-picker]
 colors-history='#2b2f38|#04b3ed|#020203|#404552|#36393f|#404552|#242933|#141414'
 
 [extensions/draw-on-your-screen]
-erase-drawings=['<Super>e']
-indicator-disabled=true
+erase-drawings=['<Super>Escape']
+indicator-disabled=false
 osd-disabled=true
-persistent-over-restarts=false
-persistent-over-toggles=true
+persistent-over-toggles=false
 toggle-drawing=['<Super>d']
 toggle-modal=['<Super>f']
 
@@ -59,40 +126,31 @@ grid-line-width=5.0
 palettes=[('GNOME HIG lighter', ['rgb(153,193,241):Blue 1', 'rgb(143,240,164):Green 1', 'rgb(249,240,107):Yellow 1', 'rgb(255,190,111):Orange 1', 'rgb(246,97,81):Red 1', 'rgb(220,138,221):Purple 1', 'rgb(205,171,143):Brown 1', 'rgb(255,255,255):Light 1', 'rgb(119,118,123):Dark 1']), ('GNOME HIG light', ['rgb(98,160,234):Blue 2', 'rgb(87,227,137):Green 2', 'rgb(248,228,92):Yellow 2', 'rgb(255,163,72):Orange 2', 'rgb(237,51,59):Red 2', 'rgb(192,97,203):Purple 2', 'rgb(181,131,90):Brown 2', 'rgb(246,245,244):Light 2', 'rgb(94,92,100):Dark 2']), ('GNOME HIG normal', ['rgb(53,132,228):Blue 3', 'rgb(51,209,122):Green 3', 'rgb(246,211,45):Yellow 3', 'rgb(255,120,0):Orange 3', 'rgb(224,27,36):Red 3', 'rgb(145,65,172):Purple 3', 'rgb(152,106,68):Brown 3', 'rgb(222,221,218):Light 3', 'rgb(61,56,70):Dark 3']), ('GNOME HIG dark', ['rgb(28,113,216):Blue 4', 'rgb(46,194,126):Green 4', 'rgb(245,194,17):Yellow 4', 'rgb(230,97,0):Orange 4', 'rgb(192,28,40):Red 4', 'rgb(129,61,156):Purple 4', 'rgb(134,94,60):Brown 4', 'rgb(192,191,188):Light 4', 'rgb(36,31,49):Dark 4']), ('GNOME HIG darker', ['rgb(26,95,180):Blue 5', 'rgb(38,162,105):Green 5', 'rgb(229,165,10):Yellow 5', 'rgb(198,70,0):Orange 5', 'rgb(165,29,45):Red 5', 'rgb(97,53,131):Purple 5', 'rgb(99,69,44):Brown 5', 'rgb(154,153,150):Light 5', 'rgb(0,0,0):Dark 5'])]
 
 [extensions/draw-on-your-screen/internal-shortcuts]
-delete-last-element=['KP_7']
-open-preferences=['KP_Subtract']
-pick-color=['p']
-select-ellipse-shape=['c']
-select-image-shape=['i']
-select-line-shape=['l']
-select-mirror-tool=['<Shift>m']
-select-move-tool=['m']
-select-none-shape=['space']
-select-polygon-shape=['v']
-select-rectangle-shape=['r']
-select-resize-tool=['s']
-select-text-shape=['t']
-smooth-last-element=['apostrophe']
-switch-dash=['KP_0']
-switch-fill=['KP_8']
-switch-linecap=['KP_5']
-switch-linejoin=['KP_4']
-toggle-help=['KP_Multiply']
+delete-last-element=['<Control>z']
+pick-color=['c']
+select-ellipse-shape=['3']
+select-line-shape=['2']
+select-none-shape=['1']
+smooth-last-element=['Alt_L']
+switch-fill-rule=['f']
 
 [extensions/extension-list]
 button-icon=uint32 1
 unpin-button=false
 unpin-list=['windowsNavigator@gnome-shell-extensions.gcampax.github.com']
 
+[extensions/focus-follows-workspace]
+move-cursor=true
+
 [extensions/googleearthwallpaper]
 download-folder='/home/emi/Media/GoogleEarthWallpaper/'
 hide=false
 icon='pin'
-image-details='County Road 29, Naples, Collier County, Florida, United States, 34114|©2019 Maxar Technologies, The Florida Department of Environmental Protection, U.S. Geological Survey|25.88683|-81.514071|14'
-image-filepath='/home/emi/Media/GoogleEarthWallpaper/1969_county_road_29_naples_collier_county_florida_united_states_34114.jpg'
-image-id=1969
+image-details='9329-10053, Southeast Vandalia Drive, Runnells, Camp, Polk County, Iowa, United States, 50237|©2019 Maxar Technologies, USDA Farm Service Agency, Warren County|41.497668|-93.41177|15'
+image-filepath='/home/emi/Media/GoogleEarthWallpaper/2131_9329_10053_southeast_vandalia_drive_runnells_camp_polk_county_iowa_united_states_50237.jpg'
+image-id=2131
 map-link-provider='google-earth'
-next-refresh=1674378457
+next-refresh=1691298694
 notify=false
 refresh-interval=300
 set-background=true
@@ -102,17 +160,19 @@ hide-window-titlebars='maximized'
 
 [extensions/pop-shell]
 active-hint=true
-active-hint-border-radius=uint32 5
-fullscreen-launcher=true
+active-hint-border-radius=uint32 2
+fullscreen-launcher=false
 gap-inner=uint32 0
 gap-outer=uint32 0
 hint-color-rgba='rgb(252,0,221)'
+mouse-cursor-focus-location=uint32 4
 mouse-cursor-follows-active-window=false
 show-skip-taskbar=false
-show-stack-tab-buttons=true
+show-stack-tab-buttons=false
 show-title=true
-smart-gaps=true
+smart-gaps=false
 snap-to-grid=true
+stacking-with-mouse=false
 tile-by-default=true
 
 [extensions/switchWorkSpace]
@@ -121,19 +181,37 @@ switch-workspace=['<Super>Tab']
 switch-workspace-backward=['<Shift><Super>Tab']
 
 [extensions/system-monitor]
+battery-show-text=false
+center-display=false
+compact-display=true
+cpu-display=true
 cpu-individual-cores=false
 cpu-show-text=true
-disk-display=true
-gpu-display=false
-gpu-show-menu=false
-gpu-show-text=false
+disk-display=false
+disk-show-menu=false
+disk-show-text=false
+fan-show-menu=false
+gpu-display=true
+gpu-memory-color='#ffa348ff'
+gpu-refresh-time=1000
+gpu-show-menu=true
+gpu-show-text=true
+gpu-used-color='#e66100ff'
+icon-display=false
 memory-cache-color='#80808039'
 memory-refresh-time=1000
+move-clock=false
+net-display=false
+net-show-menu=true
 net-show-text=true
-thermal-display=true
+show-tooltip=false
+swap-show-menu=false
+swap-show-text=false
+thermal-display=false
 thermal-refresh-time=1000
-thermal-sensor-file='/sys/class/hwmon/hwmon6/temp2_input'
-thermal-show-text=true
+thermal-sensor-file='/sys/class/hwmon/hwmon0/temp1_input'
+thermal-show-menu=false
+thermal-show-text=false
 thermal-style='graph'
 thermal-threshold=0
 
@@ -192,11 +270,13 @@ enable-popup-workspace-hover=false
 multi-monitor=false
 num-columns=4
 num-rows=4
-popup-timeout=350
-scale=0.59999999999999998
+popup-timeout=500
+scale=0.5
 show-overview-grid=true
+show-popup=true
 show-thumbnails=true
-show-workspace-names=true
+show-workspace-names=false
+workspace-overview-toggle=false
 
 [keybindings]
 focus-active-notification=@as []

@@ -1,6 +1,6 @@
 [/]
 attach-modal-dialogs=false
-center-new-windows=true
+center-new-windows=false
 dynamic-workspaces=false
 edge-tiling=false
 overlay-key='Super_R'

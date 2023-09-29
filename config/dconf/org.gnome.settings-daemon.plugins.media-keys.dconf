@@ -1,21 +1,21 @@
 [/]
 area-screenshot=@as []
 area-screenshot-clip=['Print']
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom9/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom10/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom11/']
 help=@as []
 logout=@as []
 magnifier=@as []
 magnifier-zoom-in=@as []
 magnifier-zoom-out=@as []
-next=['<Super>F3']
+next=@as []
 play=['<Super>F1']
-previous=['<Super>F2']
+previous=@as []
 screencast=@as []
 screenreader=@as []
 screensaver=@as []
 screenshot=@as []
 screenshot-clip=['<Primary>Print']
-stop=['<Super>F4']
+stop=@as []
 volume-down=['<Super>minus']
 volume-up=['<Super>equal']
 window-screenshot=@as []
@@ -30,6 +30,16 @@ name='Open Terminal'
 binding='<Shift><Alt>w'
 command='shortenurl -c'
 name='Shorten Url'
+
+[custom-keybindings/custom10]
+binding='<Super>F2'
+command='catt volumedown'
+name='catt: Volume Down'
+
+[custom-keybindings/custom11]
+binding='<Super>q'
+command='copyq show'
+name='copyq'
 
 [custom-keybindings/custom2]
 binding='<Super>s'
@@ -47,9 +57,9 @@ command='gnome-calculator'
 name='Open Calculator'
 
 [custom-keybindings/custom5]
-binding='<Shift><Alt>q'
-command="copyq 'show(\"Clipboard\")'"
-name='copyq'
+binding='<Shift><Alt>c'
+command='sentenceimprove.py'
+name='sentenceimprove'
 
 [custom-keybindings/custom6]
 binding='<Shift><Alt>r'
@@ -58,5 +68,15 @@ name='URI Download'
 
 [custom-keybindings/custom7]
 binding='<Super>h'
-command="bash -c 'xclip -o -selection clipboard | haste | tr -d \"\\n\" | xclip -i -selection clipboard'"
+command="bash -c 'xclip -o -selection clipboard | haste | xargs | xclip -i -selection clipboard'"
 name='upload to hastebin'
+
+[custom-keybindings/custom8]
+binding='<Super>F4'
+command='catt play_toggle'
+name='catt: Play/Pause'
+
+[custom-keybindings/custom9]
+binding='<Super>F3'
+command='catt volumeup'
+name='catt: Volume Up'

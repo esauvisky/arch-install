@@ -4,7 +4,7 @@ set -o errtrace
 set -o pipefail # Exit on errors
 
 dirs=("/org/gnome/shell/"
-    "/org/gnome/desktop/wm/"
+    "/org/gnome/desktop/"
     "/org/gnome/settings-daemon/plugins/media-keys/"
     "/org/gnome/mutter/"
     "/org/gnome/mutter/wayland/"
@@ -18,6 +18,8 @@ if [[ $1 == "dump" ]]; then
         echo "Dumping altered keys in $name..."
         dconf dump $dir >dconf/$name.dconf
     done
+    echo "Dumping full backup to dconf/.dconf"
+    dconf dump / > .dconf_full
 elif [[ $1 == "restore" ]]; then
     for file in dconf/*; do
         name=$(echo "/${file##.dconf}/" | \sed 's/\./\//g')
