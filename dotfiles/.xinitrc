@@ -73,6 +73,11 @@ sleep 2s && discord &
 # sleep 5s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
 sleep 2s && spotify &
 
+
+sleep 2s && workrave &
+
+# sleep 2s && openrgb &
+
 syncthing-gtk &
 solaar -w hide &
 ## guake daemon
