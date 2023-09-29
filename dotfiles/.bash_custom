@@ -21,7 +21,6 @@ alias cdp='_magicCD 2 $HOME/Pokemod/'
 alias subl='subl3open'
 alias subl3='subl3open'
 
-
 # Fixes kitty on ssh
 # if [[ $(is_ssh) && $TERM == "xterm-kitty" ]]; then
 #     export TERM=xterm
@@ -36,7 +35,6 @@ shopt -s nocaseglob
 shopt -s extglob
 # Enables the ** glob
 shopt -s globstar
-
 
 ## WIP:
 # function cd() {
@@ -116,3 +114,36 @@ shopt -s globstar
 ##     cd /u/s/*comp[TAB]
 # _bcpp --dirs --nocase --cooperate --files
 #complete -F _bcpp_complete_dir rmdir
+
+# This script runs an adb command on multiple devices at the same time.
+# It uses tmux to run multiple adb processes in parallel.
+# The script takes one argument, which is the adb command to run on the device.
+#
+# Usage: ./watch_logs.sh '<command>'
+# Example: ./watch_logs.sh 'logcat -v time -s "mytag"'
+multi_adb() {
+    if [ $# -eq 0 ]; then
+        echo "Usage: ./watch_logs.sh '<command>'"
+        return 1
+    fi
+
+    # Trap Ctrl+C (SIGINT) and call cleanup function
+    trap cleanup SIGINT
+
+    command="$*"
+
+    # Kill previous watch_logs session if it exists
+    tmux has-session -t watch_logs 2>/dev/null && tmux kill-session -t watch_logs
+    tmux new-session -s watch_logs -n 'ADB Log Watch' -d
+
+    for ip in $(adb devices -l | grep -v "List of devices attached" | grep "device" | awk '{print $1}'); do
+        tmux split-window -d -t watch_logs "adb -s $ip shell '$command'"
+        tmux select-layout -t watch_logs tiled
+    done
+
+    # Kill the first pane
+    tmux kill-pane -t watch_logs:0.0
+
+    tmux attach-session -t watch_logs
+}
+alias code="code-insiders"
