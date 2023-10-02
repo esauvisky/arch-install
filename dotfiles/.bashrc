@@ -22,39 +22,102 @@
 ##  +-+-+-+-+
 ## If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-## Used for version checking
 
-export _RCVERSION=27
+## Used for version checking
+export _RCVERSION=28
+export _DATE=$(date "+%Y-%m-%d")
 function _changelog() {
-    local c=$'\e[37;03m'       # cyan
+    local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
+    local n=$'\e[07m'          # inverted bg
     local b=$'\e[1m'           # bold
     local y=$'\e[33;01m'       # yellow
-    local i=$'\e[00m\e[96;03m' # italic
+    local i=$'\e[00m\e[96;03m' # emphasis
     local g=$'\e[32;01m'       # green
-    echo "${g}emi's .bashrc${r}
-${y}Changelog v27 (2023-09-04)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
-    echo -e "
-  ${b}- Fixed home directories with spaces in the path${r}
+    local c=$'\e[97m'       # code
 
-  ${i}\e]8;;https://www.youtube.com/watch?v=dQw4w9WgXcQ\aHello GHSASH\e]8;;\a Tip: type the beginning of a command (e.g.: echo) and press arrow-up to browse it's history.${r}"
+    echo "${g}emi's .bashrc${r}
+${y}Changelog ${_RCVERSION} ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+    echo -e "
+
+  ${r}- A new directory ${b}${c}/var/cache/pacman/pkg/${r}${b} was added to ${c}cdcool${r}${b}. ${a}Check tips below!${r}
+  ${r}${b}- Added a new function called ${c}pipi${r}.
+    It's a smart pip package installer which automatically adds installed packages to ${c}requirements.txt${r}${b} along with their versions.${r}
+  ${r}${b}- The ${c}journalctl${r}${b} aliases ${c}je${r}${b} and ${c}jb${r}${b}, were updated.${r}
+    The ${c}je${r} alias now displays the most recent 100 log entries, and the ${c}jb${r} alias has had the ${c}-e${r} flag added to display the last part of the logs.${r}
+  ${r}${b}- The git status display function ${c}gits${r}${b} was ${a}refactored${r}.
+    It now color codes the git status output according to the type of changes made to the git repository.${r}
+  ${r}${b}- The ${c}gitd${r}${b} alias was introduced${r} to show a more compact and informative git diff.
+  ${r}- New git configurations were added to improve your git experience.
+
+  ${i}Tip: try using MagicCD's commands, ${c}cdcool${r}${i} and ${c}cdX${r}${i} to quickly jump to important directories:${r}
+   - Edit your ${c}~/.bash_custom${r} file and add aliases like this:
+     ${c}alias cdc='_magicCD 2 $HOME/Coding/'${r}
+  ${i}This will present a menu with all subdirectories in $HOME/Coding/ that include the sequence ${c}scr${r}:${r}
+   $ ${c}cdc scri${r}
+   ${r}- /home/emi/Coding/pop-shell/scripts
+   ${n}- /home/emi/Coding/w3af/scripts${r}
+   - /home/emi/Coding/Scripts
+   - /home/emi/Coding/magenta-studio/scripts
+   - /home/emi/Coding/Mobile-Security-Framework-MobSF/scripts${r}
+  ${i}Select with ${b}UP/DOWN${r} ${i}keys and press ${b}ENTER${r}${i} to quickly navigate there.
+  "
 }
-# ${y}Version 23 (2022-12-27):${r}
-# - ${b}${i}New feature!${r} You can now easily measure the performance of a command:
-#     - Usage: ${c}profile_command number_of_times 'command [args]'${r}
-#     - Example: ${c}profile_command 10 'sleep 1'${r}
-#     - This will run ${c}'sleep 1'${r} 10 times and print a summary of the results. Try it out!
-# - Colors for git repositories changed and are now more consistent:
-#     - Fixed an issue when you were inside a git repo directory that was a symbolic link.
-#     - If you're inside a git repository, the path will be colored in violet, just like the username and hostname.
-#       Additionally, if the current working directory is a subdirectory of a git repo, it will be highlighted in bold.
-#       Expect more changes to git features in the future, specially on performance and in the current branch preview.
-# - Colors for the current working directory changed, it's not bold anymore and it's a light blue. This is to make it
-#   more consistent with the git repo path color change.
-# - Fixed a bug in which some terminals would not display grey colors, so changed those to white.
-# - Fixed history grepper function:
-#     - Type ${c}h any.*regex${r} to search for any regex in your history
-#     - Type ${c}h 00000${r} to show context around a particular entry
+
+
+###################
+# CHAT GPT PROMPT #
+###################
+# Below there's a diff of changes for this .bashrc version release:
+# DIFF:
+
+# END DIFF
+# You can see an example showcasing most available colors and text modifiers below:
+# COLORS:
+#     local a=$'\e[37;03m'       # cyan
+#     local r=$'\e[00m'          # reset
+#     local b=$'\e[1m'           # bold
+#     local y=$'\e[33;01m'       # yellow
+#     local i=$'\e[00m\e[96;03m' # emphasis
+#     local g=$'\e[32;01m'       # green
+#     local c=$'\e[97;03m'       # code
+# END COLORS
+
+# Using the diff, return a sound list of changes for the changelog of this version. Finally, pick your favorite change and add a tip at the bottom.
+# Here's an example of how a response should look like:
+
+# EXAMPLE:
+#   ${r}- A new directory ${b}${c}/var/cache/pacman/pkg/${r}${b} was added to ${c}cdcool${r}${b}. ${a}Check tips below!${r}
+#   ${r}${b}- Added a new function called ${c}pipi${r}.
+#     It's a smart pip package installer which automatically adds installed packages to ${c}requirements.txt${r}${b} along with their versions.${r}
+#   ${r}${b}- The ${c}journalctl${r}${b} aliases ${c}je${r}${b} and ${c}jb${r}${b}, were updated.${r}
+#     The ${c}je${r} alias now displays the most recent 100 log entries, and the ${c}jb${r} alias has had the ${c}-e${r} flag added to display the last part of the logs.${r}
+#   ${r}${b}- The git status display function ${c}gits${r}${b} was ${a}refactored${r}.
+#     It now color codes the git status output according to the type of changes made to the git repository.${r}
+#   ${r}${b}- The ${c}gitd${r}${b} alias was introduced${r} to show a more compact and informative git diff.
+#   ${r}- New git configurations were added to improve your git experience.
+
+#   ${i}Tip: try using MagicCD's commands, ${c}cdcool${r}${i} and ${c}cdX${r}${i} to quickly jump to important directories:${r}
+#    - Edit your ${c}~/.bash_custom${r} file and add aliases like this:
+#      ${c}alias cdc='_magicCD 2 $HOME/Coding/'${r}
+#   ${i}This will present a menu with all subdirectories in $HOME/Coding/ that include the sequence ${c}scr${r}:${r}
+#    $ ${c}cdc scri${r}
+#    ${r}- /home/emi/Coding/pop-shell/scripts
+#    ${n}- /home/emi/Coding/w3af/scripts${r}
+#    - /home/emi/Coding/Scripts
+#    - /home/emi/Coding/magenta-studio/scripts
+#    - /home/emi/Coding/Mobile-Security-Framework-MobSF/scripts${r}
+#   ${i}Select with ${b}UP/DOWN${r} ${i}keys and press ${b}ENTER${r}${i} to quickly navigate there.
+# END EXAMPLE
+
+# Do not return changes that aren't useful for a "final user", like if I updated the version and it shows in the diff above, it's not necessary to tell the final user of my script, as it's obvious. Here are examples of bad changes:
+# BLACKLIST:
+#   ${b}${a}- Now a dynamic date for the Changelog. Instead of having a hard-coded date, ${c}_DATE${r}${a} variable is set with the current date dynamically.${r}
+#   ${b}${a}- Incremented ${c}.bashrc${r}${a} version with ${c}_RCVERSION${r}${a}. This represents a new version of the .bashrc file to account for these changes.${r}
+# END BLACKLIST
+
+# Now return the text but for the changes in the DIFF above. Use the colors from and usage from the example to figure out how to use modifiers. Keep it pretty.
+# RESPONSE:
 
 function check_updates() {
     if [[ $(($(date +%s) - $(cat "$HOME/.emishrc_last_check"))) -gt 86400 ]]; then
@@ -725,6 +788,41 @@ alias g="xdg-open"
 
 ## Uses system python as pip
 alias pip='python -m pip'
+##
+## Pipi, the smart pip package installer
+##
+## Adds installed packages to requirements.txt file automatically.
+## Getting the canonical package name if required, and appending the version.
+## Better than using pip freeze as only explicitly installed packages are added this way.
+function pipi() {
+    cur_dir="$PWD"
+    req_file=""
+
+    while [ "$cur_dir" != "/" ]; do
+        if [ -f "$cur_dir/requirements.txt" ]; then
+            req_file="$cur_dir/requirements.txt"
+            break
+        fi
+        cur_dir=$(dirname "$cur_dir")
+    done
+
+    [[ -z "$req_file" ]] && echo "Error: requirements.txt not found in current or parent directories" && return 1
+
+    for pkg in "$@"; do
+        if [[ "$pkg" == "install" ]]; then
+            continue
+        fi
+        pip install "$pkg" && {
+            name="$(pip show "$pkg" | grep Name: | awk '{print $2}')"
+            version="$(pip show "$pkg" | grep Version: | awk '{print $2}')"
+            if [[ "$name" == "" || "$version" == "" ]]; then
+                echo "$pkg" >>"$req_file"
+            else
+                echo "${name}==${version}" >>"$req_file"
+            fi
+        }
+    done
+}
 
 ## Node
 alias node='node --experimental-modules  --experimental-repl-await  --experimental-vm-modules  --experimental-worker --experimental-import-meta-resolve'
@@ -895,8 +993,8 @@ function _systemctl_exists_user() {
 }
 
 if _e "journalctl"; then
-    alias je='journalctl -efn 50 -o short --no-hostname'
-    alias jb='journalctl -b -o short --no-hostname'
+    alias je='journalctl -efn 100 -o short --no-hostname'
+    alias jb='journalctl -b -o short --no-hostname -e'
     function st() {
         if _systemctl_exists_user "${1}"; then
             journalctl --output cat -lxef _SYSTEMD_USER_UNIT="${1}"
@@ -1097,56 +1195,165 @@ fi
 if _e "git"; then
     # does not open editor when merging
     export GIT_MERGE_AUTOEDIT=no
-    # alias gitl='git log --all --decorate=full --oneline'
-    alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
-    alias gitw="git log --no-merges --pretty=format:'------------> %C(bold red)%h%Creset -%C(bold yellow)%d%C(bold white) %s %C(bold green)(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit -p"
-    alias gits='git status --show-stash --no-renames'
-    # alias gitcam='git commit -a -m '
+    export GIT_COMPLETION_CHECKOUT_NO_GUESS=1
+    export GIT_COMPLETION_SHOW_ALL_COMMANDS=1
 
+    # GIT ALIASES AND FUNCTIONS
+
+    # Visualize the entire commit tree history in a compact and informative way, displaying commits, branches, merges, and tags.
+    alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
+
+    # Display a concise log, highlighting merges and providing patches for individual commits.
+    alias gitd="git diff --color --patch-with-stat --ignore-blank-lines --minimal --abbrev --ignore-all-space --color-moved=dimmed-zebra --color-moved-ws=ignore-all-space"
+
+    # Alias for switching branches.
+    alias s="git switch"
+
+    # Display the current status, including stash and omitting renames.
+    # alias gits='git status --show-stash --no-renames'
+
+    # Commit all staged changes with a given message.
     function gitcam() {
         git commit -a -m "$*"
     }
 
+    # Amend the most recent commit message.
     function gitm() {
         git commit --amend -m "$*"
     }
 
-    function gitd() {
-        local -A files
+    function gits() {
+        # Fetching the git status and color-coding changes.
+        readarray -t lines < <(git status --show-stash --no-renames --long | sed '/.*use "git.*$/d;s/Changes to be committed:/Staged:/;s/Changes not staged for commit:/Changes:/;s/Untracked files:/Untracked:/')
 
-        readarray diffs < <(git diff --color --stat=60 HEAD | sed '$d; s/^ //')
-        for line in "${diffs[@]}"; do
-            key=${line// |*/}
-            files[${key// /}]=$line
-        done
-        readarray status < <(git status --show-stash --no-renames | sed '/  (use..*)$/d')
-        for line in "${status[@]}"; do
-            key=${line//* /}
-            if [[ $line =~ modified: ]]; then
-                echo -en "\e[93m\tmodified: \e[01m${files[${key%?}]}\e[00m"
-            elif [[ $line =~ deleted: ]]; then
-                echo -en "\e[91m\tdeleted:  \e[01m${files[${key%?}]}\e[00m"
-            elif [[ $line =~ new\ file: ]]; then
-                echo -en "\e[92m\tnew file: \e[01m${files[${key%?}]}\e[00m"
-            elif [[ $line =~ On\ branch ]]; then
-                echo -en "${line//On branch/On branch\\e[01;94m}\e[00m"
+        current_block=""
+        for line in "${lines[@]}"; do
+            if [[ $line =~ 'On branch' ]] || [[ $line =~ 'HEAD detached at' ]]; then
+                echo -en "\e[01;94m$line.\e[00m\n"
+                continue
+            elif [[ $line =~ 'Your branch is ' ]]; then
+                echo -en "\e[94m${line}\e[00m\n"
+                continue
+            elif [[ $line =~ 'Please commit or stash' ]]; then
+                echo -en "\e[96m$line\e[00m\n"
+                continue
+            fi
+
+            if [[ $line =~ 'Staged:' ]]; then
+                current_block="staged"
+                echo -en "\e[01;90m$line\e[00m\n"
+                continue
+            elif [[ $line =~ 'Changes:' ]]; then
+                current_block="changes"
+                echo -en "\e[01;90m$line\e[00m\n"
+                continue
+            elif [[ $line =~ 'Untracked:' ]]; then
+                current_block="untracked"
+                echo -en "\e[01;90m$line\e[00m\n"
+                continue
+            elif [[ $line =~ 'Unmerged paths:' ]]; then
+                current_block="unmerged"
+                echo -en "\e[07;91m$line\e[00m\n"
+                continue
+            fi
+
+            if [[ $line =~ ^[[:space:]]+[^:]+:[[:space:]].* ]]; then
+                status="${line%%:*}"
+                path="${line#*: }"
+                if [[ $current_block == "staged" ]]; then
+                    extra="\e[01m"
+                elif [[ $current_block == "changes" ]]; then
+                    extra="\e[00m"
+                elif [[ $current_block == "unmerged" ]]; then
+                    extra="\e[01m"
+                elif [[ $current_block == "untracked" ]]; then
+                    extra="\e[95m"
+                else
+                    extra="\e[00m"
+                fi
+
+                if [[ $status == *"modified"* ]]; then
+                    echo -e "$extra\e[93m\tmodified: ${path}\e[00m"
+                elif [[ $status == *"deleted"* ]]; then
+                    echo -e "$extra\e[91m\tdeleted:  ${path}\e[00m"
+                elif [[ $status == *"added"* ]]; then
+                    echo -e "$extra\e[92m\tadded:    ${path}\e[00m"
+                elif [[ $status == *"new file"* ]]; then
+                    echo -e "$extra\e[92m\tnew file: ${path}\e[00m"
+                elif [[ $status == *"renamed"* ]]; then
+                    echo -e "$extra\e[95m\trenamed:  ${path}\e[00m"
+                elif [[ $status == *"typechange"* ]]; then
+                    echo -e "$extra\e[93m\ttypechange:\e[00m${path}"
+                else
+                    echo -e "$extra$line"
+                fi
             else
-                echo -en "$line"
+                echo "$line"
             fi
         done
     }
 
+    # # Display modified, deleted, and new files in a colorful manner. Shows git status with added emphasis on changes.
+    # function gitd() {
+    #     local -A files
+
+    #     # Fetching diffs and storing them in an associative array.
+    #     readarray diffs < <(git diff --color --stat=80 HEAD | sed '$d; s/^ //')
+    #     for line in "${diffs[@]}"; do
+    #         key=${line// |*/}
+    #         files[${key// /}]=$line
+    #     done
+
+    #     # Fetching the git status and color-coding changes.
+    #     readarray status < <(git status --show-stash --no-renames | sed '/  (use..*)$/d')
+    #     for line in "${status[@]}"; do
+    #         key=${line//* /}
+    #         if [[ $line =~ modified: ]]; then
+    #             echo -en "\e[93m\tmodified: \e[01m${files[${key%?}]}\e[00m"
+    #         elif [[ $line =~ deleted: ]]; then
+    #             echo -en "\e[91m\tdeleted:  \e[01m${files[${key%?}]}\e[00m"
+    #         elif [[ $line =~ new\ file: ]]; then
+    #             echo -en "\e[92m\tnew file: \e[01m${files[${key%?}]}\e[00m"
+    #         elif [[ $line =~ On\ branch ]]; then
+    #             echo -en "${line//On branch/On branch\\e[01;94m}\e[00m"
+    #         elif [[ $line =~ 'have diverged' ]]; then
+    #             echo -en "\e[91m$line\e[00m"
+    #         elif [[ $line =~ 'Your branch is ahead' ]]; then
+    #             echo -en "\e[92m$line\e[00m"
+    #         elif [[ $line =~ 'Your branch is behind' ]]; then
+    #             echo -en "\e[93m$line\e[00m"
+    #         elif [[ $line =~ 'Changes not staged for commit' ]]; then
+    #             echo -en "\e[95m$line\e[00m"
+    #         elif [[ $line =~ 'Changes to be committed' ]]; then
+    #             echo -en "\e[96m$line\e[00m"
+    #         elif [[ $line =~ 'Untracked files' ]]; then
+    #             echo -en "\e[97m$line\e[00m"
+    #         elif [[ $line =~ 'Stashed changes' ]]; then
+    #             echo -en "\e[90m$line\e[00m"
+    #         else
+    #             echo -en "$line"
+    #         fi
+    #     done
+    # }
+
+    # Clean up stale local branches that are already merged to the main branch. If the main branch name differs from "master", specify it as an argument.
     function gitcleanbranches() {
         git fetch --prune
+
+        # Determine the master branch name.
         if [[ $# == 1 ]]; then
             master="$1"
         else
             master="master"
         fi
+
+        # Checkout the master branch.
         if ! git checkout $master 2>/dev/null; then
             echo "Pass the master branch name as argv[1]!"
             return
         fi
+
+        # Delete branches already merged to master.
         for r in $(git for-each-ref refs/heads --format='%(refname:short)'); do
             if [[ "$(git merge-base $master "$r")" == "$(git rev-parse --verify "$r")" ]]; then
                 if [ "$r" != "$master" ]; then
@@ -1229,33 +1436,6 @@ if _e "git"; then
         fi
     }
 
-    function gitdelbranch() {
-        # First command deletes local branch, but exits > 0 if not fully merged,
-        # so the second command (which deletes the remote branch), will only run
-        # if the first one suceeds, making it "safe".
-        if [[ $(git symbolic-ref --short -q HEAD) == "${1}" ]]; then
-            echo -e "You should leave the branch you're trying to delete first.}"
-        else
-            if ! git rev-parse --verify --quiet "${1}" && git ls-remote --quiet --exit-code --heads origin "${1}"; then
-                echo -en "The local repository ${1} does not exist. Do you want to delete the remote one anyway? "
-                read -p "[y/N] " -r
-                if [[ $REPLY =~ ^[Yy]$ ]]; then
-                    echo "Deleting remote repo"
-                    git push origin --delete "${1}"
-                else
-                    echo "Ok, bye!"
-                fi
-            elif git ls-remote --exit-code --heads origin "${1}"; then
-                echo 'Deleting local repo'
-                git branch --delete "${1}"
-                echo 'Deleting remote repo'
-                git push origin --delete "${1}"
-            else
-                echo "It seems that there is no branch called ${1} neither locally or in the remote"
-            fi
-        fi
-    }
-
     # Autocomplete custom commands
     function _git_local_branches() {
         __gitcomp_direct "$(__git_heads)"
@@ -1263,6 +1443,7 @@ if _e "git"; then
     function _git_conventional_commits_prefixes() {
         __gitcomp "feat: fix: style: refactor: build: perf: ci: docs: test: chore: revert:"
     }
+    __git_complete s git_switch
     __git_complete gitdelbranch _git_local_branches
     __git_complete gitcam _git_conventional_commits_prefixes
 
