@@ -1,0 +1,356 @@
+[a11y/applications]
+screen-magnifier-enabled=false
+
+[a11y/interface]
+high-contrast=false
+
+[a11y/keyboard]
+mousekeys-enable=false
+stickykeys-enable=false
+stickykeys-modifier-beep=true
+togglekeys-enable=false
+
+[a11y/magnifier]
+cross-hairs-clip=false
+screen-position='full-screen'
+
+[app-folders]
+folder-children=['Utilities', 'YaST']
+
+[app-folders/folders/Utilities]
+apps=['gnome-abrt.desktop', 'gnome-system-log.desktop', 'nm-connection-editor.desktop', 'org.gnome.baobab.desktop', 'org.gnome.Connections.desktop', 'org.gnome.DejaDup.desktop', 'org.gnome.Dictionary.desktop', 'org.gnome.DiskUtility.desktop', 'org.gnome.eog.desktop', 'org.gnome.Evince.desktop', 'org.gnome.FileRoller.desktop', 'org.gnome.fonts.desktop', 'org.gnome.seahorse.Application.desktop', 'org.gnome.tweaks.desktop', 'org.gnome.Usage.desktop', 'vinagre.desktop']
+categories=['X-GNOME-Utilities']
+name='X-GNOME-Utilities.directory'
+translate=true
+
+[app-folders/folders/YaST]
+categories=['X-SuSE-YaST']
+name='suse-yast.directory'
+translate=true
+
+[background]
+color-shading-type='solid'
+picture-options='zoom'
+picture-uri='file:///home/emi/Media/GoogleEarthWallpaper/2131_9329_10053_southeast_vandalia_drive_runnells_camp_polk_county_iowa_united_states_50237.jpg'
+picture-uri-dark='/home/emi/Media/GoogleEarthWallpaper/2131_9329_10053_southeast_vandalia_drive_runnells_camp_polk_county_iowa_united_states_50237.jpg'
+primary-color='#86b6ef'
+secondary-color='#000000'
+
+[input-sources]
+per-window=false
+sources=[('xkb', 'br'), ('xkb', 'us+intl')]
+xkb-options=['caps:super', 'shift:both_capslock_cancel', 'numpad:mac', 'ctrl:swap_rwin_rctl', 'lv3:ralt_switch']
+
+[interface]
+can-change-accels=true
+clock-show-seconds=true
+color-scheme='prefer-dark'
+cursor-blink-time=933
+cursor-size=32
+document-font-name='Ubuntu Light 12'
+enable-animations=true
+enable-hot-corners=false
+font-antialiasing='rgba'
+font-hinting='full'
+font-name='Ubuntu Light 12'
+gtk-theme='Arc-Darker'
+icon-theme='breeze-dark'
+locate-pointer=false
+monospace-font-name='Inconsolata 10'
+overlay-scrolling=false
+text-scaling-factor=1.0
+toolkit-accessibility=false
+
+[notifications]
+application-children=['gnome-power-panel', 'forkgram-bin', 'org-gnome-nautilus', 'discord-canary', 'org-gnome-gedit', 'org-gnome-clocks', 'spotify', 'org-gnome-epiphany', 'com-uploadedlobster-peek', 'android-studio', 'google-chrome', 'discord', 'visual-studio-code', 'firefox', 'electron', 'org-gnome-terminal', 'org-gnome-extensions', 'org-gnome-software', 'xsane', 'gimp', 'ca-desrt-dconf-editor', 'gnome-network-panel', 'org-gnome-extensions-desktop', 'org-gnome-shell-extensions', 'openscad', 'superslicer', 'org-gnome-settings', 'blueman-manager', 'org-gnome-fileroller', 'electrum', 'org-gnome-characters', 'org-gnome-gitg', 'org-kde-kdenlive', 'gnome-printers-panel', 'org-gnome-calculator', 'com-obsproject-studio', 'org-kicad-pcbnew', 'cura', 'org-gnome-geary', 'solaar', 'wps-office-et', 'gnucash', 'prusaslicer', 'org-gnome-eog', 'vlc', 'org-gnome-chromegnomeshell', 'whatpulse', 'telegramdesktop', 'syncthing-gtk', 'org-telegram-desktop', 'wps-office-wps', 'code', 'org-inkscape-inkscape', 'org-kicad-kicad', 'com-github-hluk-copyq', 'dropbox', 'audacity', 'clipgrab', 'org-gnome-baobab', 'gnome-system-monitor', 'gpredict', 'sublime-text-3', 'org-gnome-meld', 'workrave', 'wps-office-prometheus']
+show-banners=true
+show-in-lock-screen=false
+
+[notifications/application/android-studio]
+application-id='android-studio.desktop'
+
+[notifications/application/audacity]
+application-id='audacity.desktop'
+
+[notifications/application/blueman-manager]
+application-id='blueman-manager.desktop'
+
+[notifications/application/ca-desrt-dconf-editor]
+application-id='ca.desrt.dconf-editor.desktop'
+
+[notifications/application/clipgrab]
+application-id='clipgrab.desktop'
+
+[notifications/application/code]
+application-id='code.desktop'
+
+[notifications/application/com-github-hluk-copyq]
+application-id='com.github.hluk.copyq.desktop'
+
+[notifications/application/com-obsproject-studio]
+application-id='com.obsproject.Studio.desktop'
+
+[notifications/application/com-uploadedlobster-peek]
+application-id='com.uploadedlobster.peek.desktop'
+
+[notifications/application/cura]
+application-id='cura.desktop'
+
+[notifications/application/discord-canary]
+application-id='discord-canary.desktop'
+
+[notifications/application/discord]
+application-id='discord.desktop'
+
+[notifications/application/dropbox]
+application-id='dropbox.desktop'
+
+[notifications/application/electron]
+application-id='electron.desktop'
+
+[notifications/application/electrum]
+application-id='electrum.desktop'
+
+[notifications/application/firefox]
+application-id='firefox.desktop'
+
+[notifications/application/forkgram-bin]
+application-id='forkgram-bin.desktop'
+
+[notifications/application/gimp]
+application-id='gimp.desktop'
+
+[notifications/application/gnome-network-panel]
+application-id='gnome-network-panel.desktop'
+
+[notifications/application/gnome-power-panel]
+application-id='gnome-power-panel.desktop'
+
+[notifications/application/gnome-printers-panel]
+application-id='gnome-printers-panel.desktop'
+
+[notifications/application/gnome-system-monitor]
+application-id='gnome-system-monitor.desktop'
+
+[notifications/application/gnucash]
+application-id='gnucash.desktop'
+
+[notifications/application/google-chrome]
+application-id='google-chrome.desktop'
+
+[notifications/application/gpredict]
+application-id='gpredict.desktop'
+
+[notifications/application/openscad]
+application-id='openscad.desktop'
+
+[notifications/application/org-gnome-baobab]
+application-id='org.gnome.baobab.desktop'
+
+[notifications/application/org-gnome-calculator]
+application-id='org.gnome.Calculator.desktop'
+
+[notifications/application/org-gnome-characters]
+application-id='org.gnome.Characters.desktop'
+
+[notifications/application/org-gnome-chromegnomeshell]
+application-id='org.gnome.ChromeGnomeShell.desktop'
+
+[notifications/application/org-gnome-clocks]
+application-id='org.gnome.clocks.desktop'
+
+[notifications/application/org-gnome-eog]
+application-id='org.gnome.eog.desktop'
+
+[notifications/application/org-gnome-epiphany]
+application-id='org.gnome.Epiphany.desktop'
+
+[notifications/application/org-gnome-extensions-desktop]
+application-id='org.gnome.Extensions.desktop.desktop'
+
+[notifications/application/org-gnome-extensions]
+application-id='org.gnome.Extensions.desktop'
+
+[notifications/application/org-gnome-fileroller]
+application-id='org.gnome.FileRoller.desktop'
+
+[notifications/application/org-gnome-geary]
+application-id='org.gnome.Geary.desktop'
+
+[notifications/application/org-gnome-gedit]
+application-id='org.gnome.gedit.desktop'
+
+[notifications/application/org-gnome-gitg]
+application-id='org.gnome.gitg.desktop'
+
+[notifications/application/org-gnome-meld]
+application-id='org.gnome.Meld.desktop'
+
+[notifications/application/org-gnome-nautilus]
+application-id='org.gnome.Nautilus.desktop'
+enable=false
+
+[notifications/application/org-gnome-settings]
+application-id='org.gnome.Settings.desktop'
+
+[notifications/application/org-gnome-shell-extensions]
+application-id='org.gnome.Shell.Extensions.desktop'
+
+[notifications/application/org-gnome-software]
+application-id='org.gnome.Software.desktop'
+
+[notifications/application/org-gnome-terminal]
+application-id='org.gnome.Terminal.desktop'
+
+[notifications/application/org-inkscape-inkscape]
+application-id='org.inkscape.Inkscape.desktop'
+
+[notifications/application/org-kde-kdenlive]
+application-id='org.kde.kdenlive.desktop'
+
+[notifications/application/org-kicad-kicad]
+application-id='org.kicad.kicad.desktop'
+
+[notifications/application/org-kicad-pcbnew]
+application-id='org.kicad.pcbnew.desktop'
+
+[notifications/application/org-telegram-desktop]
+application-id='org.telegram.desktop.desktop'
+
+[notifications/application/prusaslicer]
+application-id='PrusaSlicer.desktop'
+
+[notifications/application/solaar]
+application-id='solaar.desktop'
+
+[notifications/application/spotify]
+application-id='spotify.desktop'
+
+[notifications/application/sublime-text-3]
+application-id='sublime_text_3.desktop'
+
+[notifications/application/superslicer]
+application-id='SuperSlicer.desktop'
+
+[notifications/application/syncthing-gtk]
+application-id='syncthing-gtk.desktop'
+
+[notifications/application/telegramdesktop]
+application-id='telegramdesktop.desktop'
+
+[notifications/application/visual-studio-code]
+application-id='visual-studio-code.desktop'
+
+[notifications/application/vlc]
+application-id='vlc.desktop'
+
+[notifications/application/whatpulse]
+application-id='whatpulse.desktop'
+
+[notifications/application/workrave]
+application-id='workrave.desktop'
+
+[notifications/application/wps-office-et]
+application-id='wps-office-et.desktop'
+
+[notifications/application/wps-office-prometheus]
+application-id='wps-office-prometheus.desktop'
+
+[notifications/application/wps-office-wps]
+application-id='wps-office-wps.desktop'
+
+[notifications/application/xsane]
+application-id='xsane.desktop'
+
+[peripherals/keyboard]
+delay=uint32 350
+numlock-state=true
+remember-numlock-state=false
+repeat-interval=uint32 20
+
+[peripherals/mouse]
+accel-profile='adaptive'
+speed=0.36170212765957444
+
+[peripherals/tablets/056a:037a]
+keep-aspect=true
+left-handed=true
+mapping='absolute'
+output=['XMI', 'Mi Monitor', '2757500013755']
+
+[peripherals/touchpad]
+two-finger-scrolling-enabled=true
+
+[privacy]
+old-files-age=uint32 30
+recent-files-max-age=3
+remember-app-usage=false
+remove-old-temp-files=true
+remove-old-trash-files=true
+usb-protection=false
+
+[screensaver]
+color-shading-type='solid'
+lock-enabled=true
+picture-options='zoom'
+picture-uri='file:///home/emi/Media/GoogleEarthWallpaper/2131_9329_10053_southeast_vandalia_drive_runnells_camp_polk_county_iowa_united_states_50237.jpg'
+primary-color='#86b6ef'
+secondary-color='#000000'
+
+[search-providers]
+sort-order=['org.gnome.Contacts.desktop', 'org.gnome.Documents.desktop', 'org.gnome.Nautilus.desktop']
+
+[session]
+idle-delay=uint32 300
+
+[sound]
+allow-volume-above-100-percent=false
+event-sounds=true
+theme-name='__custom'
+
+[wm/keybindings]
+begin-move=@as []
+begin-resize=@as []
+cycle-group=@as []
+cycle-group-backward=@as []
+cycle-panels=@as []
+cycle-panels-backward=@as []
+cycle-windows=['<Alt>Tab']
+cycle-windows-backward=['<Shift><Alt>Tab']
+maximize=@as []
+minimize=@as []
+move-to-monitor-down=@as []
+move-to-monitor-left=['<Shift><Super>Left']
+move-to-monitor-right=['<Shift><Super>Right']
+move-to-monitor-up=@as []
+move-to-workspace-1=@as []
+move-to-workspace-last=@as []
+move-to-workspace-left=['<Primary><Shift><Alt>Left']
+move-to-workspace-right=['<Primary><Shift><Alt>Right']
+raise=['<Shift><Control><Alt>a']
+switch-applications=@as []
+switch-applications-backward=@as []
+switch-group=@as []
+switch-group-backward=@as []
+switch-input-source=@as []
+switch-input-source-backward=@as []
+switch-panels=@as []
+switch-panels-backward=@as []
+switch-to-workspace-1=@as []
+switch-to-workspace-last=@as []
+switch-to-workspace-left=['<Primary><Alt>Left']
+switch-to-workspace-right=['<Primary><Alt>Right']
+switch-to-workspace-up=['<Primary><Alt>Up']
+switch-windows=@as []
+switch-windows-backward=@as []
+toggle-fullscreen=['<Alt>F11']
+unmaximize=@as []
+
+[wm/preferences]
+action-double-click-titlebar='none'
+num-workspaces=16
+resize-with-right-button=false
+titlebar-font='Titillium Web Semi-Bold 12'
+visual-bell=false
+visual-bell-type='frame-flash'
+workspace-names=@as []
