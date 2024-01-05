@@ -24,8 +24,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=29
-export _DATE=$(date "+%Y-%m-%d")
+export _RCVERSION=30
+export _DATE="Janurary 5th, 2024"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -41,17 +41,13 @@ ${y}Changelog ${_RCVERSION} ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols
     echo -e "
 
   ${r}${b}- The ${c}gits${r}${b} function has been significantly updated.${r}
-    The function now uses the original 'Changes to be committed', 'Changes not staged for commit', and 'Untracked files' headers in the git status output.
-    The output is now color-coded: staged changes in green, unstaged changes in yellow, untracked files in cyan, and conflicts in inverted colors.
-    Additionally, emojis have been introduced to represent the type of change (e.g., modified, deleted, added) in the staged section.
+    There are now even emojies, so try it out!
 
-  ${r}${b}- The ${c}GIT_COMPLETION_CHECKOUT_NO_GUESS${r}${b} environment variable has been commented out.${r}
-    This change affects git auto-completion behavior during checkout operations.
+  ${r}${b}- The script now sets a default nanorc. ${i}Copy to ${c}/etc/nanorc${r}${i} and uncomment root colors for visual root editing indication.${r}
 
   ${r}- Other minor tweaks and improvements have been made to enhance the user experience and performance of the bash environment.
 
   ${i}Tip: Keep exploring the enhanced features of your .bashrc file to optimize your workflow. Remember to check the updated ${c}gits${r}${i} function for a more visually appealing git status overview.${r}
-  ${i}Tip2: Yes I used ChatGPT to generate this changelog.${r}
   "
 }
 
@@ -103,7 +99,6 @@ ${y}Changelog ${_RCVERSION} ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols
 
 # Do not return changes that aren't useful for a "final user", like if I updated the version and it shows in the diff above, it's not necessary to tell the final user of my script, as it's obvious. Here are examples of bad changes:
 # BLACKLIST:
-#   ${b}${a}- Now a dynamic date for the Changelog. Instead of having a hard-coded date, ${c}_DATE${r}${a} variable is set with the current date dynamically.${r}
 #   ${b}${a}- Incremented ${c}.bashrc${r}${a} version with ${c}_RCVERSION${r}${a}. This represents a new version of the .bashrc file to account for these changes.${r}
 # END BLACKLIST
 

@@ -12,7 +12,7 @@ if [[ $1 == "--quiet" ]]; then
     QUIET=true
 fi
 
-dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc")
+dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc" ".nanorc")
 grcconfs=(conf.efibootmgr conf.free conf.log grc.conf)
 
 # progress bar
@@ -65,9 +65,9 @@ for conf in "${grcconfs[@]}"; do
     fi
 
     if hash gio 2>/dev/null; then
-        gio trash -f ".grc/$dep" 2>/dev/null || true
+        gio trash -f ".grc/$conf" 2>/dev/null || true
     else
-        mv "./$dep" "./$dep.bak" 2>/dev/null || true
+        mv "./$conf" "./$conf.bak" 2>/dev/null || true
     fi
 
     mv ".grc/$conf.1" ".grc/$conf" || true
