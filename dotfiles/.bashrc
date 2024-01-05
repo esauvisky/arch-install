@@ -24,7 +24,7 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=28
+export _RCVERSION=29
 export _DATE=$(date "+%Y-%m-%d")
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
@@ -34,33 +34,24 @@ function _changelog() {
     local y=$'\e[33;01m'       # yellow
     local i=$'\e[00m\e[96;03m' # emphasis
     local g=$'\e[32;01m'       # green
-    local c=$'\e[97m'       # code
+    local c=$'\e[97m'          # code
 
     echo "${g}emi's .bashrc${r}
 ${y}Changelog ${_RCVERSION} ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
 
-  ${r}- A new directory ${b}${c}/var/cache/pacman/pkg/${r}${b} was added to ${c}cdcool${r}${b}. ${a}Check tips below!${r}
-  ${r}${b}- Added a new function called ${c}pipi${r}.
-    It's a smart pip package installer which automatically adds installed packages to ${c}requirements.txt${r}${b} along with their versions.${r}
-  ${r}${b}- The ${c}journalctl${r}${b} aliases ${c}je${r}${b} and ${c}jb${r}${b}, were updated.${r}
-    The ${c}je${r} alias now displays the most recent 100 log entries, and the ${c}jb${r} alias has had the ${c}-e${r} flag added to display the last part of the logs.${r}
-  ${r}${b}- The git status display function ${c}gits${r}${b} was ${a}refactored${r}.
-    It now color codes the git status output according to the type of changes made to the git repository.${r}
-  ${r}${b}- The ${c}gitd${r}${b} alias was introduced${r} to show a more compact and informative git diff.
-  ${r}- New git configurations were added to improve your git experience.
+  ${r}${b}- The ${c}gits${r}${b} function has been significantly updated.${r}
+    The function now uses the original 'Changes to be committed', 'Changes not staged for commit', and 'Untracked files' headers in the git status output.
+    The output is now color-coded: staged changes in green, unstaged changes in yellow, untracked files in cyan, and conflicts in inverted colors.
+    Additionally, emojis have been introduced to represent the type of change (e.g., modified, deleted, added) in the staged section.
 
-  ${i}Tip: try using MagicCD's commands, ${c}cdcool${r}${i} and ${c}cdX${r}${i} to quickly jump to important directories:${r}
-   - Edit your ${c}~/.bash_custom${r} file and add aliases like this:
-     ${c}alias cdc='_magicCD 2 $HOME/Coding/'${r}
-  ${i}This will present a menu with all subdirectories in $HOME/Coding/ that include the sequence ${c}scr${r}:${r}
-   $ ${c}cdc scri${r}
-   ${r}- /home/emi/Coding/pop-shell/scripts
-   ${n}- /home/emi/Coding/w3af/scripts${r}
-   - /home/emi/Coding/Scripts
-   - /home/emi/Coding/magenta-studio/scripts
-   - /home/emi/Coding/Mobile-Security-Framework-MobSF/scripts${r}
-  ${i}Select with ${b}UP/DOWN${r} ${i}keys and press ${b}ENTER${r}${i} to quickly navigate there.
+  ${r}${b}- The ${c}GIT_COMPLETION_CHECKOUT_NO_GUESS${r}${b} environment variable has been commented out.${r}
+    This change affects git auto-completion behavior during checkout operations.
+
+  ${r}- Other minor tweaks and improvements have been made to enhance the user experience and performance of the bash environment.
+
+  ${i}Tip: Keep exploring the enhanced features of your .bashrc file to optimize your workflow. Remember to check the updated ${c}gits${r}${i} function for a more visually appealing git status overview.${r}
+  ${i}Tip2: Yes I used ChatGPT to generate this changelog.${r}
   "
 }
 
@@ -1195,7 +1186,7 @@ fi
 if _e "git"; then
     # does not open editor when merging
     export GIT_MERGE_AUTOEDIT=no
-    export GIT_COMPLETION_CHECKOUT_NO_GUESS=1
+    # export GIT_COMPLETION_CHECKOUT_NO_GUESS=1
     export GIT_COMPLETION_SHOW_ALL_COMMANDS=1
 
     # GIT ALIASES AND FUNCTIONS
@@ -1224,7 +1215,7 @@ if _e "git"; then
 
     function gits() {
         # Fetching the git status and color-coding changes.
-        readarray -t lines < <(git status --show-stash --no-renames --long | sed '/.*use "git.*$/d;s/Changes to be committed:/Staged:/;s/Changes not staged for commit:/Changes:/;s/Untracked files:/Untracked:/')
+        readarray -t lines < <(git status --show-stash --long | sed '/.*use "git.*$/d')
 
         current_block=""
         for line in "${lines[@]}"; do
@@ -1239,56 +1230,85 @@ if _e "git"; then
                 continue
             fi
 
-            if [[ $line =~ 'Staged:' ]]; then
+            if [[ $line =~ 'Changes to be committed:' ]]; then
                 current_block="staged"
-                echo -en "\e[01;90m$line\e[00m\n"
+                echo -en "\e[01;32m$line\e[00m\n"
                 continue
-            elif [[ $line =~ 'Changes:' ]]; then
+            elif [[ $line =~ 'Changes not staged for commit:' ]]; then
                 current_block="changes"
-                echo -en "\e[01;90m$line\e[00m\n"
+                echo -en "\e[01;33m$line\e[00m\n"
                 continue
-            elif [[ $line =~ 'Untracked:' ]]; then
+            elif [[ $line =~ 'Untracked files:' ]]; then
                 current_block="untracked"
-                echo -en "\e[01;90m$line\e[00m\n"
+                echo -en "\e[01;96m$line\e[00m\n"
                 continue
             elif [[ $line =~ 'Unmerged paths:' ]]; then
                 current_block="unmerged"
-                echo -en "\e[07;91m$line\e[00m\n"
+                echo -en "\e[07m$line\e[00m\n"
                 continue
+            fi
+
+            if [[ $current_block == "staged" ]]; then
+                extra="\e[00m"
+            elif [[ $current_block == "changes" ]]; then
+                extra="\e[00m"
+            elif [[ $current_block == "unmerged" ]]; then
+                extra="\e[07;01m"
+            elif [[ $current_block == "untracked" ]]; then
+                extra="\e[96m"
+            else
+                extra="\e[00m"
             fi
 
             if [[ $line =~ ^[[:space:]]+[^:]+:[[:space:]].* ]]; then
                 status="${line%%:*}"
-                path="${line#*: }"
-                if [[ $current_block == "staged" ]]; then
-                    extra="\e[01m"
-                elif [[ $current_block == "changes" ]]; then
-                    extra="\e[00m"
-                elif [[ $current_block == "unmerged" ]]; then
-                    extra="\e[01m"
-                elif [[ $current_block == "untracked" ]]; then
-                    extra="\e[95m"
-                else
-                    extra="\e[00m"
-                fi
+                path="${line#*:}"
+                # strip all spaces from the beginning of path
+                path="${path##*( )}"
 
-                if [[ $status == *"modified"* ]]; then
-                    echo -e "$extra\e[93m\tmodified: ${path}\e[00m"
+                if [[ $current_block == "staged" ]]; then
+                    emojies=(   "🟣" )
+                    case $status in
+                      *"modified"*)
+                       emoji="🟠"
+                       ;;
+                      *"deleted"*)
+                       emoji="🔴"
+                       ;;
+                      *"added"*)
+                       emoji="🟢"
+                       ;;
+                      *"new file"*)
+                        emoji="🔵"
+                       ;;
+                      *"renamed"*)
+                        emoji="🟣"
+                       ;;
+                      *)
+                        emoji="⚪️"
+                       ;;
+                    esac
+                    # get right emoji for each status
+                    echo -e "$extra\e[01;32m     $emoji$line\e[00m"
+                elif [[ $status == *"modified"* ]]; then
+                    echo -e "$extra\e[33m\tmodified:\t${path}\e[00m"
                 elif [[ $status == *"deleted"* ]]; then
-                    echo -e "$extra\e[91m\tdeleted:  ${path}\e[00m"
+                    echo -e "$extra\e[91m\tdeleted: \t${path}\e[00m"
                 elif [[ $status == *"added"* ]]; then
-                    echo -e "$extra\e[92m\tadded:    ${path}\e[00m"
+                    echo -e "$extra\e[92m\tadded:   \t${path}\e[00m"
                 elif [[ $status == *"new file"* ]]; then
-                    echo -e "$extra\e[92m\tnew file: ${path}\e[00m"
+                    echo -e "$extra\e[92m\tnew file:\t${path}\e[00m"
                 elif [[ $status == *"renamed"* ]]; then
-                    echo -e "$extra\e[95m\trenamed:  ${path}\e[00m"
+                    echo -e "$extra\e[95m\trenamed: \t${path}\e[00m"
                 elif [[ $status == *"typechange"* ]]; then
-                    echo -e "$extra\e[93m\ttypechange:\e[00m${path}"
+                    echo -e "$extra\e[93m\ttypechange:\t\e[00m${path}"
                 else
                     echo -e "$extra$line"
                 fi
+            elif [[ $line =~ ^[[:space:]]+.+ && $current_block == "untracked" ]]; then
+                echo -e "$extra\e[96m\tuntracked:  \t${line/[[:space:]]/}\e[00m"
             else
-                echo "$line"
+                echo -e "$extra$line"
             fi
         done
     }
