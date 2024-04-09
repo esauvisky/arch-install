@@ -2,7 +2,7 @@
 default-compression-format='zip'
 
 [icon-view]
-default-zoom-level='medium'
+default-zoom-level='extra-large'
 
 [list-view]
 default-column-order=['name', 'size', 'type', 'owner', 'group', 'permissions', 'mime_type', 'where', 'date_modified', 'date_modified_with_time', 'date_accessed', 'date_created']
@@ -24,6 +24,7 @@ show-create-link=true
 show-image-thumbnails='always'
 
 [window-state]
+initial-size=(1363, 805)
 maximized=false
 sidebar-width=100
 start-with-sidebar=true

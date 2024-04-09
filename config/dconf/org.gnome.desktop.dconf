@@ -31,8 +31,8 @@ translate=true
 [background]
 color-shading-type='solid'
 picture-options='zoom'
-picture-uri='file:///home/emi/Media/GoogleEarthWallpaper/2131_9329_10053_southeast_vandalia_drive_runnells_camp_polk_county_iowa_united_states_50237.jpg'
-picture-uri-dark='/home/emi/Media/GoogleEarthWallpaper/2131_9329_10053_southeast_vandalia_drive_runnells_camp_polk_county_iowa_united_states_50237.jpg'
+picture-uri='file:///home/emi/Media/GoogleEarthWallpaper/14061_vitznau_switzerland.jpg'
+picture-uri-dark='/home/emi/Media/GoogleEarthWallpaper/14061_vitznau_switzerland.jpg'
 primary-color='#86b6ef'
 secondary-color='#000000'
 
@@ -62,7 +62,7 @@ text-scaling-factor=1.0
 toolkit-accessibility=false
 
 [notifications]
-application-children=['gnome-power-panel', 'forkgram-bin', 'org-gnome-nautilus', 'discord-canary', 'org-gnome-gedit', 'org-gnome-clocks', 'spotify', 'org-gnome-epiphany', 'com-uploadedlobster-peek', 'android-studio', 'google-chrome', 'discord', 'visual-studio-code', 'firefox', 'electron', 'org-gnome-terminal', 'org-gnome-extensions', 'org-gnome-software', 'xsane', 'gimp', 'ca-desrt-dconf-editor', 'gnome-network-panel', 'org-gnome-extensions-desktop', 'org-gnome-shell-extensions', 'openscad', 'superslicer', 'org-gnome-settings', 'blueman-manager', 'org-gnome-fileroller', 'electrum', 'org-gnome-characters', 'org-gnome-gitg', 'org-kde-kdenlive', 'gnome-printers-panel', 'org-gnome-calculator', 'com-obsproject-studio', 'org-kicad-pcbnew', 'cura', 'org-gnome-geary', 'solaar', 'wps-office-et', 'gnucash', 'prusaslicer', 'org-gnome-eog', 'vlc', 'org-gnome-chromegnomeshell', 'whatpulse', 'telegramdesktop', 'syncthing-gtk', 'org-telegram-desktop', 'wps-office-wps', 'code', 'org-inkscape-inkscape', 'org-kicad-kicad', 'com-github-hluk-copyq', 'dropbox', 'audacity', 'clipgrab', 'org-gnome-baobab', 'gnome-system-monitor', 'gpredict', 'sublime-text-3', 'org-gnome-meld', 'workrave', 'wps-office-prometheus']
+application-children=['gnome-power-panel', 'forkgram-bin', 'org-gnome-nautilus', 'discord-canary', 'org-gnome-gedit', 'org-gnome-clocks', 'spotify', 'org-gnome-epiphany', 'com-uploadedlobster-peek', 'android-studio', 'google-chrome', 'discord', 'visual-studio-code', 'firefox', 'electron', 'org-gnome-terminal', 'org-gnome-extensions', 'org-gnome-software', 'xsane', 'gimp', 'ca-desrt-dconf-editor', 'gnome-network-panel', 'org-gnome-extensions-desktop', 'org-gnome-shell-extensions', 'openscad', 'superslicer', 'org-gnome-settings', 'blueman-manager', 'org-gnome-fileroller', 'electrum', 'org-gnome-characters', 'org-gnome-gitg', 'org-kde-kdenlive', 'gnome-printers-panel', 'org-gnome-calculator', 'com-obsproject-studio', 'org-kicad-pcbnew', 'cura', 'org-gnome-geary', 'solaar', 'wps-office-et', 'gnucash', 'prusaslicer', 'org-gnome-eog', 'vlc', 'org-gnome-chromegnomeshell', 'whatpulse', 'telegramdesktop', 'syncthing-gtk', 'org-telegram-desktop', 'wps-office-wps', 'code', 'org-inkscape-inkscape', 'org-kicad-kicad', 'com-github-hluk-copyq', 'dropbox', 'audacity', 'clipgrab', 'org-gnome-baobab', 'gnome-system-monitor', 'gpredict', 'sublime-text-3', 'org-gnome-meld', 'workrave', 'wps-office-prometheus', 'visual-studio-code-insiders', 'masterpdfeditor4', 'org-gnome-totem', 'org-gnome-calendar', 'scrcpy', 'vial', 'sqlitebrowser', 'io-github-tdesktop-x64-tdesktop']
 show-banners=true
 show-in-lock-screen=false
 
@@ -141,6 +141,12 @@ application-id='google-chrome.desktop'
 [notifications/application/gpredict]
 application-id='gpredict.desktop'
 
+[notifications/application/io-github-tdesktop-x64-tdesktop]
+application-id='io.github.tdesktop_x64.TDesktop.desktop'
+
+[notifications/application/masterpdfeditor4]
+application-id='masterpdfeditor4.desktop'
+
 [notifications/application/openscad]
 application-id='openscad.desktop'
 
@@ -149,6 +155,9 @@ application-id='org.gnome.baobab.desktop'
 
 [notifications/application/org-gnome-calculator]
 application-id='org.gnome.Calculator.desktop'
+
+[notifications/application/org-gnome-calendar]
+application-id='org.gnome.Calendar.desktop'
 
 [notifications/application/org-gnome-characters]
 application-id='org.gnome.Characters.desktop'
@@ -202,6 +211,9 @@ application-id='org.gnome.Software.desktop'
 [notifications/application/org-gnome-terminal]
 application-id='org.gnome.Terminal.desktop'
 
+[notifications/application/org-gnome-totem]
+application-id='org.gnome.Totem.desktop'
+
 [notifications/application/org-inkscape-inkscape]
 application-id='org.inkscape.Inkscape.desktop'
 
@@ -220,11 +232,17 @@ application-id='org.telegram.desktop.desktop'
 [notifications/application/prusaslicer]
 application-id='PrusaSlicer.desktop'
 
+[notifications/application/scrcpy]
+application-id='scrcpy.desktop'
+
 [notifications/application/solaar]
 application-id='solaar.desktop'
 
 [notifications/application/spotify]
 application-id='spotify.desktop'
+
+[notifications/application/sqlitebrowser]
+application-id='sqlitebrowser.desktop'
 
 [notifications/application/sublime-text-3]
 application-id='sublime_text_3.desktop'
@@ -237,6 +255,12 @@ application-id='syncthing-gtk.desktop'
 
 [notifications/application/telegramdesktop]
 application-id='telegramdesktop.desktop'
+
+[notifications/application/vial]
+application-id='Vial.desktop'
+
+[notifications/application/visual-studio-code-insiders]
+application-id='visual-studio-code-insiders.desktop'
 
 [notifications/application/visual-studio-code]
 application-id='visual-studio-code.desktop'
@@ -283,7 +307,7 @@ two-finger-scrolling-enabled=true
 
 [privacy]
 old-files-age=uint32 30
-recent-files-max-age=3
+recent-files-max-age=0
 remember-app-usage=false
 remove-old-temp-files=true
 remove-old-trash-files=true
@@ -293,11 +317,12 @@ usb-protection=false
 color-shading-type='solid'
 lock-enabled=true
 picture-options='zoom'
-picture-uri='file:///home/emi/Media/GoogleEarthWallpaper/2131_9329_10053_southeast_vandalia_drive_runnells_camp_polk_county_iowa_united_states_50237.jpg'
+picture-uri='file:///home/emi/Media/GoogleEarthWallpaper/14061_vitznau_switzerland.jpg'
 primary-color='#86b6ef'
 secondary-color='#000000'
 
 [search-providers]
+disabled=@as []
 sort-order=['org.gnome.Contacts.desktop', 'org.gnome.Documents.desktop', 'org.gnome.Nautilus.desktop']
 
 [session]

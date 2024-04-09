@@ -1,7 +1,7 @@
 [/]
 area-screenshot=@as []
 area-screenshot-clip=['Print']
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom9/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom10/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom11/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom9/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom10/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom11/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom12/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom13/']
 help=@as []
 logout=@as []
 magnifier=@as []
@@ -22,7 +22,7 @@ window-screenshot=@as []
 window-screenshot-clip=['<Alt>Print']
 
 [custom-keybindings/custom0]
-binding='<Shift><Alt>t'
+binding='<Alt><Super>t'
 command='gnome-terminal'
 name='Open Terminal'
 
@@ -41,8 +41,18 @@ binding='<Super>q'
 command='copyq show'
 name='copyq'
 
+[custom-keybindings/custom12]
+binding='<Shift><Alt>t'
+command='bash -c "[ $(guake --is-visible) == 0 ] && guake --show"'
+name='Open Guake'
+
+[custom-keybindings/custom13]
+binding='<Shift><Control><Alt>w'
+command='wrapInBackquotes.py'
+name='wrapinquotes'
+
 [custom-keybindings/custom2]
-binding='<Super>s'
+binding='<Alt><Super>s'
 command='splatmoji --disable-emoticon-db --skin-tones none copy'
 name='splatmoji'
 
@@ -67,7 +77,7 @@ command='uridownload'
 name='URI Download'
 
 [custom-keybindings/custom7]
-binding='<Super>h'
+binding='<Alt><Super>h'
 command="bash -c 'xclip -o -selection clipboard | haste | xargs | xclip -i -selection clipboard'"
 name='upload to hastebin'
 
