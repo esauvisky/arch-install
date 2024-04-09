@@ -24,3 +24,5 @@
 	helper = /usr/lib/git-core/git-credential-libsecret
 [difftool "meld"]
     cmd = meld \"$LOCAL\" \"$REMOTE\" --label \"DIFF (ORIGINAL MY)\"
+[init]
+	defaultBranch = main
