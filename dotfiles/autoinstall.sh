@@ -91,16 +91,65 @@ if [[ $QUIET == "false" ]]; then
     fi
 
     if hash pacman 2>/dev/null; then
-        echo -en "\n\nBtw, you use Arch. I can install a couple cool shit for this to work even better, just type your password."
-        echo -e "If you don't want to, just press Ctrl+C"
-        sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils 2>/dev/null || true
+        echo -en "\n\nBtw, you use Arch. Do you want to install a couple cool shit for this to work even better? [Y/n]"
+        read -r answer
+        if [[ $answer == "Y" || $answer == "y" ]]; then
+            if [[ $(id -u) -eq 0 ]]; then
+                pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils nano-syntax-highlighting
+            elif hash sudo 2>/dev/null; then
+                sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils nano-syntax-highlighting
+            else
+                echo -e "You need sudo to install this. Install it and try again."
+            fi
+        fi
     elif hash apt 2>/dev/null; then
-        echo -en "\n\nI see you're not an Arch user, but at least it's linux. Type your password and I'll install some software for this to work better."
-        echo -e "If you don't want to, just press Ctrl+C"
-        sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano 2>/dev/null || true
+        echo -en "\n\nI see you're not an Arch user, but at least it's linux. Do you want to install some software for this to work better? [Y/n]"
+        read -r answer
+        if [[ $answer == "Y" || $answer == "y" ]]; then
+            if [[ $(id -u) -eq 0 ]]; then
+                apt install grc cowsay fortune-mod lolcat ccze colordiff nano
+            elif hash sudo 2>/dev/null; then
+                sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
+            else
+                echo -e "You need sudo to install this. Install it and try again."
+            fi
+        fi
+    fi
+
+    if hash nano 2>/dev/null; then
+        echo -e "Adding syntax highlighting to nano..."
+        find /usr/share/nano* -iname "*.nanorc" -exec echo include {} \; >> ~/.nanorc
+    fi
+
+    if ! ([[ $(id -u) -eq 0 ]] || hash sudo 2>/dev/null); then
+        echo -e "You need to be root or have sudo to be able to get additional options. Run this script again with sudo or as root."
+        exit 0
+    fi
+
+    echo -e "\nDo you want to copy your .nanorc to the global /etc/nanorc and uncomment root colors? [Y/n]"
+    read -r answer
+    if [[ $answer == "Y" || $answer == "y" ]]; then
+        sudo cp ~/.nanorc /etc/nanorc
+        sudo sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
+        sudo sed -i 's/^###//' /etc/nanorc
+    fi
+
+    echo -e "\nDo you want new users on this machine to automatically have emi's bashrc installed by default? [Y/n]"
+    read -r answer
+    if [[ $answer == "Y" || $answer == "y" ]]; then
+        sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc ~/.nanorc ~/.grc /etc/skel/
+    fi
+
+    echo -e "\nDo you want to link all users' bash history to root's bash history, effectively sharing the history between all users? [y/N]"
+    read -r answer
+    if [[ $answer == "Y" || $answer == "y" ]]; then
+        sudo touch /root/.bash_eternal_history
+        sudo ln -sf /root/.bash_eternal_history /etc/skel/.bash_eternal_history
+        for user_home in /home/*; do
+            sudo ln -sf /root/.bash_eternal_history "$user_home/.bash_eternal_history"
+        done
     fi
 
     echo -e "That's all! KTHXBYE\n\n"
-    bash --rcfile "$HOME/.bashrc"
 fi
 rm -f "$HOME/.emishrc_last_check" 2>/dev/null || true
