@@ -67,7 +67,7 @@ for conf in "${grcconfs[@]}"; do
     if hash gio 2>/dev/null; then
         gio trash -f ".grc/$conf" 2>/dev/null || true
     else
-        mv "./$conf" "./$conf.bak" 2>/dev/null || true
+        mv ".grc/$conf" ".grc/$conf.bak" 2>/dev/null || true
     fi
 
     mv ".grc/$conf.1" ".grc/$conf" || true
@@ -92,7 +92,7 @@ if [[ $QUIET == "false" ]]; then
 
     if hash pacman 2>/dev/null; then
         echo -en "\n\nBtw, you use Arch. Do you want to install a couple cool shit for this to work even better? [Y/n]"
-        read -r answer
+        read -r answer < /dev/tty
         if [[ $answer == "Y" || $answer == "y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
                 pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils nano-syntax-highlighting
@@ -104,7 +104,7 @@ if [[ $QUIET == "false" ]]; then
         fi
     elif hash apt 2>/dev/null; then
         echo -en "\n\nI see you're not an Arch user, but at least it's linux. Do you want to install some software for this to work better? [Y/n]"
-        read -r answer
+        read -r answer < /dev/tty
         if [[ $answer == "Y" || $answer == "y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
                 apt install grc cowsay fortune-mod lolcat ccze colordiff nano
@@ -127,7 +127,7 @@ if [[ $QUIET == "false" ]]; then
     fi
 
     echo -e "\nDo you want to copy your .nanorc to the global /etc/nanorc and uncomment root colors? [Y/n]"
-    read -r answer
+    read -r answer < /dev/tty
     if [[ $answer == "Y" || $answer == "y" ]]; then
         sudo cp ~/.nanorc /etc/nanorc
         sudo sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
@@ -135,13 +135,13 @@ if [[ $QUIET == "false" ]]; then
     fi
 
     echo -e "\nDo you want new users on this machine to automatically have emi's bashrc installed by default? [Y/n]"
-    read -r answer
+    read -r answer < /dev/tty
     if [[ $answer == "Y" || $answer == "y" ]]; then
         sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc ~/.nanorc ~/.grc /etc/skel/
     fi
 
     echo -e "\nDo you want to link all users' bash history to root's bash history, effectively sharing the history between all users? [y/N]"
-    read -r answer
+    read -r answer < /dev/tty
     if [[ $answer == "Y" || $answer == "y" ]]; then
         sudo touch /root/.bash_eternal_history
         sudo ln -sf /root/.bash_eternal_history /etc/skel/.bash_eternal_history
