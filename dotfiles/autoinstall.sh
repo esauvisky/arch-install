@@ -129,8 +129,13 @@ if [[ $QUIET == "false" ]]; then
     echo -e "\nDo you want to copy your .nanorc to the global /etc/nanorc and uncomment root colors? [Y/n]"
     read -r answer < /dev/tty
     if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
-        echo -e "Copying .nanorc to /etc/nanorc..."
-        sudo cp ~/.nanorc /etc/nanorc
+        if [[ $(id -u) -eq 0 ]]; then
+            echo -e "Moving .nanorc to /etc/nanorc..."
+            sudo mv ~/.nanorc /etc/nanorc
+        else
+            echo -e "Copying .nanorc to /etc/nanorc..."
+            sudo cp ~/.nanorc /etc/nanorc
+        fi
         sudo sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
         sudo sed -i 's/^###//' /etc/nanorc
     fi
