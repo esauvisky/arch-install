@@ -24,8 +24,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=30
-export _DATE="Janurary 5th, 2024"
+export _RCVERSION=31
+export _DATE="May 14th, 2024"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -39,15 +39,21 @@ function _changelog() {
     echo "${g}emi's .bashrc${r}
 ${y}Changelog ${_RCVERSION} ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
+  Here are the changes for this .bashrc version release:
+  ${r}- The directories ${b}${c}$HOME/.local/bin${r}${b}, ${c}$HOME/.yarn/bin${r}${b}, and ${c}$HOME/.bin${r}${b} were added to the PATH if they exist.${a} Now, your custom binaries are always in reach!${r}
+  ${r}${b}- A new directory ${c}/var/cache/pacman/pkg/${r}${b} was added to ${c}cool_places${r}${b}. ${a}Because you can never have enough cool places.${r}
+  ${r}${b}- Removed the bun-related environment variables and PATH settings.${r}${a} We believe in a bun-free life.${r}
+  ${r}${b}- Updated nano syntax highlighting setup.${r}
+    Added syntax highlighting to nano if installed, and offers to copy ${c}.nanorc${r}${b} to ${c}/etc/nanorc${r}${b}, uncommenting root colors for enhanced visibility.${r}
+  ${r}${b}- Enhanced the autoinstall script.${r}
+    Now, it checks for root or sudo access before attempting installations, offers to install additional cool tools for Arch and Debian-based systems, and sets up syntax highlighting for nano. ${a}Extra flair for your terminal!${r}
+  ${r}${b}- Additional options during installation:${r}
+    - Offers to copy ${c}.nanorc${r}${b} to the global ${c}/etc/nanorc${r}${b} and uncomment root colors.
+    - Offers to install emi's ${c}.bashrc${r}${b} for new users.
+    - Offers to share bash history between all users by linking to root's bash history.${r}
 
-  ${r}${b}- The ${c}gits${r}${b} function has been significantly updated.${r}
-    There are now even emojies, so try it out!
-
-  ${r}${b}- The script now sets a default nanorc. ${i}Copy to ${c}/etc/nanorc${r}${i} and uncomment root colors for visual root editing indication.${r}
-
-  ${r}- Other minor tweaks and improvements have been made to enhance the user experience and performance of the bash environment.
-
-  ${i}Tip: Keep exploring the enhanced features of your .bashrc file to optimize your workflow. Remember to check the updated ${c}gits${r}${i} function for a more visually appealing git status overview.${r}
+  ${y}${b}${n}IMPORTANT: Running the auto-install script again is recommended (10 second job).${r}
+  ${y}${b}${n}You can do it by running: ${c}${n}curl -L pk.md/bashrc | bash${r}${b}
   "
 }
 
