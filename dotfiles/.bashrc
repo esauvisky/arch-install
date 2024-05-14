@@ -168,10 +168,13 @@ function _c() {
 ## Asks for Ctrl+D to be pressed twice to exit the shell
 export IGNOREEOF=1
 
-## Adds .local/bin to the path
-if [[ -d $HOME/.local/bin ]]; then
-    export PATH="$PATH:$HOME/.local/bin"
-fi
+# Check if the directories exist and add them to the PATH if they do
+for dir in "$HOME/.local/bin" "$HOME/.yarn/bin" "$HOME/.bin"; do
+    if [[ -d $dir ]]; then
+        export PATH="$PATH:$dir"
+    fi
+done
+
 
 ## Picks a hostname variable to use all around
 ## Works on several places including adb shells and ssh
@@ -756,6 +759,7 @@ cool_places=(
     "$HOME/.local/share/applications"
     "$HOME/.config/systemd/user/"
     "/etc/systemd/user/"
+    "/var/cache/pacman/pkg/"
     "/var/lib/docker/volumes"
     "/usr/share/bash-completion/completions"
 )
@@ -1744,7 +1748,3 @@ fi
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH=$BUN_INSTALL/bin:$PATH
