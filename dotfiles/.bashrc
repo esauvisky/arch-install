@@ -1218,6 +1218,23 @@ if _e "git"; then
         git commit --amend -m "$*"
     }
 
+    function gitr() {
+        # Get the remote URL from the current Git repository
+        remote_url="$(git config --get remote.origin.url)"
+
+        if [ -n "$remote_url" ]; then
+            # Transform the SSH URL to HTTPS if needed
+            if [[ "$remote_url" == git@* ]]; then
+                remote_url=${remote_url/git@/}
+                remote_url=${remote_url/:/\/}
+                remote_url="https:\/\/${remote_url%%.git}"
+            fi
+            xdg-open "$remote_url"
+        else
+            echo "No remote URL found in the current Git repository."
+        fi
+    }
+
     function gits() {
         # Fetching the git status and color-coding changes.
         readarray -t lines < <(git status --show-stash --long | sed '/.*use "git.*$/d')
