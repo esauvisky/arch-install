@@ -175,7 +175,7 @@ function _c() {
 export IGNOREEOF=1
 
 # Check if the directories exist and add them to the PATH if they do
-for dir in "$HOME/.local/bin" "$HOME/.yarn/bin" "$HOME/.bin"; do
+for dir in "$HOME/.local/bin" "$HOME/.yarn/bin" "$HOME/.bin" "$HOME/.cargo/bin"; do
     if [[ -d $dir ]]; then
         export PATH="$PATH:$dir"
     fi
@@ -1613,7 +1613,7 @@ fi
 if [[ ! -s "$HOME/.emishrc_last_check" ]]; then
     [[ "$PS1" ]] && _changelog && date +%s >"$HOME/.emishrc_last_check"
 else
-    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s "$HOME/.emishrc_last_check" ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
+    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s "$HOME/.emishrc_last_check" ]] && fortune brasil | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
 fi
 
 function _pre_command() {
