@@ -85,13 +85,13 @@ fi
 
 if [[ $QUIET == "false" ]]; then
     if hash gio 2>/dev/null; then
-        echo -e "Everything went well! Previous files are in the trash bin."
+        echo -e "\e[32;01mEverything went well! Previous files are in the trash bin."
     else
-        echo -e "Everything went well! Previous files (if any) were backed up with a .bak extension!"
+        echo -e "\e[32;01mEverything went well! Previous files (if any) were backed up with a .bak extension!"
     fi
 
     if hash pacman 2>/dev/null; then
-        echo -en "\n\nBtw, you use Arch. Do you want to install a couple cool shit for this to work even better? [Y/n]"
+        echo -en "\e[34;01m\n\nBtw, you use Arch. Do you want to install a couple cool shit for this to work even better? [Y/n]"
         read -r answer < /dev/tty
         if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
@@ -99,11 +99,11 @@ if [[ $QUIET == "false" ]]; then
             elif hash sudo 2>/dev/null; then
                 sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils nano-syntax-highlighting
             else
-                echo -e "You need sudo to install this. Install it and try again."
+                echo -e "\e[34;01mYou need sudo to install this. Install it and try again."
             fi
         fi
     elif hash apt 2>/dev/null; then
-        echo -en "\n\nI see you're not an Arch user, but at least it's linux. Do you want to install some software for this to work better? [Y/n]"
+        echo -en "\e[34;01m\n\nI see you're not an Arch user, but at least it's linux. Do you want to install some software for this to work better? [Y/n]"
         read -r answer < /dev/tty
         if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
@@ -111,50 +111,50 @@ if [[ $QUIET == "false" ]]; then
             elif hash sudo 2>/dev/null; then
                 sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
             else
-                echo -e "You need sudo to install this. Install it and try again."
+                echo -e "\e[34;01mYou need sudo to install this. Install it and try again."
             fi
         fi
     fi
 
     if hash nano 2>/dev/null; then
-        echo -e "Adding syntax highlighting to nano..."
+        echo -e "\e[34;01mAdding syntax highlighting to nano..."
         find /usr/share/nano* -iname "*.nanorc" -exec echo include {} \; >> ~/.nanorc
     fi
 
     if ! ([[ $(id -u) -eq 0 ]] || hash sudo 2>/dev/null); then
-        echo -e "You need to be root or have sudo to be able to get additional options. Run this script again with sudo or as root."
+        echo -e "\e[34;01mYou need to be root or have sudo to be able to get additional options. Run this script again with sudo or as root."
         exit 0
     fi
 
-    echo -e "\nDo you want to copy your .nanorc to the global /etc/nanorc and uncomment root colors? [Y/n]"
+    echo -e "\e[34;01m\nDo you want to have nanorc for the root user with different colors? [Y/n]"
     read -r answer < /dev/tty
     if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
         if [[ $(id -u) -eq 0 ]]; then
-            echo -e "Moving .nanorc to /etc/nanorc..."
+            echo -e "\e[34;01mMoving .nanorc to /etc/nanorc..."
             sudo mv ~/.nanorc /etc/nanorc
         else
-            echo -e "Copying .nanorc to /etc/nanorc..."
+            echo -e "\e[34;01mCopying .nanorc to /etc/nanorc..."
             sudo cp ~/.nanorc /etc/nanorc
         fi
         sudo sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
         sudo sed -i 's/^###//' /etc/nanorc
     fi
 
-    echo -e "\nDo you want new users on this machine to automatically have emi's bashrc installed by default? [Y/n]"
+    echo -e "\e[34;01m\nDo you want new users on this machine to automatically have emi's bashrc installed by default? [Y/n]"
     read -r answer < /dev/tty
     if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
-        echo -e "Copying files to /etc/skel..."
-        sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc ~/.nanorc ~/.grc /etc/skel/
+        echo -e "\e[34;01mCopying files to /etc/skel..."
+        sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc /etc/nanorc ~/.grc /etc/skel/
     fi
 
-    echo -en "\nDo you want to link all users' bash history to root's bash history, effectively sharing the history between all users? [y/N]"
+    echo -en "\e[34;01m\nDo you want to link all users' bash history to root's bash history, effectively sharing the history between all users? [y/N]"
     read -r answer < /dev/tty
     if [[ $answer == "y" || $answer == "Y" ]]; then
         if [ -f .bash_eternal_history ]; then
-            echo -e "Bash history file already exists. Moving to /.bash_eternal_history."
+            echo -e "\e[34;01mBash history file already exists. Moving to /.bash_eternal_history."
             sudo mv .bash_eternal_history /.bash_eternal_history
         else
-            echo -e "Creating bash history file in /.bash_eternal_history."
+            echo -e "\e[34;01mCreating bash history file in /.bash_eternal_history."
             sudo touch /.bash_eternal_history
         fi
 
@@ -171,12 +171,12 @@ if [[ $QUIET == "false" ]]; then
                     sudo ln -sf /.bash_eternal_history "$user_home/.bash_eternal_history"
                 fi
             done
-            echo -e "Bash history linked for existing users in /home."
+            echo -e "\e[34;01mBash history linked for existing users in /home."
         else
-            echo -e "No existing users found in /home to link bash history."
+            echo -e "\e[34;01mNo existing users found in /home to link bash history."
         fi
     fi
 
-    echo -e "That's all! KTHXBYE\n\n"
+    echo -e "\e[34;01mThat's all! KTHXBYE\n\n"
 fi
 rm -f "$HOME/.emishrc_last_check" 2>/dev/null || true

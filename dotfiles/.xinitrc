@@ -63,22 +63,19 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=1
 
 ## Starts Telegram
 # sleep 5s && xdotool search --sync --onlyvisible --name '^Telegram$' windowminimize &
-sleep 2s && telegram-desktop &
+# sleep 2s && 64gram-desktop &
 
 ## Starts discord
 # sleep 5s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
-sleep 2s && discord &
+# sleep 2s && discord &
 
 ## Starts spotify
 # sleep 5s && xdotool search --sync --onlyvisible --name '^Discord$' windowminimize search --sync --onlyvisible --name '^Discord$' windowminimize &
-sleep 2s && spotify &
-
-
-sleep 2s && workrave &
+# sleep 2s && spotify &
 
 # sleep 2s && openrgb &
 
-syncthing-gtk &
+#syncthing-gtk &
 solaar -w hide &
 ## guake daemon
 # guake &
@@ -87,11 +84,11 @@ solaar -w hide &
 (while :; do sleep 5s && copyq; done) &
 
 ## Gnome: Ignore Lid Switch
-/usr/lib/gnome-tweak-tool-lid-inhibitor &
+#/usr/lib/gnome-tweak-tool-lid-inhibitor &
 ## Gnome: Allows to lock the screen
 # gnome-screensaver &
 ## Gnome: turns on bluetooth automatically
-sleep 5s && rfkill unblock bluetooth &
+# sleep 5s && rfkill unblock bluetooth &
 
 ## Loads XKB custom symbols map:
 if [ -f ${HOME}/.config/xkb/symbols/br ]; then
@@ -110,7 +107,7 @@ fi
 
 export XDG_SESSION_TYPE=x11
 export GDK_BACKEND=x11
-exec gnome-session --systemd
+exec gnome-session #--systemd-service
 
 #exec twm
 #exec cinnamon-session
