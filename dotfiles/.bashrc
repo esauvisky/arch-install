@@ -1362,10 +1362,10 @@ if _e "git"; then
                        emoji="🟢"
                        ;;
                       *"new file"*)
-                        emoji="🔵"
+                        emoji="🟢"
                        ;;
                       *"renamed"*)
-                        emoji="🟣"
+                        emoji="🔵"
                        ;;
                       *)
                         emoji="⚪️"
