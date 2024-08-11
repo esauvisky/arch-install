@@ -24,8 +24,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=31
-export _DATE="May 14th, 2024"
+export _RCVERSION=32
+export _DATE="Aug 11th, 2024"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -39,21 +39,22 @@ function _changelog() {
     echo "${g}emi's .bashrc${r}
 ${y}Changelog ${_RCVERSION} ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
-  Here are the changes for this .bashrc version release:
-  ${r}- The directories ${b}${c}$HOME/.local/bin${r}${b}, ${c}$HOME/.yarn/bin${r}${b}, and ${c}$HOME/.bin${r}${b} were added to the PATH if they exist.${a} Now, your custom binaries are always in reach!${r}
-  ${r}${b}- A new directory ${c}/var/cache/pacman/pkg/${r}${b} was added to ${c}cool_places${r}${b}. ${a}Because you can never have enough cool places.${r}
-  ${r}${b}- Removed the bun-related environment variables and PATH settings.${r}${a} We believe in a bun-free life.${r}
-  ${r}${b}- Updated nano syntax highlighting setup.${r}
-    Added syntax highlighting to nano if installed, and offers to copy ${c}.nanorc${r}${b} to ${c}/etc/nanorc${r}${b}, uncommenting root colors for enhanced visibility.${r}
-  ${r}${b}- Enhanced the autoinstall script.${r}
-    Now, it checks for root or sudo access before attempting installations, offers to install additional cool tools for Arch and Debian-based systems, and sets up syntax highlighting for nano. ${a}Extra flair for your terminal!${r}
-  ${r}${b}- Additional options during installation:${r}
-    - Offers to copy ${c}.nanorc${r}${b} to the global ${c}/etc/nanorc${r}${b} and uncomment root colors.
-    - Offers to install emi's ${c}.bashrc${r}${b} for new users.
-    - Offers to share bash history between all users by linking to root's bash history.${r}
+  ${r}- The directory ${b}${c}$HOME/.cargo/bin${r}${b} was added to the PATH if it exists.${a} Now, you have Rust binaries at your fingertips!${r}
+  ${r}${b}- Revamped the ${c}pip${r}${b} command behavior.${r}
+    ${a}When installing packages, it now offers to add them to ${c}requirements.txt${r}${a} automatically, ensuring your dependencies stay up-to-date with minimal effort.${r}
+  ${r}${b}- Integrated ${c}pyenv${r}${b} into the environment if available.${r}
+    ${a}Python developers can now easily switch between Python versions using the new ${c}python-switch${r}${a} function.${r}
+  ${r}${b}- Updated the ${c}journalctl${r}${b} aliases:${r}
+    ${a}The ${c}je${r}${a} alias now outputs with the ${c}with-unit${r}${a} option, providing more detailed logs.${r}
+  ${r}${b}- Improved ${c}git${r}${b} functions with a new ${c}gitr${r}${b} function.${r}
+    ${a}Quickly opens the current repository's remote URL in your browser with a single command.${r}
+  ${r}${b}- Re-enabled the ${c}_yay${r}${b} function and its alias.${r}
+    ${a}For Arch users, ${c}yay${r}${a} now updates everything without prompting, enhancing your AUR package management.${r}
+  ${r}${b}- Updated GIT emoji mappings for more accurate representations:${r}
+    ${a}- Renamed files are now marked with a ${c}🔵${r}${b} instead of ${c}🟣${r}.
+    ${a}- New files are marked with a ${c}🟢${r}${b} emoji.${r}
 
-  ${y}${b}${n}IMPORTANT: Running the auto-install script again is recommended (10 second job).${r}
-  ${y}${b}${n}You can do it by running: ${c}${n}curl -L pk.md/bashrc | bash${r}${b}
+  ${y}${y}Tip: Take advantage of the new ${c}pip${r}${y} enhancements to keep your ${c}requirements.txt${r}${y} up-to-date automatically!${r}
   "
 }
 
@@ -1613,7 +1614,7 @@ fi
 if [[ ! -s "$HOME/.emishrc_last_check" ]]; then
     [[ "$PS1" ]] && _changelog && date +%s >"$HOME/.emishrc_last_check"
 else
-    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s "$HOME/.emishrc_last_check" ]] && fortune brasil | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
+    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s "$HOME/.emishrc_last_check" ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
 fi
 
 function _pre_command() {
