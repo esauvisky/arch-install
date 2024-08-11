@@ -1185,14 +1185,14 @@ if _e "pacman"; then
 
             cd "$CURRDIR"
         }
-        # function _yay() {
-        #     if [[ $# == 0 ]]; then
-        #         # if running simply `yay`, then ask for packages to ignore
-        #         command yay --noanswerupgrade -Syu
-        #     fi
-        #     command yay "$@"
-        # }
-        # alias yay="_yay"
+        function _yay() {
+            if [[ $# == 0 ]]; then
+                # if running simply `yay`, then ask for packages to ignore
+                command yay --noanswerupgrade -Syu
+            fi
+            command yay "$@"
+        }
+        alias yay="_yay"
     fi
     alias pacman="pacman "
     alias pacs="sudo pacman -S --needed --asdeps"
@@ -1201,6 +1201,7 @@ if _e "pacman"; then
     alias paci="pacman -Qi"
     alias pacl="pacman -Ql"
     alias paccache_safedelete="sudo paccache -r && sudo paccache -ruk1"
+    # alias yay="yay -Syu --noanswerupgrade"
     complete -F _complete_alias pacs
     complete -F _complete_alias pacr
     complete -F _complete_alias pacss
@@ -1209,23 +1210,23 @@ if _e "pacman"; then
     complete -F _complete_alias paccache_safedelete
 
     ## Pacman Awesome Updater
-    function pacsyu() {
-        echo -e "\e[01;93mUpdating pacman repositories...\e[00m"
-        sudo pacman -Sy
+    # function pacsyu() {
+    #     echo -e "\e[01;93mUpdating pacman repositories...\e[00m"
+    #     sudo pacman -Syu
 
-        mkdir -p "$HOME/.pacman-updated"
-        currentUpdatePkgs=$(\pacman -Qu --color never)
-        previousUpdatePkgs=$(cat .pacman-updated/$(\ls -L .pacman-updated/ | tail -n1))
-        if [[ "$currentUpdatePkgs" == "$previousUpdatePkgs" ]]; then
-            echo -e "\e[00;92\nThis is the same list that was previously saved, not saving again.\e[00m"
-        else
-            echo -e "\e[01;93m\nSaving log of packages to upgrade...\e[00m"
-            echo "$currentUpdatePkgs" >"$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
-        fi
+    #     mkdir -p "$HOME/.pacman-updated"
+    #     currentUpdatePkgs=$(\pacman -Qu --color never)
+    #     previousUpdatePkgs=$(cat .pacman-updated/$(\ls -L .pacman-updated/ | tail -n1))
+    #     if [[ "$currentUpdatePkgs" == "$previousUpdatePkgs" ]]; then
+    #         echo -e "\e[00;92\nThis is the same list that was previously saved, not saving again.\e[00m"
+    #     else
+    #         echo -e "\e[01;93m\nSaving log of packages to upgrade...\e[00m"
+    #         echo "$currentUpdatePkgs" >"$HOME/.pacman-updated/pacmanQu-$(date -Iminutes)"
+    #     fi
 
-        echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
-        sudo yay -Syu --noconfirm
-    }
+    #     echo -e "\e[01;91m\nUpdating pacman packages...\e[00m"
+    #     yay -Syu --noanswerupgrade -Syu
+    # }
 
     ## NOT REQUIRED ANYMORE BECAUSE BTRFS
     # function pacman_rollback() {
