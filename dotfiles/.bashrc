@@ -782,46 +782,106 @@ alias sudo='sudo '
 alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 alias g="xdg-open"
 
-## Uses system python as pip
-alias pip='python -m pip'
-##
-## Pipi, the smart pip package installer
-##
-## Adds installed packages to requirements.txt file automatically.
-## Getting the canonical package name if required, and appending the version.
-## Better than using pip freeze as only explicitly installed packages are added this way.
-function pipi() {
-    cur_dir="$PWD"
-    req_file=""
 
-    while [ "$cur_dir" != "/" ]; do
-        if [ -f "$cur_dir/requirements.txt" ]; then
-            req_file="$cur_dir/requirements.txt"
-            break
-        fi
-        cur_dir=$(dirname "$cur_dir")
-    done
+if _e python || _e python3; then
+    if _e pyenv; then
+        eval "$(pyenv init --path)"
+        eval "$(pyenv init -)"
 
-    [[ -z "$req_file" ]] && echo "Error: requirements.txt not found in current or parent directories" && return 1
+        function python-switch() {
+            if [[ -z "$1" ]]; then
+                echo -e "Usage:\n  python_switch <version>"
+                echo -e "Example:\n  python_switch 3.8\n\n"
+                echo -e "Afterwards, anything you run with 'python' will use python 3.8, including pip and virtualenv.\n"
+                return 1
+            fi
 
-    for pkg in "$@"; do
-        if [[ "$pkg" == "install" ]]; then
-            continue
-        fi
-        pip install "$pkg" && {
-            name="$(pip show "$pkg" | grep Name: | awk '{print $2}')"
-            version="$(pip show "$pkg" | grep Version: | awk '{print $2}')"
-            if [[ "$name" == "" || "$version" == "" ]]; then
-                echo "$pkg" >>"$req_file"
+            local python_version="$1"
+            if pyenv install --skip-existing "$python_version"; then
+                pyenv local "$python_version"
             else
-                echo "${name}==${version}" >>"$req_file"
+                echo "Failed to install Python $python_version. Please check the version number and your internet connection."
+                return 1
             fi
         }
-    done
-}
+
+        if _e virtualenv; then
+            alias virtualenv="virtualenv -p \$(pyenv which python)"
+        fi
+    fi
+
+    function pip() {
+        local cmd="$1"
+        shift  # Remove the first argument and process the rest
+
+        if [[ "$cmd" == "install" ]]; then
+            local packages=()
+            local has_r=0
+
+            # Process arguments to check for '-r' or '--requirement'
+            for arg in "$@"; do
+                if [[ "$arg" == "-r" ]] || [[ "$arg" == "--requirement" ]]; then
+                    has_r=1
+                    break
+                fi
+                if [[ "$arg" != -* ]]; then
+                    packages+=("$arg")
+                fi
+            done
+
+            # Run the installation
+            if [[ $has_r -eq 0 ]] && [[ ${#packages[@]} -gt 0 ]]; then
+                # Normal pip install for the specified packages
+                command pip install "$@"
+
+                # Find requirements.txt file in the current or parent directories
+                local cur_dir="$PWD"
+                local req_file=""
+
+                while [ "$cur_dir" != "/" ]; do
+                    if [ -f "$cur_dir/requirements.txt" ]; then
+                        req_file="$cur_dir/requirements.txt"
+                        break
+                    fi
+                    cur_dir=$(dirname "$cur_dir")
+                done
+
+                # Ask user and append package and version to the requirements.txt if found and if the user agrees
+                if [[ -n "$req_file" ]]; then
+                    echo -e "\e[01;93m\nInstallation successful.\nDo you want to add installed packages to $req_file? [y/N]\e[00m"
+                    read -r user_input
+                    if [[ "$user_input" =~ ^[Yy] ]]; then
+                        for pkg in "${packages[@]}"; do
+                            local name="$(pip show "$pkg" | grep 'Name:' | awk '{print $2}')"
+                            local version="$(pip show "$pkg" | grep 'Version:' | awk '{print $2}')"
+                            if [[ -n "$name" && -n "$version" ]]; then
+                                echo "${name}==${version}" >> "$req_file"
+                            else
+                                echo "$pkg" >> "$req_file"
+                            fi
+                        done
+                        echo "Added to $req_file."
+                    else
+                        echo "Not adding to $req_file."
+                    fi
+                else
+                    echo "Error: requirements.txt not found in current or parent directories."
+                fi
+            else
+                # Run pip install with the original arguments if '-r' is present
+                command pip install "$@"
+            fi
+        else
+            # Handle all other pip commands normally
+            command pip "$cmd" "$@"
+        fi
+    }
+fi
 
 ## Node
-alias node='node --experimental-modules  --experimental-repl-await  --experimental-vm-modules  --experimental-worker --experimental-import-meta-resolve'
+if _e node; then
+    alias node='node --experimental-modules --experimental-repl-await --experimental-vm-modules --experimental-worker --experimental-import-meta-resolve'
+fi
 
 ## True screen clearing
 function clear() {
@@ -989,8 +1049,8 @@ function _systemctl_exists_user() {
 }
 
 if _e "journalctl"; then
-    alias je='journalctl -efn 100 -o short --no-hostname'
-    alias jb='journalctl -b -o short --no-hostname -e'
+    alias je='journalctl -efn 100 -o with-unit --no-hostname'
+    alias jb='journalctl -b -o with-unit --no-hostname -e'
     function st() {
         if _systemctl_exists_user "${1}"; then
             journalctl --output cat -lxef _SYSTEMD_USER_UNIT="${1}"
