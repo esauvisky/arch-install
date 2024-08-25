@@ -656,6 +656,23 @@ _Em função dos pontos decimais invertidos_
             # subl3 /etc/tmpfiles.d/hibernation_size.conf
                 #Type   Path                                Mode    UID     GID     Age     Argument
                 w       /sys/power/image_size               -       -       -       -       [TAMANHO-SWAP-BYTES]
+## Problemas de Lag no Input com Layouts de Teclado Alternativos
+
+Usuários do Xorg com layouts como ABNT podem enfrentar lags ao usar ferramentas que simulam pressionamentos de teclas, devido ao recarregamento do mapa de teclas pelo Xorg a cada simulação.
+
+- Gnome: [Issue #1858 no GitLab](https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/1858)
+- Mutter: [Commit relevante no GitLab](https://gitlab.gnome.org/GNOME/mutter/-/commit/b01edc22f3cf816ec2bbc4e777fb44525a8456a8)
+
+### Solução: Instalar `mutter-performance`
+1. Clone e entre no repositório do AUR:
+    ```bash
+    git clone https://aur.archlinux.org/mutter-performance.git
+    cd mutter-performance
+    ```
+2. Edite o PKGBUILD conforme necessário e compile o pacote:
+    ```bash
+    makepkg -si
+    ```
 
 # A verificar/atualizar
 
