@@ -21,7 +21,7 @@ ConditionPathExists=/dev/tty0
 
 [Service]
 # the VT is cleared by TTYVTDisallocate
-ExecStart=/bin/sh -c "exec /bin/journalctl -af | ccze > /dev/%I"
+ExecStart=/bin/sh -c "exec /bin/journalctl -af > /dev/%I"
 Type=idle
 Restart=always
 RestartSec=1
@@ -40,3 +40,4 @@ Environment=LANG= LANGUAGE= LC_CTYPE= LC_NUMERIC= LC_TIME= LC_COLLATE= LC_MONETA
 
 [Install]
 Alias=getty.target.wants/journal@tty12.service
+
