@@ -1,0 +1,60 @@
+// GitGutter Settings - User
+{
+    // Live mode evaluates changes every time file is modified,
+    // Set false to disable evaluation after each input
+    "live_mode": true,
+
+    // Focus Change mode evaluates changes every time a view gets the focus
+    // Set false to disable evaluation when changing views
+    "focus_change_mode": true,
+
+    // (ST3, Build 3119+ only)
+    // Enable an hover popup, which shows an diff of the
+    // changed lines.
+    "enable_hover_diff_popup": true,
+
+    // Add a special marker on untracked files
+    "show_markers_on_untracked_file": true,
+
+    // Determines whether GitGutter shows status information in the status bar.
+    // Set false to disable status information.
+    // Set true to show information using the "status_bar_text" template.
+    "show_status_bar_text": true,
+
+    // Determines whether GitGutter ignores whitespace in modified files.
+    // Set "none" to ensure whitespace is considered in the diff
+    // Set "eol" to only ignore whitespace at the end of lines
+    // Set "space" to ignore changes in amount of white space
+    // Set "all" to ignore all white space
+    "ignore_whitespace": "space",
+
+    // Show GitGutter information in the minimap
+    // =0: hide markers
+    // >0: width of markers
+    // -1: highlight full line
+    "show_in_minimap": -1,
+
+    // Add a special marker on untracked files
+    "show_markers_on_untracked_file": false,
+
+    // (ST3, Build 3124+ only)
+    // Display a phantom text at the end of the active line with information
+    // about who changed it using the output of `git blame`.
+    //   "auto"  -- show line annotation if word wrap is disabled (default)
+    //   "true"  -- always show line annotation
+    //   "false" -- never show line annotation
+    "show_line_annotation": "false",
+
+    // (ST3, Build 3124+ only)
+    // The 1 based ruler index to align the line annotation text to.
+    //
+    // If no ruler is available the phantom is aligned to the end of line.
+    // If the selected ruler does not exist the most right one is used.
+    //
+    // Valid values are:
+    //   "False"  -- align to end of line (default)
+    //   "1"      -- align to first ruler
+    //   "2"      -- align of second ruler
+    //   ...
+    "line_annotation_ruler": 1,
+}

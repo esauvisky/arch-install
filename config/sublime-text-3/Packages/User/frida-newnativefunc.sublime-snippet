@@ -1,0 +1,8 @@
+
+<snippet>
+    <content>NativeFunction(${1:getMethodOffset(${2:namespace}, ${3:className}, ${4:method}, ${5:arg#})}, '${6:pointer}', [${7:'pointer', 'pointer'}]);</content>
+    <tabTrigger>NativeFunction</tabTrigger>
+    <description>Create a new NativeFunction to call the function at address (specified with a NativePointer).</description>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

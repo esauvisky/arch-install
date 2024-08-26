@@ -1,0 +1,16 @@
+
+<snippet>
+    <content>Interceptor.attach(${1:getMethodOffset(${2:namespace}, ${3:className}, ${4:method}, ${5:arg#})}, {
+    onEnter: (args) => {
+        ${6:args[1] = 1;}
+    },
+    onLeave: (retval) => {
+        ${7:retval.replace(ptr(0x0));}
+    },
+});
+</content>
+    <tabTrigger>Interceptor.attach</tabTrigger>
+    <description>Intercept calls to function at target.</description><!--This is a NativePointer specifying the address of the function you would like to intercept calls to. Note that on 32-bit ARM this address must have its least significant bit set to 0 for ARM functions, and 1 for Thumb functions. Frida takes care of this detail for you if you get the address from a Frida API (for example Module.getExportByName()).\nThe callbacks argument is an object containing one or more of:\nonEnter: function (args): callback function given one argument args that can be used to read or write arguments as an array of NativePointer objects.\nonLeave: function (retval): callback function given one argument retval that is a NativePointer-derived object containing the raw return value. You may call retval.replace(1337) to replace the return value with the integer 1337, or retval.replace(ptr("0x1234")) to replace with a pointer. Note that this object is recycled across onLeave calls, so do not store and use it outside your callback. Make a deep copy if you need to store the contained value, e.g.: ptr(retval.toString()).</description-->
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

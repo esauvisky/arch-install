@@ -1,0 +1,111 @@
+// SublimeLinter Settings - User
+{
+    // Available gutter themes:
+    // - Blueberry Cross
+    // - Blueberry Round
+    // - Circle
+    // - Danish Royalty
+    // - Default
+    // - Hands
+    // - Knob
+    // - Knob Symbol
+    // - Koloria
+    // - ProjectIcons
+    // Note that you may need to change the "icon" property in "styles"
+    // to an icon in the theme (they usually include "warning" and "error")
+    "gutter_theme": "Circle",
+
+    // Show the messages for problems at your cursor position.
+    // - {message} will be replaced by the actual messages.
+    // - {linter} will be replaced by the linter reporting the error.
+    // - {type} will be replaced by either warning or error.
+    // - {code} will be replaced by the error code.
+    // Set to "" to display nothing
+    "statusbar.messages_template": "({linter}) {type}{code}: {message}",
+    "statusbar.show_active_linters": false,
+
+    "linters": {
+        "annotations": {
+            "@disable": false,
+            "args": [],
+            "errors": [
+                "FIXME"
+            ],
+            "excludes": [],
+            "warnings": [
+                "NOTE",
+                "README",
+                "TODO",
+                "SEE"
+            ]
+        },
+        "cs": {
+            "@disable": true
+        },
+        "bashate": {
+            "@disable": false,
+            "args": [],
+            "error": "",
+            "excludes": [],
+            "ignore": [
+                "E006",
+                "E020"
+            ],
+            "warn": ""
+        },
+        "eslint": {
+            "@disable": false,
+            "args": [],
+            "excludes": []
+        },
+        "json": {
+            "@disable": false,
+            "args": [],
+            "excludes": [],
+            "strict": true
+        },
+        "php": {
+            "@disable": false,
+            "args": [],
+            "excludes": []
+        }
+    },
+    "styles": [
+        {
+            // Used to determine the color. E.g. region.<colorish>, with one of
+            // redish, orangish, yellowish, greenish, bluish, purplish, pinkish.
+            "scope": "region.yellowish markup.warning.sublime_linter",
+
+            // The error type this style definition will match for.
+            // An array which can contain "warning" and/or "error".
+            // If omitted will match both.
+            "types": ["warning"]
+        },
+        {
+            // Determines, for overlapping errors, which one is visualised.
+            "priority": 1,
+
+            // The icon displayed in the gutter area
+            // - "circle", "dot" or "bookmark"
+            // - "none" to remove the icon
+            // - A path to an icon file like
+            //   "Packages/SublimeLinter/gutter-themes/Blueberry Cross/error.png"
+            // - One provided by a gutter theme (e.g. "warning" or "error").
+            //   In theme Default: warning, error, cog, x,
+            //   and diamond, heart, pointer, square, star, triangle, which all
+            //   also have an -outline variant.
+            "icon": "error",
+
+            // The highlight style:
+            // - "none"
+            // - "fill", "outline",
+            // - "solid_underline", "squiggly_underline", "stippled_underline"
+            // The underline styles are replaced with outlines when there is
+            // whitespace in the problem region, because underlines aren't drawn
+            // on whitespace (ST issue #137).
+            "mark_style": "outline",
+
+            "scope": "region.redish markup.error.sublime_linter"
+        }
+    ],
+}

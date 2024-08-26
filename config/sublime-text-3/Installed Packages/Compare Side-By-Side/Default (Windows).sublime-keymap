@@ -1,0 +1,4 @@
+[
+	{ "keys": ["alt+n"], "command": "sbs_next_diff" },
+	{ "keys": ["alt+p"], "command": "sbs_prev_diff" }
+]

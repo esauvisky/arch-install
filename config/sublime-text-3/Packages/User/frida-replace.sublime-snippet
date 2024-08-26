@@ -1,0 +1,11 @@
+
+<snippet>
+    <content>Interceptor.replace(${1:getMethodOffset(${2:namespace}, ${3:className}, ${4:method}, ${5:arg#})}, new NativeCallback((${6:object, intArg}) => {
+    $0
+}, '${7:void}', [${8:'pointer'}, ${9:'int'}]));
+        </content>
+    <tabTrigger>Interceptor.replace</tabTrigger>
+    <description>Create a new NativeFunction to call the function at address (specified with a NativePointer).</description>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

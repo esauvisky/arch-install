@@ -1,0 +1,13 @@
+
+<snippet>
+    <content>const functionToCall = new NativeFunction(${1:getMethodOffset(${2:namespace}, ${3:className}, ${4:method}, ${5:arg#})}, '${6:pointer}', ['pointer'${7}]);
+Interceptor.replace(${1:getMethodOffset(${2:namespace}, ${3:className}, ${4:method}, ${5:arg#})}, new NativeCallback( (object${8:${7}}) => {
+    functionToCall(object${8:${7}});
+    $0
+}, '${6:pointer}', ['pointer'${7}]));
+        </content>
+    <tabTrigger>Interceptor.chainreplace</tabTrigger>
+    <description>Typically used if you want to fully or partially replace an existing function’s implementation.</description>
+    <!-- Optional: Set a scope to limit where the snippet will trigger -->
+    <!-- <scope>source.python</scope> -->
+</snippet>

@@ -1,0 +1,6 @@
+[
+    // Jump Back and Forward com botões do mouse
+    { "button": "button8", "command": "jump_back" },
+    { "button": "button9", "command": "jump_forward" },
+    { "button": "button1", "modifiers": ["alt"], "command": "goto_definition", "press_command": "drag_select" }
+]

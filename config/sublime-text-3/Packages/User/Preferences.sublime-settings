@@ -1,0 +1,53 @@
+{
+	"adaptive_dividers": false,
+	"always_show_minimap_viewport": true,
+	"auto_complete_commit_on_tab": true,
+	"auto_complete_delay": 100,
+	"auto_complete_triggers":
+	{
+		"characters": "$>:\\",
+		"selector": "source.php"
+	},
+	"auto_complete_with_fields": true,
+	"auto_find_in_selection": true,
+	"auto_match_enabled": true,
+	"caret_style": "phase",
+	"color_scheme": "Packages/Theme - Solarized Flat/Solarized Flat Dark.tmTheme",
+	"drag_text": false,
+	"draw_minimap_border": true,
+	"enable_tab_scrolling": false,
+	"fade_fold_buttons": true,
+	"fold_buttons": false,
+	"font_face": "Helvetica",
+	"font_size": 8,
+	"highlight_line": true,
+	"highlight_modified_tabs": true,
+	"hot_exit": false,
+	"ignored_packages":
+	[
+		"Diff",
+		"Git Formats",
+		"Package Control",
+		"SublimeCodeIntel",
+		"Vintage"
+	],
+	"indent_to_bracket": true,
+	"index_files": false,
+	"margin": 2,
+	"match_brackets": false,
+	"match_brackets_angle": false,
+	"match_brackets_braces": false,
+	"match_brackets_content": false,
+	"match_brackets_square": false,
+	"match_tags": false,
+	"remember_open_files": false,
+	"shift_tab_unindent": true,
+	"show_encoding": true,
+	"show_line_endings": true,
+	"show_tab_close_buttons": true,
+	"theme": "Solarized Flat Light.sublime-theme",
+	"translate_tabs_to_spaces": true,
+	"trim_trailing_white_space_on_save": true,
+	"update_check": false,
+	"word_wrap": false
+}

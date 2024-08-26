@@ -1,0 +1,39 @@
+{
+	"bootstrapped": true,
+	"downloader_precedence":
+	{
+		"linux":
+		[
+			"curl",
+			"urllib",
+			"wget"
+		],
+		"osx":
+		[
+			"curl",
+			"urllib"
+		],
+		"windows":
+		[
+			"wininet"
+		]
+	},
+	"in_process_packages":
+	[
+		"Package Control"
+	],
+	"installed_packages":
+	[
+		"ANSIescape",
+		"ApacheConf",
+		"AutoSetSyntax",
+		"BracketHighlighter",
+		"Compare Side-By-Side",
+		"ExpandRegion",
+		"gcode",
+		"Package Control",
+		"Solarized Color Scheme",
+		"SublimeCodeIntel",
+		"Theme - Solarized Flat"
+	]
+}

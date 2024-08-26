@@ -1,0 +1,109 @@
+/*
+    Anaconda user settings
+*/
+{
+    /*
+        Set those as true if you don't want Sublime Text regular completions
+    */
+    "suppress_word_completions": true,
+    "suppress_explicit_completions": true,
+
+    /*
+        If complete_parameters is true, anaconda will add function and class
+        parameters to its completions.
+
+        If complete_all_parameters is true, it will add all the possible
+        parameters, if it's false, it will add only required parameters
+    */
+    "complete_parameters": false,
+    "complete_all_parameters": false,
+
+    /*
+        If you set the following option as true, anaconda will complete
+        function parameters on keypress, when cursor is between function
+        brackets, independently from any other setting. It also works with
+        disabled tooltips.
+
+        Moreover you'll be able to choose at the moment of insertion, whether
+        inserting all parameters or just the required parameters.
+
+        Default keybindings (they only work between empty function brackets):
+        Tab      : insert required parameters
+        Ctrl+Tab : insert all parameters
+    */
+    "parameters_completion_on_keypress": true,
+
+    /*
+        Do not fix the errors listed here:
+        Note: By default we ignore E309 as this is not pep8 but it does
+        conflict with pep257 D211.
+    */
+    "autoformat_ignore":
+    [
+        "E309"
+    ],
+
+    /*
+        Set the threshold limit for McCabe complexity checker.
+    */
+    "mccabe_threshold": 7,
+
+    /*
+
+        If anaconda_gutter_marks is true, this determines what theme is used.
+        Theme 'basic' only adds dots and circles to gutter.
+
+        Other available themes are 'alpha', 'bright', 'dark', 'hard', "retina"
+        (for retina displays) and 'simple'. To see icons that will be used for
+        each theme check gutter_icon_themes folder in Anaconda package.
+    */
+    "anaconda_gutter_theme": "bright",
+
+    /*
+        If 'outline' (default), anaconda will outline error lines.
+        If 'fill', anaconda will fill the lines.
+        If 'solid_underline', anaconda will draw a solid underline below regions.
+        If 'stippled_underline', anaconda will draw a stippled underline below regions.
+        If 'squiggly_underline', anaconda will draw a squiggly underline below regions.
+        If 'none', anaconda will not draw anything on error lines.
+    */
+    "anaconda_linter_mark_style": "solid_underline",
+
+    /*
+        If this is set to true, anaconda will show errors inline.
+    */
+    "anaconda_linter_phantoms": false,
+
+    /*
+        A list of pep8 error numbers to ignore.
+        The list of error codes is in this file:
+            https://github.com/jcrocholl/pep8/blob/master/pep8.py.
+        Search for "Ennn:", where nnn is a 3-digit number.
+        E309 is ignored by default as it conflicts with pep257 E211
+    */
+    "pep8_ignore":
+    [
+        "E309",
+        "E303",
+        "E221",
+        "E265",
+        "E266",
+        "E402",
+        "E501",
+        "E241",
+        "W291",
+        "W293",
+        "W391"
+    ],
+
+    /*
+        Set the following option to true if you want anaconda to check
+        the validity of your imports when the linting process is fired.
+
+        WARNING: take into account that anaconda compiles and import the
+        modules in the JsonServer memory segment in order to check this
+    */
+    "validate_imports": false,
+}
+
+// vim: set ft=javascript:

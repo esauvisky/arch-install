@@ -1,0 +1,25 @@
+{
+    // Character threshold to search
+    "search_threshold": 50000,
+    "ignore_threshold": false,
+
+    // Disable gutter icons when doing multi-select
+    "no_multi_select_icons": true,
+
+    // When only either the left or right bracket can be found
+    // this defines if the unmatched bracket should be shown.
+    "show_unmatched": true,
+
+    // Show hover popup
+    // This will show a hover popup when mousing over
+    // the visible bracket if the other
+    // highlighted matching bracket is off screen.
+    // It will show line text of the off screen bracket -/+ 128 chars
+    // from the bracket start and end points.
+    // A link will be available allowing the user to click and jump to
+    // the other bracket.
+    "show_offscreen_bracket_popup": true,
+    // Outside adjacent bracket matching
+    "bracket_outside_adjacent": true,
+}
+

@@ -1,0 +1,30 @@
+{
+	"clients":
+	{
+		"eslint":
+		{
+			"enabled": false
+		},
+		"phpls":
+		{
+			"command":
+			[
+				"php",
+				"/home/esauvisky/.composer/vendor/felixfbecker/language-server/bin/php-language-server.php"
+			],
+			"languageId": "php",
+			"scopes":
+			[
+				"source.php"
+			],
+			"syntaxes":
+			[
+				"Packages/PHP/PHP.sublime-syntax"
+			]
+		},
+		"pyls":
+		{
+			"enabled": false
+		}
+	}
+}

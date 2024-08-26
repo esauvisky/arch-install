@@ -1,0 +1,20 @@
+{
+    "event_listeners": {
+        "on_activated_async": true,
+        "on_clone_async": true,
+        "on_load_async": true,
+        "on_modified_async": true,
+        "on_modified": true,
+        "on_new_async": true,
+        "on_post_paste": true,
+        "on_pre_save_async": true,
+        "on_text_commands": true
+    },
+    "syntax_mapping": {
+        "Packages/ShellScript/Bash.sublime-syntax": [
+            "#!/bin/bash",
+            "#!/usr/bin/env bash",
+            "bash"
+        ]
+    }
+}

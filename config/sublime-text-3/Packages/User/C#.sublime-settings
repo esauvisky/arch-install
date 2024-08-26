@@ -1,0 +1,21 @@
+// These settings override both User and Default settings for the C# syntax
+
+{
+    "extensions":
+    [
+        "cs",
+    ],
+    "mini_diff": false,
+    "detect_indentation": false,
+    "auto_indent": false,
+    "smart_indent": false,
+    "trim_automatic_white_space": false,
+    "auto_match_enabled": false,
+    "show_definitions": true,
+    "tab_completion": false,
+    "auto_complete": false,
+    // Set to 0 to disable smooth scrolling. Set to a value between 0 and 1 to
+    // scroll slower, or set to larger than 1 to scroll faster
+    "scroll_speed": 0.2,
+    "ignored_packages": ["ApacheConf", "AutoSetSyntax", "BracketHighlighter", "DocBlockr", "SublimeCodeIntel"]
+}

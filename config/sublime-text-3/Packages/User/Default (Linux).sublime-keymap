@@ -1,0 +1,173 @@
+[
+    // Remove alguimas keybindings padrões
+    { "keys": ["alt+q"], "command": "noop" },
+
+    // Abre e fecha a sidebar
+    { "keys": ["f9"], "command": "toggle_side_bar" },
+    // Navega pelas abas de forma absoluta
+    { "keys": ["ctrl+tab"], "command": "next_view" },
+    { "keys": ["ctrl+shift+tab"], "command": "prev_view" },
+
+    // Abre uma nova aba
+    { "keys": ["ctrl+t"], "command": "new_file" },
+    // Abre as abas recentemente fechadas
+    { "keys": ["ctrl+shift+t"], "command": "reopen_last_file" },
+    // Abre uma nova janela
+    { "keys": ["ctrl+n"], "command": "new_window" },
+
+    // Bookmarks
+    { "keys": ["f5"], "command": "toggle_bookmark" },
+    { "keys": ["f6"], "command": "next_bookmark" },
+    { "keys": ["f7"], "command": "prev_bookmark" },
+    { "keys": ["alt+f5"], "command": "clear_bookmarks" },
+    { "keys": ["shift+f5"], "command": "select_all_bookmarks" },
+
+    // Abre um terminal na pasta do documento
+    { "keys": ["alt+t"], "command": "open_terminal" },
+    // Abre o diretório do documento
+    { "keys": ["alt+e"], "command": "open_dir",
+        "args": {"dir": "$file_path", "file": "$file_name"} },
+
+    // Seta ctrl+v padrão como colar e auto-identar
+    { "keys": ["ctrl+v"], "command": "paste_and_indent" },
+    { "keys": ["ctrl+shift+v"], "command": "paste" },
+
+    // Ativa/desativa line wrapping
+    { "keys": ["f4"], "command": "toggle_setting", "args": {"setting": "word_wrap"}},
+
+    // Auto-identa o texto selecionado
+    { "keys": ["ctrl+i"], "command": "reindent" },
+
+    // Multiedit de linha (quase) estilo nautilus
+    { "keys": ["ctrl+pageup"], "command": "select_lines", "args": {"forward": false} },
+    { "keys": ["ctrl+pagedown"], "command": "select_lines", "args": {"forward": true} },
+
+    // Expande a seleção de escopo para escopo (melhor que anterior)
+    { "keys": ["ctrl+w"], "command": "expand_region" },
+    {
+        "keys": ["super+u"],
+        "command": "expand_region",
+        "args": {"undo": true},
+        "context": [{ "key": "expand_region_soft_undo" }]
+    },
+
+    // Anaconda documentação
+    {
+        "command": "anaconda_doc", "keys": ["f1"], "context": [
+            {"key": "selector", "operator": "equal", "operand": "source.python"}
+        ]
+    },
+
+    // Alterna "In-Selection" nas pesquisas e substituições
+    { "keys": ["alt+s"], "command": "toggle_in_selection", "context":
+        [
+            { "key": "setting.is_widget", "operator": "equal", "operand": true }
+        ]
+    },
+
+    // Converte para upper/lower case
+    { "keys": ["ctrl+shift+u"], "command": "upper_case" },
+    { "keys": ["ctrl+shift+l"], "command": "lower_case" },
+
+    // Abre o console
+    { "keys": ["ctrl+p"], "command": "show_panel", "args": {"panel": "console", "toggle": true} },
+
+    // // Abre a sidebar da pasta atual
+    // {
+    //   "keys": ["f12"],
+    //   "command": "dired",
+    //   "args": {
+    //     "immediate": true,
+    //     "single_pane": true,
+    //     "other_group": "left",
+    //     "project": false
+    //   }
+    // },
+
+    /**
+     *  Fecha e salva a workspace para o projeto não reiniciar e não perder as abas
+     *  (utilizar antes de fechar o subl)
+     */
+    { "keys": ["ctrl+shift+q"], "command": "close_workspace" },
+
+    // Salva um workspace novo
+    { "keys": ["ctrl+shift+w"], "command": "save_workspace_as" },
+
+    /*  ~~ Magic Below ~~
+        Faz com que o sublime não swallow o closing-bracket se algum texto for digitado.
+        Se nenhum texto for digitado ele vai swallow normalmente.
+        Teste digitando: '[]' e depois '[texto]', na segunda situação, o ] será duplicado.
+        Isto evita que o sublime coma o closing-bracket quando você está tentando arrumar escopos e tal.
+        Se não estiver funcionando direito simplesmente remover/comentar toda "key": "preceding_text" de cada um.
+    */
+    // { "keys": ["\""], "command": "insert", "args": {"characters": "\""}, "context":
+    //     [
+    //         { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+    //         { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+    //         { "key": "following_text", "operator": "regex_contains", "operand": "^\"", "match_all": true },
+    //         { "key": "preceding_text", "operator": "regex_contains", "operand": "[^\"]$", "match_all": true }
+    //     ]
+    // },
+    { "keys": [")"], "command": "insert", "args": {"characters": ")"}, "context":
+        [
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+            { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "^\\)", "match_all": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "[^(]$", "match_all": true }
+        ]
+    },
+    { "keys": [")"], "command": "move", "args": {"by": "characters", "forward": true}, "context":
+        [
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+            { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "^\\)", "match_all": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "\\($", "match_all": true }
+        ]
+    },
+    // { "keys": ["]"],"command": "insert", "args": {"characters": "]"}, "context":
+    //     [
+    //         { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+    //         { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+    //         { "key": "following_text", "operator": "regex_contains", "operand": "^\\]", "match_all": true },
+    //         { "key": "preceding_text", "operator": "regex_contains", "operand": "[^[]$", "match_all": true }
+    //     ]
+    // },
+    // { "keys": ["}"], "command": "insert", "args": {"characters": "}"}, "context":
+    //     [
+    //         { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+    //         { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+    //         { "key": "following_text", "operator": "regex_contains", "operand": "^\\}", "match_all": true },
+    //         { "key": "preceding_text", "operator": "regex_contains", "operand": "[^{]$", "match_all": true }
+    //     ]
+    // },
+
+    /**
+     * Isto é parecido, mas para aspas:
+     */
+    { "keys": ["'"], "command": "insert", "args": {"characters": "'"}, "context":
+        [
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+            { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "^'", "match_all": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "[^']$", "match_all": true }
+        ]
+    },
+    { "keys": ["\""], "command": "insert", "args": {"characters": "\""}, "context":
+        [
+            { "key": "setting.auto_match_enabled", "operator": "equal", "operand": true },
+            { "key": "selection_empty", "operator": "equal", "operand": true, "match_all": true },
+            { "key": "following_text", "operator": "regex_contains", "operand": "^\"", "match_all": true },
+            { "key": "preceding_text", "operator": "regex_contains", "operand": "[^\"]$", "match_all": true }
+        ]
+    },
+
+    // shows autocompletion popup
+    { "keys": ["ctrl+space"], "command": "auto_complete" },
+    { "keys": ["ctrl+space"], "command": "replace_completion_with_auto_complete", "context":
+        [
+            { "key": "last_command", "operator": "equal", "operand": "insert_best_completion" },
+            { "key": "auto_complete_visible", "operator": "equal", "operand": false },
+            { "key": "setting.tab_completion", "operator": "equal", "operand": true }
+        ]
+    },
+]
