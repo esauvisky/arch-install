@@ -107,7 +107,8 @@ fi
 
 export XDG_SESSION_TYPE=x11
 export GDK_BACKEND=x11
-exec gnome-session #--systemd-service
+gnome-session #--systemd-service
+# exec gnome-shell -r --x11 -d 0 -r --sm-disable --sync --mode user
 
 #exec twm
 #exec cinnamon-session
