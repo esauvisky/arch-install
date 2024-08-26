@@ -1,7 +1,0 @@
-# GIMP gimp-text-tool options
-
-(foreground (color-rgb 1 1 0.99215686321258545))
-(palette "Color History")
-(font "xos4 Terminus Bold")
-
-# end of gimp-text-tool options

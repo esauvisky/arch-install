@@ -1,0 +1,20 @@
+# settings
+
+(preset 0)
+(lossless no)
+(quality 90)
+(alpha-quality 100)
+(use-sharp-yuv no)
+(animation-loop yes)
+(minimize-size yes)
+(keyframe-distance 50)
+(default-delay 200)
+(force-delay no)
+(animation no)
+(save-exif yes)
+(save-iptc yes)
+(save-xmp yes)
+(save-color-profile yes)
+(save-thumbnail no)
+
+# end of settings

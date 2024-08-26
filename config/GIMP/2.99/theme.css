@@ -1,0 +1,21 @@
+/* GIMP theme.css
+ *
+ * This file is written on GIMP startup and on every theme change.
+ * It is NOT supposed to be edited manually. Edit your personal
+ * gimp.css file instead (/home/emi/.config/GIMP/2.99/gimp.css).
+ */
+
+@import url("file:///usr/share/gimp/2.99/themes/System/gimp.css");
+@import url("file:///etc/gimp/2.99/gimp.css");
+
+* { -gtk-icon-style: regular; }
+
+
+* { -GimpToolPalette-tool-icon-size: dnd; }
+* { -GimpDockbook-tab-icon-size: large-toolbar; }
+* { -GimpEditor-button-icon-size: large-toolbar; }
+toolpalette button { padding: 5px; }
+button, tab { padding: 5px; }
+paned separator { padding: 2px; }
+
+/* end of theme.css */

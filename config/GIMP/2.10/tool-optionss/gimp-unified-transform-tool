@@ -1,7 +1,0 @@
-# GIMP gimp-unified-transform-tool options
-
-(direction backward)
-(clip clip)
-(show-preview no)
-
-# end of gimp-unified-transform-tool options

@@ -1,0 +1,20 @@
+# settings
+
+(interlaced no)
+(compression 9)
+(bkgd yes)
+(offs no)
+(phys yes)
+(time yes)
+(save-transparent no)
+(optimize-palette no)
+(format "auto")
+(save-exif yes)
+(save-iptc no)
+(save-xmp yes)
+(save-color-profile yes)
+(save-thumbnail no)
+(save-comment yes)
+(gimp-comment "Created with GIMP")
+
+# end of settings
