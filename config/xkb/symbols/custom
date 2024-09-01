@@ -1,23 +1,13 @@
-default
-xkb_symbols "abnt2" {
-    //////////////////////////////////////////////////
-    // by @emi - made for IBM Model M ABNT2 Layouts //
-    //////////////////////////////////////////////////
-    // How to install:
-    // 1. Put this in ~/.config/xkb/symbols/modelm
-    // >  Tip: dump your current config with:
-    // >   $ setxkbmap -print
-    // 2. Look for the xkb_symbols part, after pc you should have `br(abnt2)` probably.
-    //    We'll have to edit it:
-    //     $ setxkbmap -print | sed 's/\+br/+modelm/'
-    // 3. Then we want to pass that to `xkbcomp` with the -I param pointing to our local folder:
-    //     $ setxkbmap -print | sed 's/\+br/+modelm/' | xkbcomp -I${HOME}/.config/xkb - $DISPLAY
-    // 4. Put this command on .xinitrc or .bash_profile or whatever, and should be good.
+xkb_symbols "new_modifiers" {
+    replace key <CAPS> { [ Hyper_L ] };
+    modifier_map Mod3 { Hyper_L };
+    // replace key <LWIN> { [ Meta_L ] };  // Replace <NEWKEY> with an appropriate keycode
+    // modifier_map Mod2 { <META> };
+};
 
-    include "latin"
-    name[Group1]="Portuguese (Brazil, IBM Model M)";
-
-    key <TLDE> { [   apostrophe,       quotedbl                                 ] }; // U34F is the character joiner (good nbsp). U2003 is long space
+partial
+xkb_symbols "abnt2_mods" {
+    key <TLDE> { [   apostrophe,       quotedbl,       notsign,         notsign ] };
     key <AE01> { [            1,         exclam,         U2081,     onesuperior ] };
     key <AE02> { [            2,             at,         U2082,     twosuperior ] };
     key <AE03> { [            3,     numbersign,         U2083,   threesuperior ] };
@@ -57,77 +47,4 @@ xkb_symbols "abnt2" {
     key <AB08> { [        comma,           less, guillemotleft                  ] };
     key <AB09> { [       period,        greater,guillemotright                  ] };
     key <AB10> { [    semicolon,          colon                                 ] };
-    key <SPCE> { [        space,          space,         U2003,            U34F ] };
-
-    // The ABNT-2 keyboard has this special key:
-    key <AB11> { [        slash,       question,        degree,    questiondown ] };
-
-    key <SCLK> { [ Menu ] };
-    // modifier_map Mod3   { Scroll_Lock };
-
-    include "kpdl(comma)"
-    include "level3(ralt_switch)"
-
 };
-
-partial alphanumeric_keys
-    xkb_symbols "basic" {
-    include "sun_vndr/br(sun_type6)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "abnt2" {
-    include "br(abnt2)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "nodeadkeys" {
-    include "br(nodeadkeys)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "thinkpad" {
-    include "br(thinkpad)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "olpc" {
-    include "br(olpc)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "dvorak" {
-    include "br(dvorak)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "nativo" {
-    include "br(nativo)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "nativo-us" {
-    include "br(nativo-us)"
-};
-
-partial alphanumeric_keys
-    xkb_symbols "nativo-epo" {
-    include "br(nativo-epo)"
-};
-
-///////////////////////
-// OLD DOCUMENTATION //
-///////////////////////
-// Use the command below to test it:
-// $ setxkbmap -v 10 -model abnt2 -layout br -variant abnt2
-//
-// Also don't forget to make the file immutable if you don't want it to get replaced when updating.
-//
-// The command below is helpful for insta-debugging
-// $ sudo chattr -i /usr/share/X11/xkb/symbols/br && sudo cp br /usr/share/X11/xkb/symbols && sudo chattr +i /usr/share/X11/xkb/symbols/br && setxkbmap -v 10 -model abnt2 -layout br -variant abnt2
-//
-// The latin layout is available at the end of the file.
-// Eventually, I'll stop including latin and define all keys on this file.
-//
-// Any blank space is a space for a character, make use of them.
-

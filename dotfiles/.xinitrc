@@ -91,8 +91,8 @@ solaar -w hide &
 # sleep 5s && rfkill unblock bluetooth &
 
 ## Loads XKB custom symbols map:
-if [ -f ${HOME}/.config/xkb/symbols/br ]; then
-    setxkbmap -print | sed 's/\+br/+modelm/' | xkbcomp -I${HOME}/.config/xkb - $DISPLAY
+if [ -d ${HOME}/.config/xkb ]; then
+    xkbcomp -I$HOME/.config/xkb $HOME/.config/xkb/custom_layout.xkb $DISPLAY -w 10
 fi
 
 ############

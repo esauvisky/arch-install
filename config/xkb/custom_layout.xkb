@@ -1,0 +1,17 @@
+xkb_keymap {
+    xkb_keycodes  { include "evdev" };
+    xkb_types { include "complete" };
+    xkb_compatibility {
+        include "basic"
+        augment "iso9995"
+        augment "mousekeys"
+        augment "accessx(full)"
+        augment "misc"
+        augment "xfree86"
+        augment "level5"
+    };
+    xkb_symbols {
+        include "pc+br(abnt2)+inet(evdev)+ctrl(swap_rwin_rctl)+shift(both_capslock_cancel)+custom(new_modifiers)+custom(abnt2_mods)"
+    };
+    xkb_geometry { include "pc(pc104)" };
+};
