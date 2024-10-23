@@ -538,60 +538,71 @@ fi
 ## You can also get context around a particular entry with:
 ##   h 4513
 function h() {
-    GET_NEARBY=0
+    local GET_NEARBY=0
+    local MAX_RESULTS=1000  # Limit total results to prevent hanging
+    local result_count=0
+    # Determine the padding length based on the most recent history number
+    local max_number_length=$(history | tail -n 1 | awk '{print length($1)}')
+    # Check if first argument is a number for nearby context
     if [[ $1 =~ ^[0-9][0-9]*$ ]]; then
         GET_NEARBY=1
+        local target_num="$1"
+        local context=30  # Number of lines before/after
     fi
-    # Workaround for the lack of
-    # multidimensional arrays in bash.
-    local results_cmds=()
-    local results_nums=()
-    local query="${@}"
-
+    local query="$*"
+    # Print header
+    printf "\e[01;95m=== Search Results ===\e[00m\n"
+    # Process history entries immediately using process substitution
     if [[ $GET_NEARBY == 1 ]]; then
-        readarray -d '' grepped_history < <(history | \grep -ZEC30 "^$1 ")
-    else
-        readarray -d '' grepped_history < <(history | \grep -ZEC0 -- "$query")
-    fi
-    # echo $
-    while read -r entry; do
-        local number="${entry// */}"
-        local datetime="${entry#*[}"
-        datetime="${datetime%] *}"
-        local cmd="${entry##$number*$datetime] }"
-        # # Strips repeated results
-        if [[ $GET_NEARBY == 0 ]]; then
-            if [[ ! "${results_cmds[*]}" =~ $cmd ]]; then
-                results_cmds+=("$cmd")
-                results_nums+=("$number")
-            fi
-        else
-            results_cmds+=("$cmd")
-            results_nums+=("$number")
-        fi
-    done < <(echo "${grepped_history[@]}")
+        # For numeric search, collect entries before and after the target number
+        mapfile -t matching_entries < <(
+            LANG=C history | \
+            awk -v target="$target_num" -v ctx="$context" '
+                match($0, /^[ ]*[0-9]+/) {
+                    num = substr($0, RSTART, RLENGTH)
+                    num = num + 0  # Convert to number, trimming spaces
+                    entry = substr($0, RSTART + RLENGTH)
+                    if (num >= target - ctx && num <= target + ctx) {
+                        print num entry
+                    }
+                }' 2>/dev/null
+        )
 
-    num=0
-    for r in "${!results_cmds[@]}"; do
-        if [[ $GET_NEARBY == 1 ]]; then
-            cmd="${results_cmds[$r]}"
-            if [[ "${results_nums[$r]}" -eq $1 ]]; then
-                cmd=$'\e[33m'"${results_cmds[$r]}"$'\e[00m'
+        for entry in "${matching_entries[@]}"; do
+            if [[ -n "$entry" ]]; then
+                local number="${entry%% *}"
+                local cmd="${entry#* }"
+                # Highlight the target line
+                if [[ $number == "$target_num" ]]; then
+                    printf "\e[01;96m%-*s \e[00m\e[33m%s\e[00m\n" "$max_number_length" "$number" "$cmd"
+                else
+                    printf "\e[01;96m%-*s \e[00m%s\n" "$max_number_length" "$number" "$cmd"
+                fi
             fi
-        else
-            cmd="$(echo "${results_cmds[$r]}" | sed "s/\($query\)/"$'\e[33m'"\1"$'\e[00m'"/g")"
-            if [[ $cmd == "" ]]; then
-                cmd="${results_cmds[$r]}"
+        done
+    else
+        # For text search, process and print matches immediately
+        local seen_commands=()
+        while IFS=$'\n' read -r entry; do
+            ((result_count++))
+            # Break if we've hit the maximum results
+            if [[ $result_count -gt $MAX_RESULTS ]]; then
+                printf "\e[01;93m=== Results limited to %d matches ===\e[00m\n" "$MAX_RESULTS"
+                break
             fi
-        fi
-        # if [[ "${results_nums[$r]}" -gt "$((num+1))" ]]; then
-        #     printf "\e[01;95m============\e[00m\n"
-        # fi
-        num=${results_nums[$r]}
-        line="\e[01;96m${results_nums[$r]} \e[00m$cmd\e[00m"
-        printf "$line\n"
-    done
-    printf "\e[01;95m============\e[00m\n"
+            local number="${entry%% *}"
+            local cmd="${entry#* }"
+            seen_commands+=("$cmd")
+            # Highlight matching parts
+            local highlighted_cmd
+            highlighted_cmd="${cmd//$query/$(printf '\e[33m%s\e[00m' "$query")}"
+            if [[ "$highlighted_cmd" == "" ]]; then
+                highlighted_cmd="$cmd"
+            fi
+            printf "\e[01;96m%-*s \e[00m%s\n" "$max_number_length" "$number" "$highlighted_cmd"
+        done < <(history | grep -i -- "$query")
+    fi
+    printf "\e[01;95m================\e[00m\n"
 }
 
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+
