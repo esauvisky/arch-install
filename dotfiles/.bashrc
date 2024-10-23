@@ -129,17 +129,38 @@ check_updates 2>/dev/null &
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
+
+declare -A IS_SSH_CACHE
+
 function is_ssh() {
-    # For windows or other weird systems:
+    local p=${1:-$PPID}
+
+    if [[ -n ${IS_SSH_CACHE[$p]} ]]; then
+        return "${IS_SSH_CACHE[$p]}"
+    fi
+
     if [[ ! -f /proc/1/stat ]]; then
+        IS_SSH_CACHE[$p]=1
         return 1
     fi
-    p=${1:-$PPID}
-    read pid name x ppid y < <(cat /proc/$p/stat)
+
+    read -r pid name x ppid y < <(cat "/proc/$p/stat")
     # or: read pid name ppid < <(ps -o pid= -o comm= -o ppid= -p $p)
-    [[ "$name" =~ sshd ]] && { return 0; }
-    [[ "$ppid" -le 1 ]] && { return 1; }
-    is_ssh $ppid
+
+    if [[ "$name" =~ sshd ]]; then
+        IS_SSH_CACHE[$p]=0
+        return 0
+    fi
+
+    if [[ "$ppid" -le 1 ]]; then
+        IS_SSH_CACHE[$p]=1
+        return 1
+    fi
+
+    is_ssh "$ppid"
+    local result=$?
+    IS_SSH_CACHE[$p]=$result
+    return $result
 }
 
 ## Checks if a binary or built-in command exists on PATH with failovers
