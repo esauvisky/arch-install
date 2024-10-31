@@ -20,7 +20,7 @@ allow_multiline_lambdas=False
 allow_split_before_default_or_named_assigns=False
 
 # Allow splits before the dictionary value.
-allow_split_before_dict_value=false
+allow_split_before_dict_value=False
 
 #   Let spacing indicate operator precedence. For example:
 #
@@ -127,12 +127,12 @@ each_dict_entry_on_separate_line=False
 # The regex for an i18n comment. The presence of this comment stops
 # reformatting of that line, because the comments are required to be
 # next to the string they translate.
-i18n_comment=
+# i18n_comment=
 
 # The i18n function call names. The presence of this function stops
 # reformattting on that line, because the string it has cannot be moved
 # away from the i18n comment.
-i18n_function_call=
+# i18n_function_call=
 
 # Indent blank lines.
 indent_blank_lines=False

@@ -77,6 +77,8 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=1
 
 #syncthing-gtk &
 solaar -w hide &
+imwheel &
+.config/xkb/set_custom_layout.sh &
 ## guake daemon
 # guake &
 

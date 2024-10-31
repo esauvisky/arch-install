@@ -6,6 +6,7 @@
 #     nvm use lts/carbon
 # fi
 
+
 # MagicCD
 alias cdc='_magicCD 2 $HOME/Coding/'
 alias cdp='_magicCD 2 $HOME/Pokemod/'
@@ -20,6 +21,7 @@ alias cdp='_magicCD 2 $HOME/Pokemod/'
 # Uses open-subl3 instead of plain subl3 (so it doesn't changes workspaces if there's an instance already opened)
 alias subl='subl3open'
 alias subl3='subl3open'
+alias ls="lsd -ltr --classify --human-readable --literal --sort time --icon-theme unicode --date relative --permission octal --blocks permission,user,size,date,name"
 
 # Fixes kitty on ssh
 # if [[ $(is_ssh) && $TERM == "xterm-kitty" ]]; then

@@ -1196,16 +1196,6 @@
         "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
     },
     {
-        "key": "ctrl+'",
-        "command": "workbench.action.terminal.focusNext",
-        "when": "terminalHasBeenCreated || terminalProcessSupported"
-    },
-    {
-        "key": "ctrl+shift+'",
-        "command": "workbench.action.terminal.focusPrevious",
-        "when": "terminalHasBeenCreated || terminalProcessSupported"
-    },
-    {
         "key": "ctrl+pagedown",
         "command": "-workbench.action.terminal.focusNext",
         "when": "terminalFocus && terminalHasBeenCreated && !terminalEditorFocus || terminalFocus && terminalProcessSupported && !terminalEditorFocus"
@@ -1730,5 +1720,15 @@
         "key": "ctrl+o",
         "command": "-workbench.action.files.openFolderViaWorkspace",
         "when": "!openFolderWorkspaceSupport && workbenchState == 'workspace'"
-    }
+    },
+    {
+        "key": "ctrl+'",
+        "command": "workbench.action.terminal.focusNext",
+        "when": "terminalHasBeenCreated || terminalProcessSupported"
+    },
+    {
+        "key": "ctrl+shift+'",
+        "command": "workbench.action.terminal.focusPrevious",
+        "when": "terminalHasBeenCreated || terminalProcessSupported"
+    },
 ]

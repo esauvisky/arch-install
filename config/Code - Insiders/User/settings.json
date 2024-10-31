@@ -27,7 +27,18 @@
     },
     "[php]": {
         "editor.defaultFormatter": "bmewburn.vscode-intelephense-client",
-        "editor.detectIndentation": false
+        "editor.detectIndentation": false,
+        // Intelephense settings
+        "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": true,
+        "intelephense.completion.maxItems": 50,
+        "intelephense.diagnostics.enable": true,
+        "intelephense.diagnostics.run": "onSave",
+        "intelephense.environment.includePaths": [
+            "/home/emi/Coding/Arduino/libraries"
+        ],
+        "intelephense.format.braces": "k&r",
+        "intelephense.telemetry.enabled": false,
+        "intelephense.trace.server": "off",
     },
     "[python]": {
         "editor.autoIndent": "keep",
@@ -260,8 +271,28 @@
     "git.enableStatusBarSync": false,
     "git.mergeEditor": false,
     "git.openDiffOnClick": false,
+    "git.alwaysShowStagedChangesResourceGroup": true,
+    "git.closeDiffOnOperation": true,
+    "git.optimisticUpdate": true,
+    "git.ignoreSubmodules": true,
     "git.openRepositoryInParentFolders": "always",
     "git.promptToSaveFilesBeforeCommit": "always",
+    "gitlens.blame.highlight.enabled": true,
+    "gitlens.blame.compact": true,
+    "gitlens.changes.locations": [
+        "gutter",
+        "line",
+        "overview"
+    ],
+    "gitlens.views.collapseWorktreesWhenPossible": true,
+    "gitlens.blame.highlight.locations": [
+        "gutter",
+        "line",
+        "overview"
+    ],
+    "gitlens.blame.heatmap.location": "right",
+    "gitlens.codeLens.recentChange.enabled": true,
+    "gitlens.currentLine.enabled": true,
     "git.repositoryScanMaxDepth": 5,
     "git.untrackedChanges": "separate",
     // GitHub settings
@@ -282,10 +313,10 @@
     // GitLens settings
     "gitlens.advanced.abbreviatedShaLength": 6,
     "gitlens.advanced.abbreviateShaOnCopy": true,
-    "gitlens.advanced.caching.enabled": false,
+    "gitlens.advanced.caching.enabled": true,
     "gitlens.advanced.fileHistoryFollowsRenames": true,
     "gitlens.advanced.fileHistoryShowAllBranches": true,
-    "gitlens.advanced.repositorySearchDepth": 1,
+    "gitlens.advanced.repositorySearchDepth": null,
     "gitlens.blame.ignoreWhitespace": true,
     "gitlens.blame.separateLines": false,
     "gitlens.blame.toggleMode": "window",
@@ -293,38 +324,49 @@
     "gitlens.codeLens.includeSingleLineSymbols": true,
     "gitlens.codeLens.recentChange.command": "gitlens.showCommitsInView",
     "gitlens.currentLine.dateFormat": "LLLL",
-    "gitlens.gitCommands.search.matchRegex": false,
-    "gitlens.gitCommands.search.showResultsInSideBar": false,
+    "gitlens.gitCommands.search.matchRegex": true,
+    "gitlens.gitCommands.search.showResultsInSideBar": true,
     "gitlens.heatmap.toggleMode": "window",
     "gitlens.hovers.autolinks.enhanced": false,
     "gitlens.hovers.changesDiff": "hunk",
     "gitlens.hovers.pullRequests.enabled": false,
     "gitlens.integrations.enabled": false,
+    "gitlens.cloudIntegrations.enabled": false,
+    "gitlens.views.workspaces.showWorktrees": false,
+    "gitlens.views.workspaces.showContributors": false,
+    "gitlens.views.workspaces.files.layout": "tree",
+    "gitlens.advanced.commitOrdering": "topo",
+    "gitlens.views.searchAndCompare.files.icon": "status",
+    "gitlens.gitCommands.closeOnFocusOut": false,
     "gitlens.keymap": "none",
     "gitlens.menus": {
         "editor": {
             "blame": true,
             "clipboard": false,
-            "compare": false,
+            "compare": true,
             "details": false,
-            "history": true,
+            "history": false,
             "remote": false
         },
         "editorGroup": {
             "blame": true,
-            "compare": false
+            "compare": true
         },
         "editorTab": {
-            "clipboard": true,
+            "clipboard": false,
             "compare": false,
             "history": true,
-            "remote": true
+            "remote": false
         },
         "explorer": {
-            "clipboard": true,
-            "compare": true,
+            "clipboard": false,
+            "compare": false,
             "history": true,
             "remote": false
+        },
+        "editorGutter": {
+            "compare": true,
+            "share": true,
         },
         "scmGroup": {
             "compare": true,
@@ -392,17 +434,6 @@
     "hungryDelete.followAboveLineIndent": true,
     "hungryDelete.keepOneSpace": true,
     "hungryDelete.keepOneSpaceException": ">;",
-    // Intelephense settings
-    "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": true,
-    "intelephense.completion.maxItems": 50,
-    "intelephense.diagnostics.enable": true,
-    "intelephense.diagnostics.run": "onSave",
-    "intelephense.environment.includePaths": [
-        "/home/emi/Coding/Arduino/libraries"
-    ],
-    "intelephense.format.braces": "k&r",
-    "intelephense.telemetry.enabled": false,
-    "intelephense.trace.server": "off",
     // JavaScript settings
     "javascript.suggest.completeFunctionCalls": true,
     "javascript.updateImportsOnFileMove.enabled": "always",
@@ -863,11 +894,6 @@
     "terminal.integrated.confirmOnExit": "hasChildProcesses",
     "terminal.integrated.drawBoldTextInBrightColors": false,
     "openscad-formatter.clang-format.style": "{ BasedOnStyle: Microsoft, UseTab: ForIndentation, ColumnLimit: 250,StatementMacros: [rotate,translate]}",
-    "flexigpt.defaultProvider": "openai",
-    "flexigpt.openai.defaultChatCompletionModel": "gpt-4o",
-    "flexigpt.openai.defaultCompletionModel": "gpt-4o",
-    "flexigpt.googlegl.defaultChatCompletionModel": "gemini-1.5-pro",
-    "flexigpt.googlegl.defaultCompletionModel": "gemini-1.5-flash",
     "gitlab.aiAssistedCodeSuggestions.additionalLanguages": [
         "yaml"
     ],
@@ -887,4 +913,5 @@
     "dotnetAcquisitionExtension.enableTelemetry": false,
     "gitlens.telemetry.enabled": false,
     "window.newWindowProfile": "Default",
+    "diffEditor.renderSideBySide": false,
 }

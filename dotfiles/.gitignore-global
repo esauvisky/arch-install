@@ -21,3 +21,9 @@ node_modules/
 
 # Python rubbish
 __pycache__/
+
+# Cheaters
+.aider*
+
+# Frontend Build
+frontend/build
