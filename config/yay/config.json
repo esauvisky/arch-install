@@ -2,7 +2,7 @@
 	"aururl": "https://aur.archlinux.org",
 	"aurrpcurl": "https://aur.archlinux.org/rpc?",
 	"buildDir": "/tmp/yay/build",
-	"editor": "open-subl3",
+	"editor": "subl3",
 	"editorflags": "",
 	"makepkgbin": "makepkg",
 	"makepkgconf": "",

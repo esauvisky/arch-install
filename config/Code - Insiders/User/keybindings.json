@@ -645,15 +645,6 @@
         "command": "workbench.action.closeEditorsToTheRight"
     },
     {
-        "key": "ctrl+shift+w",
-        "command": "workbench.action.terminal.kill",
-        "when": "terminalFocus"
-    },
-    {
-        "key": "ctrl+shift+f4",
-        "command": "workbench.action.terminal.killAll"
-    },
-    {
         "key": "ctrl+k ctrl+s",
         "command": "-workbench.action.openGlobalKeybindings"
     },
@@ -1661,7 +1652,7 @@
     },
     {
         "key": "ctrl+shift+w",
-        "command": "editor.action.smartSelect.grow"
+        "command": "editor.action.smartSelect.shrink"
     },
     // {
     //     "key": "ctrl+shift+w",
@@ -1686,6 +1677,11 @@
         "key": "ctrl+shift+w",
         "command": "-undo_expand_region",
         "when": "editorHasSelection && editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+w",
+        "command": "workbench.action.terminal.kill",
+        "when": "terminalFocus"
     },
     {
         "key": "ctrl+alt+enter",
@@ -1731,4 +1727,13 @@
         "command": "workbench.action.terminal.focusPrevious",
         "when": "terminalHasBeenCreated || terminalProcessSupported"
     },
+    {
+        "key": "ctrl+v",
+        "command": "pyPasteIndent.pasteIndent",
+        "when": "editorLangId == 'python'"
+    },
+    {
+        "key": "ctrl+shift+o",
+        "command": "workbench.action.files.openFileFolder"
+    }
 ]

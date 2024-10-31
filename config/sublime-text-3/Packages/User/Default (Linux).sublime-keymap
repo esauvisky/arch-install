@@ -58,6 +58,11 @@
         ]
     },
 
+    // Find panel key bindings
+    // { "keys": ["enter"], "command": "find_next"},
+    { "keys": ["shift+enter"], "command": "find_prev"},
+    { "keys": ["alt+enter"], "command": "find_all", "args": {"close_panel": true}},
+
     // Alterna "In-Selection" nas pesquisas e substituições
     { "keys": ["alt+s"], "command": "toggle_in_selection", "context":
         [

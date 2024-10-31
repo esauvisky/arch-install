@@ -1,5 +1,15 @@
 # settings
 
+(GimpGegl-gegl-dropshadow-config "2024-10-13 05:23:51"
+    (time 1728807831)
+    (x 1)
+    (y 1)
+    (radius 3)
+    (grow-shape circle)
+    (grow-radius 2)
+    (color
+        (color "R'G'B'A float" 16 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\200\77" 0))
+    (opacity 1.9670000000000001))
 (GimpGegl-gegl-dropshadow-config "2023-10-05 20:04:13"
     (time 1696547053)
     (x 2)
@@ -7,7 +17,8 @@
     (radius 2)
     (grow-shape circle)
     (grow-radius 0)
-    (color (color-rgba 0 0 0 1))
+    (color
+        (color "R'G'B'A double" 32 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\360\77" 0))
     (opacity 0.5))
 (GimpGegl-gegl-dropshadow-config "2023-10-05 20:04:03"
     (time 1696547043)
@@ -16,7 +27,8 @@
     (radius 0)
     (grow-shape circle)
     (grow-radius 0)
-    (color (color-rgba 0 0 0 1))
+    (color
+        (color "R'G'B'A double" 32 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\360\77" 0))
     (opacity 0.5))
 (GimpGegl-gegl-dropshadow-config "2022-07-01 15:47:40"
     (time 1656701260)
@@ -25,7 +37,8 @@
     (radius 10)
     (grow-shape circle)
     (grow-radius 0)
-    (color (color-rgba 0 0 0 1))
+    (color
+        (color "R'G'B'A double" 32 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\360\77" 0))
     (opacity 0.5))
 (GimpGegl-gegl-dropshadow-config "2020-09-26 20:29:44"
     (time 1601162984)
@@ -35,7 +48,8 @@
     (radius 30)
     (grow-shape circle)
     (grow-radius 5)
-    (color (color-rgba 0 0 0 1))
+    (color
+        (color "R'G'B'A double" 32 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\360\77" 0))
     (opacity 1))
 (GimpGegl-gegl-dropshadow-config "2020-08-15 23:51:21"
     (time 1597546281)
@@ -44,7 +58,8 @@
     (radius 10)
     (grow-shape circle)
     (grow-radius 0)
-    (color (color-rgba 0 0 0 1))
+    (color
+        (color "R'G'B'A double" 32 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\360\77" 0))
     (opacity 1.647))
 (GimpGegl-gegl-dropshadow-config "2020-08-15 23:49:31"
     (time 1597546171)
@@ -54,7 +69,8 @@
     (radius 17)
     (grow-shape circle)
     (grow-radius -2)
-    (color (color-rgba 0 0 0 1))
+    (color
+        (color "R'G'B'A double" 32 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\360\77" 0))
     (opacity 1.0900000000000005))
 (GimpGegl-gegl-dropshadow-config "2020-07-07 20:15:39"
     (time 1594163739)
@@ -63,7 +79,8 @@
     (radius 13)
     (grow-shape square)
     (grow-radius 7)
-    (color (color-rgba 0 0 0 1))
+    (color
+        (color "R'G'B'A double" 32 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\360\77" 0))
     (opacity 1.3300000000000007))
 
 # end of settings

@@ -40,7 +40,7 @@
 (custom-title-bar yes)
 (show-welcome-dialog no)
 (image-convert-indexed-max-colors 6)
-(selection-feather-radius 1)
+(layer-new-fill-type foreground)
 (selection-border-radius 1)
 (fill-options
     (style bg-color)
