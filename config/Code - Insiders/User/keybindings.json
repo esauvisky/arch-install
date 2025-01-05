@@ -877,7 +877,7 @@
         "when": "fileMatchOrFolderMatchWithResourceFocus"
     },
     {
-        "key": "ctrl+b",
+        "key": "ctrl+shift+e",
         "command": "workbench.action.toggleSidebarVisibility"
     },
     {
@@ -1106,18 +1106,28 @@
     },
     {
         "key": "escape",
-        "command": "workbench.action.closeSidebar",
-        "when": "editorFocus && sideBarVisible"
-    },
-    {
-        "key": "escape",
         "command": "workbench.action.closePanel",
-        "when": "editorFocus && panelVisible && !(sideBarVisible || auxiliaryBarVisible)"
+        "when": "editorFocus && panelVisible"
     },
     {
         "key": "escape",
         "command": "workbench.action.closeAuxiliaryBar",
-        "when": "editorFocus && auxiliaryBarVisible && !sideBarVisible"
+        "when": "editorFocus && auxiliaryBarVisible && !panelVisible"
+    },
+    {
+        "key": "escape",
+        "command": "workbench.action.closeSidebar",
+        "when": "editorFocus && sideBarVisible && !(auxiliaryBarVisible || panelVisible)"
+    },
+    {
+        "key": "escape",
+        "command": "closeFindWidget",
+        "when": "editorFocus && findWidgetVisible && !isComposings"
+    },
+    {
+        "key": "escape",
+        "command": "cancelSelection",
+        "when": "editorHasSelection && editorTextFocus"
     },
     {
         "key": "ctrl+p",
@@ -1386,11 +1396,6 @@
         "when": "editorTextFocus && isWorkspaceTrusted && jupyter.hascodecells && !editorHasSelection && !jupyter.havenativecells && !notebookEditorFocused"
     },
     {
-        "key": "escape",
-        "command": "closeFindWidget",
-        "when": "editorFocus && findWidgetVisible && !isComposings"
-    },
-    {
         "key": "ctrl+shift+b",
         "command": "workbench.action.toggleAuxiliaryBar"
     },
@@ -1632,8 +1637,14 @@
     },
     {
         "key": "ctrl+shift+w",
-        "command": "editor.action.smartSelect.shrink"
+        "command": "editor.action.smartSelect.shrink",
+        "when": "editorHasSelection && editorTextFocus"
     },
+    // {
+    //     "key": "ctrl+shift+w",
+    //     "command": "-undo_expand_region",
+    //     "when": "editorHasSelection && editorTextFocus"
+    // },
     // {
     //     "key": "ctrl+shift+w",
     //     "command": "expand-selection-to-scope.expand",
@@ -1655,13 +1666,8 @@
     },
     {
         "key": "ctrl+shift+w",
-        "command": "-undo_expand_region",
-        "when": "editorHasSelection && editorTextFocus"
-    },
-    {
-        "key": "ctrl+shift+w",
         "command": "workbench.action.terminal.kill",
-        "when": "terminalFocus || (terminal.visible && !editorHasSelection)"
+        "when": "terminalFocus || terminal.visible"
     },
     {
         "key": "ctrl+alt+enter",
