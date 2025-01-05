@@ -67,15 +67,15 @@
   _unitId: DEFC81F2
   _wpid: '4069'
   change-host: null
-  divert-keys: {82: 1, 83: 1, 86: 1, 195: 2, 196: 0}
+  divert-keys: {82: 0, 83: 2, 86: 2, 195: 1, 196: 0}
   dpi: 1000
   gesture2-divert: {46: false}
   gesture2-gestures: {45: true, 46: true}
   hires-scroll-mode: false
   hires-smooth-invert: false
   hires-smooth-resolution: true
-  reprogrammable-keys: {80: 80, 81: 81, 82: 82, 83: 83, 86: 86, 195: 195, 196: 82}
-  scroll-ratchet: 1
+  reprogrammable-keys: {80: 80, 81: 81, 82: 82, 83: 83, 86: 86, 195: 196, 196: 82}
+  scroll-ratchet: 2
   smart-shift: 50
 - _NAME: Wireless Touch Keyboard K400 Plus
   _absent: [hi-res-scroll, lowres-scroll-mode, hires-smooth-invert, hires-smooth-resolution, hires-scroll-mode, scroll-ratchet, smart-shift, thumb-scroll-invert,
