@@ -41,6 +41,7 @@
 (show-welcome-dialog no)
 (image-convert-indexed-max-colors 6)
 (layer-new-fill-type foreground)
+(selection-grow-radius 10)
 (selection-border-radius 1)
 (fill-options
     (style bg-color)
