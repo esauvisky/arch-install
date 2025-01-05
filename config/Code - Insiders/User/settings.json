@@ -648,6 +648,9 @@
         },
         "javascript:S6749": {
             "level": "off"
+        },
+        "javascript:S6635": {
+            "level": "off"
         }
     },
     // Task settings
@@ -861,7 +864,7 @@
     "scm.showChangesSummary": false,
     "scm.showOutgoingChanges": "never",
     "github.copilot.editor.enableAutoCompletions": false,
-    "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.ignoreTrimWhitespace": true,
     "peacock.surpriseMeOnStartup": true,
     "peacock.surpriseMeFromFavoritesOnly": true,
     "projectManager.git.baseFolders": [
@@ -885,6 +888,11 @@
     "terminal.integrated.confirmOnExit": "hasChildProcesses",
     "terminal.integrated.drawBoldTextInBrightColors": false,
     "openscad-formatter.clang-format.style": "{ BasedOnStyle: Microsoft, UseTab: ForIndentation, ColumnLimit: 250,StatementMacros: [rotate,translate]}",
+    "flexigpt.defaultProvider": "openai",
+    "flexigpt.openai.defaultChatCompletionModel": "gpt-4o",
+    "flexigpt.openai.defaultCompletionModel": "gpt-4o",
+    "flexigpt.googlegl.defaultChatCompletionModel": "gemini-1.5-pro",
+    "flexigpt.googlegl.defaultCompletionModel": "gemini-1.5-flash",
     "scad-lsp.fmtExePath": "clang-format",
     "scad-lsp.defaultParam": true,
     "scad-lsp.fmtStyle": "LLVM",
@@ -998,4 +1006,7 @@
     "window.menuBarVisibility": "compact",
     "diffEditor.experimental.showMoves": true,
     "supermaven.allowGitignore": true,
+    "[dockerfile]": {
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    },
 }
