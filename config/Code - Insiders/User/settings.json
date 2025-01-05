@@ -45,7 +45,7 @@
         "editor.defaultFormatter": "eeyore.yapf",
         "editor.formatOnType": false,
         "editor.wordBasedSuggestions": "off",
-        "diffEditor.ignoreTrimWhitespace": false
+        "diffEditor.ignoreTrimWhitespace": true
     },
     "[scss]": {
         "editor.defaultFormatter": "sibiraj-s.vscode-scss-formatter"
@@ -466,6 +466,7 @@
     // Python settings
     "python.analysis.diagnosticSeverityOverrides": {
         "reportOptionalMemberAccess": "none",
+        "reportOptionalSubscript": "none"
     },
     "python.experiments.enabled": true,
     "python.interpreter.infoVisibility": "onPythonRelated",
@@ -775,7 +776,7 @@
         "terminalCursor.foreground": "#93A1A1",
         "textLink.foreground": "#d8c769"
     },
-    "workbench.colorTheme": "Braver's Solarized Dark (themed workbench)",
+    "workbench.colorTheme": "Braver's Solarized Dark",
     "workbench.commandPalette.preserveInput": true,
     "workbench.editor.centeredLayoutAutoResize": true,
     "workbench.editor.closeOnFileDelete": true,
@@ -846,7 +847,7 @@
     "gitlens.ai.experimental.openai.model": "gpt-4o",
     "workbench.editor.splitInGroupLayout": "vertical",
     "github.copilot.editor.enableCodeActions": false,
-    "sonarlint.focusOnNewCode": true,
+    "sonarlint.focusOnNewCode": false,
     "smalise.cache.memoryLimit": 2048,
     "android-debug.ndkRoot": "/opt/android-ndk",
     "android-debug.sdkRoot": "/opt/android-sdk",
@@ -866,7 +867,17 @@
     "github.copilot.editor.enableAutoCompletions": false,
     "diffEditor.ignoreTrimWhitespace": true,
     "peacock.surpriseMeOnStartup": true,
-    "peacock.surpriseMeFromFavoritesOnly": true,
+    "peacock.surpriseMeFromFavoritesOnly": false,
+    "peacock.affectSideBarBorder": true,
+    "peacock.affectDebuggingStatusBar": true,
+    "peacock.affectTabActiveBorder": false,
+    "peacock.affectEditorGroupBorder": true,
+    "peacock.affectPanelBorder": true,
+    "peacock.elementAdjustments": {
+        "activityBar": "lighten",
+        "statusBar": "none",
+        "titleBar": "lighten",
+    },
     "projectManager.git.baseFolders": [
         "~/Pokemod",
         "~/Coding"
@@ -874,7 +885,7 @@
     "projectManager.git.maxDepthRecursion": 2,
     "notebook.cellFocusIndicator": "border",
     "[javascript]": {
-        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+        "editor.defaultFormatter": "vscode.typescript-language-features"
     },
     "notebook.compactView": false,
     "notebook.find.scope": {
@@ -1006,6 +1017,9 @@
     "window.menuBarVisibility": "compact",
     "diffEditor.experimental.showMoves": true,
     "supermaven.allowGitignore": true,
+    "supermaven.enableSuggestionHighlighting": true,
+    "supermaven.logFilePath": "/tmp/supermaven.log",
+    "supermaven.enableJumpSuggestions": true,
     "[dockerfile]": {
         "editor.defaultFormatter": "ms-azuretools.vscode-docker"
     },
