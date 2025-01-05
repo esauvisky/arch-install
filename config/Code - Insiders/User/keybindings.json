@@ -111,10 +111,6 @@
         "when": "textInputFocus"
     },
     {
-        "key": "alt+left",
-        "command": "editsHistory.moveCursorToPreviousEdit"
-    },
-    {
         "key": "alt+right",
         "command": "editsHistory.moveCursorToNextEdit"
     },
@@ -158,8 +154,8 @@
     },
     {
         "key": "alt+t",
-        "command": "workbench.action.terminal.newInActiveWorkspace",
-        "when": "terminalCount == 0"
+        "command": "workbench.action.terminal.new",
+        "when": "!terminal.visible && terminalCount == '0'"
     },
     {
         "key": "alt+t",
@@ -623,10 +619,6 @@
     {
         "key": "ctrl+numpad_subtract",
         "command": "-workbench.action.zoomOut"
-    },
-    {
-        "key": "ctrl+shift+-",
-        "command": "-workbench.action.navigateForward"
     },
     {
         "key": "ctrl+-",
@@ -1587,20 +1579,8 @@
         "when": "suggestWidgetMultipleSuggestions && suggestWidgetVisible && textInputFocus || suggestWidgetVisible && textInputFocus && !suggestWidgetHasFocusedSuggestion"
     },
     {
-        "key": "alt+left",
-        "command": "navigateEditHistory.moveCursorToPreviousEdit"
-    },
-    {
-        "key": "ctrl+q",
-        "command": "-navigateEditHistory.moveCursorToPreviousEdit"
-    },
-    {
         "key": "ctrl+k ctrl+q",
         "command": "-workbench.action.navigateToLastEditLocation"
-    },
-    {
-        "key": "alt+right",
-        "command": "navigateEditHistory.moveCursorToNextEdit"
     },
     {
         "key": "alt+]",
@@ -1681,7 +1661,7 @@
     {
         "key": "ctrl+shift+w",
         "command": "workbench.action.terminal.kill",
-        "when": "terminalFocus"
+        "when": "terminalFocus || (terminal.visible && !editorHasSelection)"
     },
     {
         "key": "ctrl+alt+enter",
@@ -1735,5 +1715,30 @@
     {
         "key": "ctrl+shift+o",
         "command": "workbench.action.files.openFileFolder"
+    },
+    {
+        "key": "alt+left",
+        "command": "workbench.action.navigateBack",
+        "when": "canNavigateBack"
+    },
+    {
+        "key": "ctrl+alt+-",
+        "command": "-workbench.action.navigateBack",
+        "when": "canNavigateBack"
+    },
+    {
+        "key": "alt+right",
+        "command": "workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        "key": "ctrl+shift+-",
+        "command": "-workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        "key": "alt+t",
+        "command": "-gl.generateTests",
+        "when": "config.gitlab.duoChat.enabled && editorHasSelection && gitlab:chatAvailable && gitlab:chatAvailableForProject"
     }
 ]
