@@ -458,7 +458,11 @@ function _get_truncated_pwd() {
     local newPWD="${PWD/#${HOME}/${tilde}}"
     local pwdmaxlen="$((${COLUMNS:-80} / 4))"
     [[ "${#newPWD}" -gt "${pwdmaxlen}" ]] && newPWD="…${newPWD:3-$pwdmaxlen}"
-    echo -n "${newPWD}"
+    if is_ssh; then
+        echo -n "[SSH] ${newPWD}"
+    else
+        echo -n "${newPWD}"
+    fi
 }
 
 ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
