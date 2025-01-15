@@ -1746,5 +1746,15 @@
         "key": "alt+t",
         "command": "-gl.generateTests",
         "when": "config.gitlab.duoChat.enabled && editorHasSelection && gitlab:chatAvailable && gitlab:chatAvailableForProject"
+    },
+    {
+        "key": "f4",
+        "command": "workbench.files.action.focusOpenEditorsView",
+        "when": "workbench.explorer.openEditorsView.active && !isInDiffEditor"
+    },
+    {
+        "key": "ctrl+k e",
+        "command": "-workbench.files.action.focusOpenEditorsView",
+        "when": "workbench.explorer.openEditorsView.active"
     }
 ]

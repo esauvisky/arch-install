@@ -1,5 +1,0 @@
-# Set scheduler for everything (internal SSD and USB flash drives, most likely)
-ACTION=="add|change", KERNEL=="sd[a-z]|mmcblk[0-9]*", ATTR{queue/scheduler}="mq-deadline"
-
-# Set scheduler for ORICO USB Dock (rotational disks will be BFQ)
-#ACTION=="add|change", KERNEL=="sd[a-z]", ATTRS{idVendor}=="152d", ATTRS{idProduct}=="9561", ATTR{queue/scheduler}="bfq"

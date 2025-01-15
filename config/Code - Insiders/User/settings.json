@@ -120,7 +120,7 @@
     "editor.find.autoFindInSelection": "multiline",
     "editor.find.cursorMoveOnType": false,
     "editor.find.seedSearchStringFromSelection": "never",
-    "editor.folding": false,
+    "editor.folding": true,
     // Editor settings - Font and formatting
     "editor.fontFamily": "'Fira Code', 'Droid Sans Mono', 'monospace'",
     "editor.fontLigatures": false,
@@ -161,7 +161,7 @@
     "editor.scrollbar.horizontalScrollbarSize": 20,
     "editor.scrollbar.vertical": "hidden",
     "editor.scrollbar.verticalScrollbarSize": 20,
-    "editor.showFoldingControls": "never",
+    "editor.showFoldingControls": "mouseover",
     "editor.smoothScrolling": true,
     // Editor settings - Sticky scroll and parameter hints
     "editor.stickyScroll.enabled": false,
@@ -865,18 +865,18 @@
     "scm.showChangesSummary": false,
     "scm.showOutgoingChanges": "never",
     "github.copilot.editor.enableAutoCompletions": false,
-    "diffEditor.ignoreTrimWhitespace": true,
+    "diffEditor.ignoreTrimWhitespace": false,
     "peacock.surpriseMeOnStartup": true,
     "peacock.surpriseMeFromFavoritesOnly": false,
     "peacock.affectSideBarBorder": true,
     "peacock.affectDebuggingStatusBar": true,
-    "peacock.affectTabActiveBorder": false,
+    "peacock.affectTabActiveBorder": true,
     "peacock.affectEditorGroupBorder": true,
     "peacock.affectPanelBorder": true,
     "peacock.elementAdjustments": {
         "activityBar": "lighten",
         "statusBar": "none",
-        "titleBar": "lighten",
+        "titleBar": "none",
     },
     "projectManager.git.baseFolders": [
         "~/Pokemod",
@@ -885,7 +885,7 @@
     "projectManager.git.maxDepthRecursion": 2,
     "notebook.cellFocusIndicator": "border",
     "[javascript]": {
-        "editor.defaultFormatter": "vscode.typescript-language-features"
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
     "notebook.compactView": false,
     "notebook.find.scope": {
