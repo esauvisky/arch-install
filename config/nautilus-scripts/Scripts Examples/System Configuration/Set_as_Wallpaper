@@ -1,3 +1,0 @@
-#!/bin/sh
-# From Tuomos Kuosmanen on the Nautilus Mailing List
-background-properties-capplet --init-session-settings --background-image="`pwd`/$1"
