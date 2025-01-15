@@ -825,52 +825,33 @@ if _e python || _e python3; then
         eval "$(pyenv init --path)"
         eval "$(pyenv init -)"
 
-        function python-switch() {
-            if [[ -z "$1" ]]; then
-                echo -e "Usage:\n  python_switch <version>"
-                echo -e "Example:\n  python_switch 3.8\n\n"
-                echo -e "Afterwards, anything you run with 'python' will use python 3.8, including pip and virtualenv.\n"
-                return 1
-            fi
-
-            local python_version="$1"
-            if pyenv install --skip-existing "$python_version"; then
-                pyenv local "$python_version"
-            else
-                echo "Failed to install Python $python_version. Please check the version number and your internet connection."
-                return 1
-            fi
-        }
-
         if _e virtualenv; then
             alias virtualenv="virtualenv -p \$(pyenv which python)"
         fi
     fi
 
+    mkdir -p "/tmp/pip"
+    # Enhanced pip function with additional checks and features
     function pip() {
         local cmd="$1"
-        shift  # Remove the first argument and process the rest
 
-        if [[ "$cmd" == "install" ]]; then
+        if [[ "$cmd" == "install" && -n "$VIRTUAL_ENV" ]]; then
             local packages=()
-            local has_r=0
+            local flags=()
+            local has_flags=0
 
-            # Process arguments to check for '-r' or '--requirement'
+            # Process arguments to check for flags
             for arg in "$@"; do
-                if [[ "$arg" == "-r" ]] || [[ "$arg" == "--requirement" ]]; then
-                    has_r=1
-                    break
-                fi
-                if [[ "$arg" != -* ]]; then
+                if [[ "$arg" != -* && "$arg" != "install" ]]; then
                     packages+=("$arg")
                 fi
             done
 
-            # Run the installation
-            if [[ $has_r -eq 0 ]] && [[ ${#packages[@]} -gt 0 ]]; then
-                # Normal pip install for the specified packages
-                command pip install "$@"
+            command pip "$@"
+            error_code=$?
 
+            # Proceed only if there are packages and no flags
+            if [[ ${#packages[@]} -gt 0 && $error_code -eq 0 ]]; then
                 # Find requirements.txt file in the current or parent directories
                 local cur_dir="$PWD"
                 local req_file=""
@@ -883,34 +864,140 @@ if _e python || _e python3; then
                     cur_dir=$(dirname "$cur_dir")
                 done
 
-                # Ask user and append package and version to the requirements.txt if found and if the user agrees
-                if [[ -n "$req_file" ]]; then
-                    echo -e "\e[01;93m\nInstallation successful.\nDo you want to add installed packages to $req_file? [y/N]\e[00m"
+                # Read existing packages from requirements.txt
+                local req_packages=()
+                if [[ -f "$req_file" ]]; then
+                    # Read package names from requirements.txt
+                    # Remove comments and blank lines
+                    while read -r line; do
+                        line=$(echo "$line" | sed 's/#.*//g' | xargs)
+                        if [[ -n "$line" ]]; then
+                            pkg_name=$(echo "$line" | cut -d'=' -f1 | cut -d'<' -f1 | cut -d'>' -f1)
+                            req_packages+=("$pkg_name")
+                        fi
+                    done < "$req_file"
+                fi
+
+                # Read packages from temporary list
+                local dir_hash=$( echo "$PWD" | md5sum | cut -d' ' -f1)
+                local tmp_file="/tmp/pip/$dir_hash.txt"
+                local tmp_packages=()
+                if [[ -f "$tmp_file" ]]; then
+                    while read -r line; do
+                        tmp_packages+=("$line")
+                    done < "$tmp_file"
+                fi
+
+                # Combine req_packages and tmp_packages
+                local known_packages=("${req_packages[@]}" "${tmp_packages[@]}")
+
+                # Check if any of the installed packages are not in known_packages
+                local new_packages=()
+                for pkg in "${packages[@]}"; do
+                    found=0
+                    for known_pkg in "${known_packages[@]}"; do
+                        if [[ "$pkg" == "$known_pkg" ]]; then
+                            found=1
+                            break
+                        fi
+                    done
+                    if [[ $found -eq 0 ]]; then
+                        new_packages+=("$pkg")
+                    fi
+                done
+
+                # Only prompt if at least one new package
+                if [[ ${#new_packages[@]} -gt 0 ]]; then
+                    echo -e "\e[01;91m\nInstallation successful."
+                    echo -e "\e[00;96mDo you want to add installed packages to requirements.txt? [y/N] \e[00m"
                     read -r user_input
-                    if [[ "$user_input" =~ ^[Yy] ]]; then
-                        for pkg in "${packages[@]}"; do
-                            local name="$(pip show "$pkg" | grep 'Name:' | awk '{print $2}')"
-                            local version="$(pip show "$pkg" | grep 'Version:' | awk '{print $2}')"
-                            if [[ -n "$name" && -n "$version" ]]; then
-                                echo "${name}==${version}" >> "$req_file"
+                    if [[ "$user_input" =~ ^[Yy]$ ]]; then
+                        # Add the new packages to the temporary list
+                        for pkg in "${new_packages[@]}"; do
+                            # Avoid duplicates in the temporary list
+                            if [[ -f "$tmp_file" ]]; then
+                                if ! grep -Fxq "$pkg" "$tmp_file"; then
+                                    echo "$pkg" >> "$tmp_file"
+                                fi
                             else
-                                echo "$pkg" >> "$req_file"
+                                echo "$pkg" >> "$tmp_file"
                             fi
                         done
-                        echo "Added to $req_file."
+
+                        # If requirements.txt not found, create it in the current directory
+                        if [[ -z "$req_file" ]]; then
+                            req_file="$PWD/requirements.txt"
+                            touch "$req_file"
+                            echo -e "\e[01;96mCreated new requirements.txt at $req_file.\e[00m"
+                        fi
+                        # Read the temporary list and add packages to requirements.txt
+                        if [[ -f "$tmp_file" ]]; then
+                            while read -r pkg; do
+                                pkg_name=$(echo "$pkg" | cut -d'=' -f1 | cut -d'<' -f1 | cut -d'>' -f1)
+                                # Avoid duplicates in requirements.txt
+                                if ! grep -Eq "^$pkg_name(==|>=|<=|~=|!=|>|<|$)" "$req_file"; then
+                                    # Retrieve package information
+                                    local pkg_info
+                                    pkg_info=$(pip show "$pkg")
+                                    if [[ -n "$pkg_info" ]]; then
+                                        local name version
+                                        name=$(echo "$pkg_info" | grep '^Name:' | awk '{print $2}')
+                                        version=$(echo "$pkg_info" | grep '^Version:' | awk '{print $2}')
+                                        if [[ -n "$name" && -n "$version" ]]; then
+                                            echo "${name}==${version}" >> "$req_file"
+                                        else
+                                            echo "$pkg" >> "$req_file"
+                                        fi
+                                    else
+                                        echo -e "\e[01;93mDidn't find package information for $pkg.\e[00m"
+                                    fi
+                                fi
+                            done < "$tmp_file"
+                            echo -e "\n\e[01;92mAdded packages to $req_file:\e[00m"
+                            echo -e "\e[97m$(cat "$req_file")\e[00m"
+                            # Clear the temporary list
+                            rm "$tmp_file"
+                        fi
                     else
-                        echo "Not adding to $req_file."
+                        # Add the current packages to the temporary list
+                        # if the user doesn't want to add them to requirements.txt
+                        for pkg in "${req_packages[@]}"; do
+                            if ! grep -qm1 "$pkg" "$tmp_file"; then
+                                echo "$pkg" >> "$tmp_file"
+                            fi
+                        done
                     fi
-                else
-                    echo "Error: requirements.txt not found in current or parent directories."
                 fi
-            else
-                # Run pip install with the original arguments if '-r' is present
-                command pip install "$@"
+            fi
+        elif [[ "$cmd" == "uninstall" && -n "$VIRTUAL_ENV" && $error_code -eq 0 ]]; then
+            # Remove packages from the temporary list
+            local tmp_file="/tmp/pip_installed_packages.txt"
+            if [[ -f "$tmp_file" ]]; then
+                local tmp_packages=()
+                while read -r line; do
+                    tmp_packages+=("$line")
+                done < "$tmp_file"
+
+                local updated_tmp_packages=()
+                for pkg in "${tmp_packages[@]}"; do
+                    remove_pkg=0
+                    for arg in "$@"; do
+                        if [[ "$pkg" == "$arg" ]]; then
+                            remove_pkg=1
+                            break
+                        fi
+                    done
+                    if [[ $remove_pkg -eq 0 ]]; then
+                        updated_tmp_packages+=("$pkg")
+                    fi
+                done
+
+                # Write updated list back to tmp_file
+                printf "%s\n" "${updated_tmp_packages[@]}" > "$tmp_file"
             fi
         else
             # Handle all other pip commands normally
-            command pip "$cmd" "$@"
+            command pip "$@"
         fi
     }
 fi
