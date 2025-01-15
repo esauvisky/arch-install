@@ -131,20 +131,29 @@ if [[ $QUIET == "false" ]]; then
     if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
         if [[ $(id -u) -eq 0 ]]; then
             echo -e "\e[34;01mMoving .nanorc to /etc/nanorc..."
-            sudo mv ~/.nanorc /etc/nanorc
+            mv ~/.nanorc /etc/nanorc
         else
             echo -e "\e[34;01mCopying .nanorc to /etc/nanorc..."
             sudo cp ~/.nanorc /etc/nanorc
         fi
-        sudo sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
-        sudo sed -i 's/^###//' /etc/nanorc
+        if [[ $(id -u) -eq 0 ]]; then
+            sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
+            sed -i 's/^###//' /etc/nanorc
+        else
+            sudo sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
+            sudo sed -i 's/^###//' /etc/nanorc
+        fi
     fi
 
     echo -e "\e[34;01m\nDo you want new users on this machine to automatically have emi's bashrc installed by default? [Y/n]"
     read -r answer < /dev/tty
     if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
         echo -e "\e[34;01mCopying files to /etc/skel..."
-        sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc /etc/nanorc ~/.grc /etc/skel/
+        if [[ $(id -u) -eq 0 ]]; then
+            cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc /etc/nanorc ~/.grc /etc/skel/
+        else
+            sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc /etc/nanorc ~/.grc /etc/skel/
+        fi
     fi
 
     echo -en "\e[34;01m\nDo you want to link all users' bash history to root's bash history, effectively sharing the history between all users? [y/N]"
@@ -152,23 +161,38 @@ if [[ $QUIET == "false" ]]; then
     if [[ $answer == "y" || $answer == "Y" ]]; then
         if [ -f .bash_eternal_history ]; then
             echo -e "\e[34;01mBash history file already exists. Moving to /.bash_eternal_history."
-            sudo mv .bash_eternal_history /.bash_eternal_history
+            if [[ $(id -u) -eq 0 ]]; then
+                mv .bash_eternal_history /.bash_eternal_history
+            else
+                sudo mv .bash_eternal_history /.bash_eternal_history
+            fi
         else
             echo -e "\e[34;01mCreating bash history file in /.bash_eternal_history."
-            sudo touch /.bash_eternal_history
+            if [[ $(id -u) -eq 0 ]]; then
+                touch /.bash_eternal_history
+            else
+                sudo touch /.bash_eternal_history
+            fi
         fi
 
-        sudo chmod 777 /.bash_eternal_history
+        if [[ $(id -u) -eq 0 ]]; then
+            chmod 777 /.bash_eternal_history
+            ln -sf /.bash_eternal_history /etc/skel/.bash_eternal_history
+            ln -sf /.bash_eternal_history .bash_eternal_history
+        else
+            sudo chmod 777 /.bash_eternal_history
+            sudo ln -sf /.bash_eternal_history /etc/skel/.bash_eternal_history
+            sudo ln -sf /.bash_eternal_history .bash_eternal_history
+        fi
 
-        # Ensure the file is linked for future users
-        sudo ln -sf /.bash_eternal_history /etc/skel/.bash_eternal_history
-        sudo ln -sf /.bash_eternal_history .bash_eternal_history
-
-        # Link the history file for existing users
         if [ "$(ls -A /home)" ]; then
             for user_home in /home/*; do
                 if [ -d "$user_home" ]; then
-                    sudo ln -sf /.bash_eternal_history "$user_home/.bash_eternal_history"
+                    if [[ $(id -u) -eq 0 ]]; then
+                        ln -sf /.bash_eternal_history "$user_home/.bash_eternal_history"
+                    else
+                        sudo ln -sf /.bash_eternal_history "$user_home/.bash_eternal_history"
+                    fi
                 fi
             done
             echo -e "\e[34;01mBash history linked for existing users in /home."
