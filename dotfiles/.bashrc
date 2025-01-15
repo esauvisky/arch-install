@@ -24,8 +24,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=32
-export _DATE="Aug 11th, 2024"
+export _RCVERSION=33
+export _DATE="Jan 15th, 2025"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -37,24 +37,22 @@ function _changelog() {
     local c=$'\e[97m'          # code
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog ${_RCVERSION} ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 33 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
-  ${r}- The directory ${b}${c}$HOME/.cargo/bin${r}${b} was added to the PATH if it exists.${a} Now, you have Rust binaries at your fingertips!${r}
-  ${r}${b}- Revamped the ${c}pip${r}${b} command behavior.${r}
-    ${a}When installing packages, it now offers to add them to ${c}requirements.txt${r}${a} automatically, ensuring your dependencies stay up-to-date with minimal effort.${r}
-  ${r}${b}- Integrated ${c}pyenv${r}${b} into the environment if available.${r}
-    ${a}Python developers can now easily switch between Python versions using the new ${c}python-switch${r}${a} function.${r}
-  ${r}${b}- Updated the ${c}journalctl${r}${b} aliases:${r}
-    ${a}The ${c}je${r}${a} alias now outputs with the ${c}with-unit${r}${a} option, providing more detailed logs.${r}
-  ${r}${b}- Improved ${c}git${r}${b} functions with a new ${c}gitr${r}${b} function.${r}
-    ${a}Quickly opens the current repository's remote URL in your browser with a single command.${r}
-  ${r}${b}- Re-enabled the ${c}_yay${r}${b} function and its alias.${r}
-    ${a}For Arch users, ${c}yay${r}${a} now updates everything without prompting, enhancing your AUR package management.${r}
-  ${r}${b}- Updated GIT emoji mappings for more accurate representations:${r}
-    ${a}- Renamed files are now marked with a ${c}🔵${r}${b} instead of ${c}🟣${r}.
-    ${a}- New files are marked with a ${c}🟢${r}${b} emoji.${r}
+  ${r}- Enhanced ${b}${c}pip${r}${b} function behavior.${r}
+    ${a}Now includes better handling of packages in virtual environments.${r}
+    ${a}Automatically identifies and prompts to add newly installed packages to ${c}requirements.txt${r}${a}, ensuring better dependency management.${r}
+    ${a}Temporary tracking of installed packages for easy integration into project dependencies.${r}
+  ${r}${b}- Improved ${c}PATH truncation in terminal prompts.${r}
+    ${a}Added an ${c}[SSH]${r}${a} prefix when in an SSH session, providing better context for remote work.${r}
+  ${r}${b}- Updated color-aware aliases for common commands.${r}
+    ${a}Aliases like ${c}docker, ip, ps, lsblk${r}${a}, and others are now only set if the respective commands are available, reducing errors in non-standard environments.${r}
+  ${r}${b}- Enhanced terminal title updates.${r}
+    ${a}Terminal titles now include an ${c}[SSH]${r}${a} prefix when connected via SSH, providing better visual indicators for remote work.${r}
+  ${r}${b}- Refined ${c}pip uninstall${r}${b} handling.${r}
+    ${a}Uninstall commands now also clean up temporary tracking of installed packages for a smoother workflow.${r}
 
-  ${y}${y}Tip: Take advantage of the new ${c}pip${r}${y} enhancements to keep your ${c}requirements.txt${r}${y} up-to-date automatically!${r}
+  ${y}${y}Tip: Use the enhanced ${c}pip${r}${y} functionality to streamline dependency management in your Python projects!${r}
   "
 }
 
