@@ -95,9 +95,9 @@ if [[ $QUIET == "false" ]]; then
         read -r answer < /dev/tty
         if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
-                pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils nano-syntax-highlighting sudo
+                pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat colordiff nano inetutils nano-syntax-highlighting sudo
             elif hash sudo 2>/dev/null; then
-                sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat ccze colordiff nano inetutils nano-syntax-highlighting
+                sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat colordiff nano inetutils nano-syntax-highlighting
             else
                 echo -e "\e[34;01mYou need sudo to install this. Install it and try again."
             fi
