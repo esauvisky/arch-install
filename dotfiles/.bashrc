@@ -508,37 +508,37 @@ if _e "grc"; then
     alias colourify="$GRC -es"
     alias blkid='colourify blkid'
     alias configure='colourify ./configure'
-    alias docker='colourify docker'
-    alias docker-compose='colourify docker-compose'
-    alias docker-machine='colourify docker-machine'
-    alias efibootmgr='colourify efibootmgr'
-    alias du='colourify du -h'
-    alias free='colourify free'
-    alias fdisk='colourify fdisk'
-    alias findmnt='colourify findmnt'
-    alias make='colourify make'
-    alias gcc='colourify gcc'
-    alias g++='colourify g++'
-    alias id='colourify id'
-    alias ip='colourify ip'
-    alias iptables='colourify iptables'
-    alias journalctl='colourify journalctl'
-    alias kubectl='colourify kubectl'
-    alias lsof='colourify lsof'
-    alias lsblk='colourify lsblk'
-    alias lspci='colourify lspci'
-    alias netstat='colourify netstat'
-    alias ping='colourify ping'
-    alias traceroute='colourify traceroute'
-    alias traceroute6='colourify traceroute6'
-    alias dig='colourify dig'
-    alias mount='colourify mount'
-    alias ps='colourify ps'
-    alias mtr='colourify mtr'
-    alias semanage='colourify semanage'
-    alias getsebool='colourify getsebool'
-    alias ifconfig='colourify ifconfig'
-    alias sockstat='colourify sockstat'
+    _e "docker" && alias docker='colourify docker'
+    _e "docker-compose" && alias docker-compose='colourify docker-compose'
+    _e "docker-machine" && alias docker-machine='colourify docker-machine'
+    _e "efibootmgr" && alias efibootmgr='colourify efibootmgr'
+    _e "du" && alias du='colourify du -h'
+    _e "free" && alias free='colourify free'
+    _e "fdisk" && alias fdisk='colourify fdisk'
+    _e "findmnt" && alias findmnt='colourify findmnt'
+    _e "make" && alias make='colourify make'
+    _e "gcc" && alias gcc='colourify gcc'
+    _e "g++" && alias g++='colourify g++'
+    _e "id" && alias id='colourify id'
+    _e "ip" && alias ip='colourify ip'
+    _e "iptables" && alias iptables='colourify iptables'
+    _e "journalctl" && alias journalctl='colourify journalctl'
+    _e "kubectl" && alias kubectl='colourify kubectl'
+    _e "lsof" && alias lsof='colourify lsof'
+    _e "lsblk" && alias lsblk='colourify lsblk'
+    _e "lspci" && alias lspci='colourify lspci'
+    _e "netstat" && alias netstat='colourify netstat'
+    _e "ping" && alias ping='colourify ping'
+    _e "traceroute" && alias traceroute='colourify traceroute'
+    _e "traceroute6" && alias traceroute6='colourify traceroute6'
+    _e "dig" && alias dig='colourify dig'
+    _e "mount" && alias mount='colourify mount'
+    _e "ps" && alias ps='colourify ps'
+    _e "mtr" && alias mtr='colourify mtr'
+    _e "semanage" && alias semanage='colourify semanage'
+    _e "getsebool" && alias getsebool='colourify getsebool'
+    _e "ifconfig" && alias ifconfig='colourify ifconfig'
+    _e "sockstat" && alias sockstat='colourify sockstat'
 fi
 
 ###  _____  _____ _      ______         _
@@ -1761,7 +1761,11 @@ function _pre_command() {
         # Changes the terminal title to the command that is going to be run
         # uses printf in case there are scapes characters on the command, which
         # would block the rendering.
-        printf "\033]0;${this_command%% *}\007"
+        if is_ssh; then
+            printf "\033]0;[SSH]${this_command%% *}\007"
+        else
+            printf "\033]0;${this_command%% *}\007"
+        fi
         ;;
     esac
 
