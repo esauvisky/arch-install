@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-set -o errexit
+# set -o errexit
 set -o errtrace
-set -o pipefail # Exit on errors
+# set -o pipefail # Exit on errors
 # Uncomment line below for debugging:
 #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'; set -o xtrace
 __deps=("sed" "grep")
@@ -107,9 +107,9 @@ if [[ $QUIET == "false" ]]; then
         read -r answer < /dev/tty
         if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
-                apt install grc cowsay fortune-mod lolcat ccze colordiff nano sudo
+                apt install grc cowsay fortune-mod lolcat colordiff nano sudo
             elif hash sudo 2>/dev/null; then
-                sudo apt install grc cowsay fortune-mod lolcat ccze colordiff nano
+                sudo apt install grc cowsay fortune-mod lolcat colordiff nano
             else
                 echo -e "\e[34;01mYou need sudo to install this. Install it and try again."
             fi
