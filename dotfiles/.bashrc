@@ -205,6 +205,7 @@ done
 
 ## Picks a hostname variable to use all around
 ## Works on several places including adb shells and ssh
+_ENV_COLOR='\[\e[22;37m\]'
 _HOSTNAME=$(hostname)
 if _e "getprop"; then
     # ADB shells
@@ -1398,12 +1399,9 @@ fi
 #  | (_ || |  | |
 #   \___|___| |_|
 if _e "git"; then
-    # does not open editor when merging
-    export GIT_MERGE_AUTOEDIT=no
-    # export GIT_COMPLETION_CHECKOUT_NO_GUESS=1
+    export GIT_MERGE_AUTOEDIT=no # does not open editor when merging
     export GIT_COMPLETION_SHOW_ALL_COMMANDS=1
-
-    # GIT ALIASES AND FUNCTIONS
+    # export GIT_COMPLETION_CHECKOUT_NO_GUESS=1
 
     # Visualize the entire commit tree history in a compact and informative way, displaying commits, branches, merges, and tags.
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
@@ -1691,6 +1689,7 @@ if _e "git"; then
     function _git_local_branches() {
         __gitcomp_direct "$(__git_heads)"
     }
+
     function _git_conventional_commits_prefixes() {
         __gitcomp "feat: fix: style: refactor: build: perf: ci: docs: test: chore: revert:"
     }
@@ -1744,6 +1743,66 @@ if _e "git"; then
             __git_complete_index_file "--cached"
         fi
     }
+
+    # Load the official git-prompt script if it exists
+    if [[ -f /usr/share/git/git-prompt.sh ]]; then
+        source /usr/share/git/git-prompt.sh
+        export GIT_PS1_SHOWDIRTYSTATE=1     # Show unstaged (*) and staged (+) changes
+        export GIT_PS1_SHOWUPSTREAM="auto"   # Show if behind (↓), ahead (↑), or diverged (<>)
+
+        function _git_prompt() {
+            local reset='\[\e[0m\]'
+            local bold='\[\e[1m\]'
+            local green='\[\e[32m\]'        # Clean branch
+            local yellow='\[\e[33m\]'       # Unstaged changes
+            local red='\[\e[31m\]'          # Detached HEAD
+            local light_red='\[\e[91m\]'    # Conflict (merge/rebase)
+            local blue='\[\e[34m\]'         # Upstream ahead/behind
+            local cyan='\[\e[36m\]'         # Untracked files
+
+            # Fetch Git status using __git_ps1
+            local git_info
+            if [[ -n "$(command -v __git_ps1)" ]]; then
+                git_info=$(__git_ps1 "%s")
+            fi
+
+            # Determine the branch color
+            local branch_color="$bold$green"  # Default: Clean branch
+            if [[ "$git_info" == "HEAD" ]]; then
+                branch_color="$bold$red"      # Detached HEAD
+            elif [[ "$git_info" == *"|"* ]]; then
+                branch_color="$bold$light_red" # Conflict (Rebase/Merge in progress)
+            elif [[ "$git_info" == *"*"* ]]; then
+                branch_color="$bold$yellow"   # Unstaged changes
+            fi
+
+            # Format upstream indicators
+            if [[ "$git_info" == *"<>"* ]]; then
+                git_info="${git_info//<>/$bold$light_red<>$reset}" # Diverged (light red)
+            else
+                git_info="${git_info//</$cyan↓$reset}"  # Behind upstream (blue)
+                git_info="${git_info//>/$cyan↑$reset}"  # Ahead upstream (blue)
+            fi
+
+            # Remove `*` (unstaged indicator)
+            git_info="${git_info//\*/}"
+            # Highlight staged changes (`+`) in bold green
+            git_info="${git_info//+/ $bold$green+$reset}"
+            # Remove `=` (no-op, since it won’t be displayed anyway)
+            git_info="${git_info//=/}"
+            # Remove `%` (untracked files indicator)
+            git_info="${git_info//%/}"
+            # Remove ` ` (untracked files indicator)
+            git_info="${git_info// /}"
+
+            # Return formatted Git prompt
+            [[ -n "$git_info" ]] && echo -ne " ${branch_color}[${git_info}${branch_color}]$reset"
+        }
+    else
+        function _git_prompt() {
+            true
+        }
+    fi
 fi
 
 ###                                                                                                                      .         .
@@ -1843,67 +1902,11 @@ function _set_prompt() {
         PS1+="$RedBold$FancyX $(printf "%03d" $_last_command) "
     fi
 
-    local __env_color="${_ENV_COLOR:-$White}"
-    readarray -t repo_info <<<"$(git rev-parse --show-toplevel --show-prefix --git-dir --is-inside-git-dir --is-bare-repository --is-inside-work-tree --short HEAD 2>/dev/null)"
-    if [[ ${#repo_info[@]} -eq 7 ]]; then
-        __env_color="${_ENV_COLOR:-$VioletLight}"
-    fi
-
-    PS1+="${__env_color}${Bold}\\u${ResetBold}@${_HOSTNAME}"
-
+    PS1+="${_ENV_COLOR}${Bold}\\u${ResetBold}@${_HOSTNAME}"
     ## Nicely shows you're in a python virtual environment
     [[ -n "$VIRTUAL_ENV" || -n $_PYENV_INITIALIZED ]] && PS1+=" $Magenta$(_virtualenv_info)"
-
-    ## Nicely shows you're in a git repository
-    # TODO: @see: /usr/share/git/git-prompt.sh for more use cases and
-    # more robust implementations.
-    # FIXME: **this is slow**. depending on what you're doing, it might
-    # hang when inside dirs of big projects (3gb+)
-    if [[ ${#repo_info[@]} -eq 7 ]]; then
-        local short_sha="${repo_info[6]}"
-        branch_name=$(git symbolic-ref -q HEAD)
-        branch_name=${branch_name##refs/heads/}
-        branch_name=${branch_name:-$short_sha}
-
-        PS1+=" ${__env_color}["
-
-        # TODO: stop using git status here, it lags like fuck when
-        #       lots of files are deleted
-        local -r git_status=$(git status 2>&1) # TODO: still couldn't find what -r is about
-        # see: https://github.com/koalaman/shellcheck/wiki/SC2155)
-        if echo "${git_status}" | grep -qm1 'nothing to commit'; then
-            if [[ $branch_name == "$short_sha" ]]; then
-                PS1+="${WhiteBackground}${WhiteBold}• $branch_name•$Reset" # DETACHED HEAD
-            else
-                PS1+="$GreenLight✔ $branch_name•$Reset"
-            fi
-        elif echo "${git_status}" | grep -qm1 'Changes not staged'; then
-            PS1+="$YellowBold→ $branch_name!$Reset"
-        elif echo "${git_status}" | grep -qm1 'Changes to be committed'; then
-            PS1+="$Violet→ $branch_name+$Reset"
-        else
-            PS1+="$BlueLight→ $branch_name*$Reset"
-        fi
-        if echo "${git_status}" | grep -qm1 'Untracked files'; then
-            PS1+="$WhiteBoldLight?$Reset"
-        fi
-
-        # DIRECTORY DEBUGGING:
-        # echo -e "repo_info[0]: \t${repo_info[0]}"         repo_info[0]: 	/home/emi/Coding/gnome-shell-wsmatrix
-        # echo -e "repo_info[1]: \t${repo_info[1]}"         $(dirs +0): 	~/.local/share/gnome-shell/extensions/wsmatrix@martin.zurowietz.de/overview
-        # echo -e "\$(dirs +0): \t$(dirs +0)"               repo_info[1]: 	wsmatrix@martin.zurowietz.de/overview/
-        # echo -e "PWD:     \t${PWD}"                       PWD:     	    /home/emi/.local/share/gnome-shell/extensions/wsmatrix@martin.zurowietz.de/overview
-        # echo -e "\$(pwd -L): \t$(pwd -L)"                 $(pwd -L): 	    /home/emi/.local/share/gnome-shell/extensions/wsmatrix@martin.zurowietz.de/overview
-        # echo -e "\$(pwd -P): \t$(pwd -P)"                 $(pwd -P): 	    /home/emi/Coding/gnome-shell-wsmatrix/wsmatrix@martin.zurowietz.de/overview
-        local relative_path="${repo_info[1]%\/}"
-        local root_path
-        root_path="$(dirs +0)"
-        root_path="${root_path%"$relative_path"}"
-
-        PS1+="$__env_color]$Reset $VioletLight$root_path$Bold$VioletLight$relative_path"
-    else
-        PS1+="$__env_color$Reset $BlueLight\\w"
-    fi
+    PS1+="$(_git_prompt)"
+    PS1+="$_ENV_COLOR$Reset $BlueLight\\w"
 
     # Sets the prompt color according to
     # user (if logged in as root gets red)
@@ -1937,11 +1940,9 @@ function _set_prompt() {
     # Save cursor position, jump to right hand edge, then go left N columns where
     # N is the length of the printable RHS string. Print the RHS string, then
     # return to the saved position and print the LHS prompt.
-
     # Note: "\[" and "\]" are used so that bash can calculate the number of
     # printed characters so that the prompt doesn't do strange things when
     # editing the entered text.
-
     PS1="\[${Save}\\n\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
 
     # Changes the terminal window title to the current dir by default, truncating if too long.
