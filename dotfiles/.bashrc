@@ -472,15 +472,6 @@ function _get_truncated_pwd() {
     fi
 }
 
-##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-##  |d|i|s|a|b|l|e|_|v|e|n|v|_|p|r|o|m|p|t|
-##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-## Disables the native embedded venv prompt so we can make our own
-export VIRTUAL_ENV_DISABLE_PROMPT=0
-function _virtualenv_info() {
-    [[ -n "$VIRTUAL_ENV" ]] && echo "${VIRTUAL_ENV##*/}"
-}
-
 #  _____       _
 # /  __ \     | |
 # | /  \/ ___ | | ___  _ __ ___
@@ -826,17 +817,42 @@ alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --gro
 alias g="xdg-open"
 
 
+### Python
 if _e python || _e python3; then
-    if _e pyenv; then
-        eval "$(pyenv init --path)"
-        eval "$(pyenv init -)"
+    ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ##  |d|i|s|a|b|l|e|_|v|e|n|v|_|p|r|o|m|p|t|
+    ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ## Disables the native embedded venv prompt so we can make our own
+    export VIRTUAL_ENV_DISABLE_PROMPT=0
+    function _virtualenv_info() {
+        local venv_name=""
 
+        if [[ -n "$VIRTUAL_ENV" || -n "$_PYENV_INITIALIZED" ]]; then
+            venv_name=$(python -V)
+            venv_name="${venv_name#Python }"
+            if [[ -n "$VIRTUAL_ENV" ]]; then
+                venv_name="py${venv_name%.*}:${VIRTUAL_ENV##*/}"
+            else
+                venv_name="py${venv_name%.*}"
+            fi
+
+            echo "($venv_name)"
+        fi
+    }
+
+    if _e pyenv; then
+        pyenv() {
+            if [[ -z $_PYENV_INITIALIZED ]]; then
+                _PYENV_INITIALIZED=1
+                eval "$(command pyenv init -)"
+            fi
+            pyenv "$@"
+        }
         if _e virtualenv; then
             alias virtualenv="virtualenv -p \$(pyenv which python)"
         fi
     fi
 
-    mkdir -p "/tmp/pip"
     # Enhanced pip function with additional checks and features
     function pip() {
         local cmd="$1"
@@ -886,6 +902,7 @@ if _e python || _e python3; then
 
                 # Read packages from temporary list
                 local dir_hash=$( echo "$PWD" | md5sum | cut -d' ' -f1)
+                mkdir -p "/tmp/pip"
                 local tmp_file="/tmp/pip/$dir_hash.txt"
                 local tmp_packages=()
                 if [[ -f "$tmp_file" ]]; then
@@ -1834,9 +1851,7 @@ function _set_prompt() {
     PS1+="${__env_color}${Bold}\\u${ResetBold}@${_HOSTNAME}"
 
     ## Nicely shows you're in a python virtual environment
-    if [[ -n $VIRTUAL_ENV ]]; then
-        PS1+=" $Magenta(venv:$(_virtualenv_info))"
-    fi
+    [[ -n "$VIRTUAL_ENV" || -n $_PYENV_INITIALIZED ]] && PS1+=" $Magenta$(_virtualenv_info)"
 
     ## Nicely shows you're in a git repository
     # TODO: @see: /usr/share/git/git-prompt.sh for more use cases and
