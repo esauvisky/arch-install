@@ -1747,35 +1747,24 @@ else
 fi
 
 function _pre_command() {
-    # Show the currently running command in the terminal title:
-    # *see http://www.davidpashley.com/articles/xterm-titles-with-bash.html
-    # *see https://gist.github.com/fly-away/751f32e7f6150419697d
-    # *see https://goo.gl/xJMzHG
+    # Capture last entered command, including aliases, without history number
+    local history_entry
+    history_entry="$(HISTTIMEFORMAT='' history 1 2>/dev/null)"
 
-    # Instead of using $BASH_COMMAND, which doesn't deals with aliases,
-    # uses an awesome tip by @zeroimpl. It's scary, touch it and it breaks!!!
-    # *see https://goo.gl/2ZFDfM
-    local this_command="$(HISTTIMEFORMAT= history 1 | \sed -E 's/^[ ]*[0-9]*[ ]*//')"
-    case "$this_command" in
-    *\033]0* | set_prompt* | echo* | printf* | cd* | ls)
-        # The command is trying to set the title bar as well;
-        # this is most likely the execution of $PROMPT_COMMAND.
-        # In any case nested escapes confuse the terminal, so don't
-        # output them.
-        ;;
-    *)
-        # Changes the terminal title to the command that is going to be run
-        # uses printf in case there are scapes characters on the command, which
-        # would block the rendering.
-        if is_ssh; then
-            printf "\033]0;[SSH]${this_command%% *}\007"
-        else
-            printf "\033]0;${this_command%% *}\007"
-        fi
-        ;;
-    esac
+    # Use built-in Bash expansion to strip history number efficiently
+    local current_cmd="${history_entry#*[0-9] }"
 
-    # Small fix that clears up all prompt colors, so we don't colorize any output by mistake
+    # Fast ignore certain commands
+    [[ "$current_cmd" =~ ^(echo|printf|cd|ls|_set_prompt|\033]0) ]] && return
+    [[ "$BASH_COMMAND" =~ ^(echo|printf|cd|ls|_set_prompt|\033]0) ]] && return
+
+    # Fastest way to set terminal title
+    local prefix
+    [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] && prefix="[SSH] "
+
+    printf "\033]0;%s%s\007" "$prefix" "$current_cmd"
+
+    # Reset colors (fastest)
     echo -ne "\e[0m"
 }
 
