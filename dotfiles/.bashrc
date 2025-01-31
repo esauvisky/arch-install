@@ -416,7 +416,7 @@ profile_command() {
         echo "Usage: profile_command number_of_times 'command [args]'"
         echo -e "\nExample: profile_command 10 'sleep 1'"
         echo -e "This will run 'sleep 1' 10 times and print statistics about the performance."
-        echo -e "Note: you must quote the command to be profiled. Bash builtins aren't supported."
+        echo -e "Note: you must quote the command to be profiled, it must print properly when echoing."
         return 1
     fi
     local high_precision=false
@@ -430,7 +430,7 @@ profile_command() {
     end_time=0
     start_time="$($date_cmd)"
     for round in $(seq 1 "$1"); do
-        $2 >/dev/null
+        eval "$2" >/dev/null
         echo -en "\rRound $round/$1"
     done
     end_time="$($date_cmd)"
