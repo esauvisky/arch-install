@@ -204,12 +204,21 @@ done
 
 ## Picks a hostname variable to use all around
 ## Works on several places including adb shells and ssh
-_HOSTNAME=$(hostname | sed 's/localhost//')
-_e "getprop" && _HOSTNAME=${_HOSTNAME:-$(getprop "net.hostname")}
-_e "getprop" && _HOSTNAME=${_HOSTNAME:-$(getprop "ro.product.device")}
-_HOSTNAME=${_HOSTNAME:-"bielefeld"}
-is_ssh && _HOSTNAME="${_HOSTNAME} [SSH]" && _ENV_COLOR='\[\e[01;93m\]'
-_e getprop && _HOSTNAME="${_HOSTNAME} [ADB]" && _ENV_COLOR='\[\e[00;91m\]'
+_HOSTNAME=$(hostname)
+if _e "getprop"; then
+    # ADB shells
+    _HOSTNAME=${_HOSTNAME:-$(getprop "net.hostname")}
+    _HOSTNAME=${_HOSTNAME:-$(getprop "ro.product.device")}
+
+    if [[ -n "$_HOSTNAME" ]]; then
+        _HOSTNAME+=" [ADB]"
+        _ENV_COLOR='\[\e[00;91m\]'
+    fi
+elif [[ -n "$_HOSTNAME" ]] && is_ssh; then
+    # SSH shells
+    _HOSTNAME+=" [SSH]"
+    _ENV_COLOR='\[\e[01;93m\]'
+fi
 
 ## GPG Signing TTY: required for GPG signing in git
 GPG_TTY=$(tty)
