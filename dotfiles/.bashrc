@@ -1901,7 +1901,7 @@ function _set_prompt() {
     fi
 
     # Aligns stuff when you don't close quotes
-    PS2=" | "
+    PS2="| "
 
     # Debug (PS4)
     # ** Does not work if set -x is used outside an script :( **
