@@ -1906,12 +1906,12 @@ function _set_prompt() {
     ## Nicely shows you're in a python virtual environment
     [[ -n "$VIRTUAL_ENV" || -n $_PYENV_INITIALIZED ]] && PS1+=" $Magenta$(_virtualenv_info)"
     PS1+="$(_git_prompt)"
-    PS1+="$_ENV_COLOR$Reset $BlueLight\\w"
+    PS1+="$_ENV_COLOR$Reset $Blue\\w"
 
     # Sets the prompt color according to
     # user (if logged in as root gets red)
     if [[ $(id -u) -eq 0 ]]; then
-        PS1+="\\n${RedBoldLight}\\\$ ${RedLight}"
+        PS1+="\\n${RedBold}\\\$ ${RedLight}"
     else
         PS1+="\\n${YellowBold}\\\$ ${Yellow}"
     fi
