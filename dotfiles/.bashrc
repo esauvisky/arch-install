@@ -1013,7 +1013,7 @@ function clear() {
 ## use bat instead of cat if available
 function cat() {
     if [[ -t 0 ]] && [[ $# == 1 ]] && _e bat && bat -L | grep -qm1 "[,:]${1##*.}($|,)"; then
-        command bat "$@"
+        command bat -P "$@"
     else
         command cat "$@"
     fi
