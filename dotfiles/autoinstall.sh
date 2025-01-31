@@ -74,6 +74,25 @@ for conf in "${grcconfs[@]}"; do
 done
 
 echo -e '\e[0m'
+
+# Check if .bashrc is sourced from .bash_profile
+if [[ -f "$HOME/.bash_profile" ]]; then
+    if ! grep -q "\.bashrc" "$HOME/.bash_profile"; then
+        echo -e "\e[33;01mYour .bash_profile does not source .bashrc. Do you want to add it? [Y/n]\e[00m"
+        read -r answer < /dev/tty
+        if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
+            {
+                echo ""
+                echo "# Source the .bashrc file"
+                echo "if [ -f ~/.bashrc ]; then"
+                echo "  source ~/.bashrc"
+                echo "fi"
+            } >>"$HOME/.bash_profile"
+            echo -e "\e[32;01m.bashrc sourcing added to .bash_profile\e[00m"
+        fi
+    fi
+fi
+
 if [[ $SHELL != "/bin/bash" && $SHELL != "/usr/bin/bash" ]]; then
     # change default shell to bash
     if ! chsh -s /bin/bash; then
