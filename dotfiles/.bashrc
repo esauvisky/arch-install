@@ -501,43 +501,7 @@ if [[ -x /usr/bin/dircolors ]]; then
 fi
 
 ## Global colouriser used all around to make everything even gayer
-if _e "grc"; then
-    GRC='grc -es '
-    alias colourify="$GRC -es"
-    alias blkid='colourify blkid'
-    alias configure='colourify ./configure'
-    _e "docker" && alias docker='colourify docker'
-    _e "docker-compose" && alias docker-compose='colourify docker-compose'
-    _e "docker-machine" && alias docker-machine='colourify docker-machine'
-    _e "efibootmgr" && alias efibootmgr='colourify efibootmgr'
-    _e "du" && alias du='colourify du -h'
-    _e "free" && alias free='colourify free'
-    _e "fdisk" && alias fdisk='colourify fdisk'
-    _e "findmnt" && alias findmnt='colourify findmnt'
-    _e "make" && alias make='colourify make'
-    _e "gcc" && alias gcc='colourify gcc'
-    _e "g++" && alias g++='colourify g++'
-    _e "id" && alias id='colourify id'
-    _e "ip" && alias ip='colourify ip'
-    _e "iptables" && alias iptables='colourify iptables'
-    _e "journalctl" && alias journalctl='colourify journalctl'
-    _e "kubectl" && alias kubectl='colourify kubectl'
-    _e "lsof" && alias lsof='colourify lsof'
-    _e "lsblk" && alias lsblk='colourify lsblk'
-    _e "lspci" && alias lspci='colourify lspci'
-    _e "netstat" && alias netstat='colourify netstat'
-    _e "ping" && alias ping='colourify ping'
-    _e "traceroute" && alias traceroute='colourify traceroute'
-    _e "traceroute6" && alias traceroute6='colourify traceroute6'
-    _e "dig" && alias dig='colourify dig'
-    _e "mount" && alias mount='colourify mount'
-    _e "ps" && alias ps='colourify ps'
-    _e "mtr" && alias mtr='colourify mtr'
-    _e "semanage" && alias semanage='colourify semanage'
-    _e "getsebool" && alias getsebool='colourify getsebool'
-    _e "ifconfig" && alias ifconfig='colourify ifconfig'
-    _e "sockstat" && alias sockstat='colourify sockstat'
-fi
+_e "grc" && GRC="grc -es "
 
 ###  _____  _____ _      ______         _
 ### |  _  ||  _  | |     |  ___|       | |
@@ -813,6 +777,41 @@ cool_places=(
 ### \_| |_/_|_|\__,_|___/\___||___/   \__,_|_| |_|\__,_|   \___/  \_/ \___|_|  |_|  |_|\__,_|\___||___/
 ## Allows using aliases after sudo (the ending space is what does teh trick)
 alias sudo='sudo '
+
+
+_e "blkid" && alias blkid="${GRC}blkid"
+_e "docker" && alias docker="${GRC}docker"
+_e "docker-compose" && alias "ocker-compose='${GRC}docker-compose"
+_e "docker-machine" && alias "ocker-machine='${GRC}docker-machine"
+_e "efibootmgr" && alias efibootmgr="${GRC}efibootmgr"
+_e "du" && alias du="${GRC}du -h"
+_e "free" && alias free="${GRC}free"
+_e "fdisk" && alias fdisk="${GRC}fdisk"
+_e "findmnt" && alias findmnt="${GRC}findmnt"
+_e "make" && alias make="${GRC}make"
+_e "gcc" && alias gcc="${GRC}gcc"
+_e "g++" && alias g+"='${GRC}g++"
+_e "id" && alias id="${GRC}id"
+_e "ip" && alias ip="${GRC}ip"
+_e "iptables" && alias iptables="${GRC}iptables"
+_e "journalctl" && alias journalctl="${GRC}journalctl"
+_e "kubectl" && alias kubectl="${GRC}kubectl"
+_e "lsof" && alias lsof="${GRC}lsof"
+_e "lsblk" && alias lsblk="${GRC}lsblk"
+_e "lspci" && alias lspci="${GRC}lspci"
+_e "netstat" && alias netstat="${GRC}netstat"
+_e "ping" && alias ping="${GRC}ping"
+_e "traceroute" && alias traceroute="${GRC}traceroute"
+_e "traceroute6" && alias traceroute6="${GRC}traceroute6"
+_e "dig" && alias dig="${GRC}dig"
+_e "mount" && alias mount="${GRC}mount"
+_e "ps" && alias ps="${GRC}ps"
+_e "mtr" && alias mtr="${GRC}mtr"
+_e "semanage" && alias semanage="${GRC}semanage"
+_e "getsebool" && alias getsebool="${GRC}getsebool"
+_e "ifconfig" && alias ifconfig="${GRC}ifconfig"
+_e "sockstat" && alias sockstat="${GRC}sockstat"
+
 ## Navigation
 alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 alias g="xdg-open"
