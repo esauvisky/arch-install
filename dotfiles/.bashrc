@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2139,SC1001,SC2155
 #                          .         .
 ##  /$$$$$$$$               /$$ /$$              /$$$$$$$   /$$$$$$   /$$$$$$  /$$   /$$ /$$$$$$$   /$$$$$$
 ## | $$_____/              |__/| $/             | $$__  $$ /$$__  $$ /$$__  $$| $$  | $$| $$__  $$ /$$__  $$
@@ -439,7 +440,7 @@ profile_command() {
     end_time=0
     start_time="$($date_cmd)"
     for round in $(seq 1 "$1"); do
-        eval "$2" >/dev/null
+        $2 >/dev/null
         echo -en "\rRound $round/$1"
     done
     end_time="$($date_cmd)"
@@ -1089,7 +1090,7 @@ fi
 ## Colors on DF
 alias df="${GRC}df -H"
 ## Makes dd pretty and with progress bar
-alias dd="dd status=progress oflag=sync"
+alias dd="${GRC}dd status=progress oflag=sync"
 ## Makes ccze not stupid (fast and no output clearing)
 _e "ccze" && alias ccze='ccze -A -o nolookups'
 
