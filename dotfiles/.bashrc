@@ -25,8 +25,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=33
-export _DATE="Jan 15th, 2025"
+export _RCVERSION=34
+export _DATE="Jan 31st, 2025"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -38,22 +38,28 @@ function _changelog() {
     local c=$'\e[97m'          # code
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 33 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
-    echo -e "
-  ${r}- Enhanced ${b}${c}pip${r}${b} function behavior.${r}
-    ${a}Now includes better handling of packages in virtual environments.${r}
-    ${a}Automatically identifies and prompts to add newly installed packages to ${c}requirements.txt${r}${a}, ensuring better dependency management.${r}
-    ${a}Temporary tracking of installed packages for easy integration into project dependencies.${r}
-  ${r}${b}- Improved ${c}PATH truncation in terminal prompts.${r}
-    ${a}Added an ${c}[SSH]${r}${a} prefix when in an SSH session, providing better context for remote work.${r}
-  ${r}${b}- Updated color-aware aliases for common commands.${r}
-    ${a}Aliases like ${c}docker, ip, ps, lsblk${r}${a}, and others are now only set if the respective commands are available, reducing errors in non-standard environments.${r}
-  ${r}${b}- Enhanced terminal title updates.${r}
-    ${a}Terminal titles now include an ${c}[SSH]${r}${a} prefix when connected via SSH, providing better visual indicators for remote work.${r}
-  ${r}${b}- Refined ${c}pip uninstall${r}${b} handling.${r}
-    ${a}Uninstall commands now also clean up temporary tracking of installed packages for a smoother workflow.${r}
+${y}Changelog 34 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+    echo -e "${n}This update is all about speed. Because, let's be honest, it was getting slow.${r}
 
-  ${y}${y}Tip: Use the enhanced ${c}pip${r}${y} functionality to streamline dependency management in your Python projects!${r}
+  ${r}- ${b}The ${c}git${r}${b} prompt got a major overhaul.${r}
+    ${a}It's faster now. A lot faster. But it might look a bit weird at first.${r}
+    ${a}Yes, it might take you a second to get used to, but you’ll thank me later.${r}
+
+  ${r}- ${b}Python environments now show up in the prompt.${r}
+    ${a}If you're using ${c}pyenv${r}${a} or a virtualenv, you'll actually know about it now.${r}
+    ${a}No more running ${c}python -V${r}${a} every five minutes to check if you're in the right version.${r}
+
+  ${r}- ${b}Simple ${c}cat${r}${b} now just uses ${c}bat${r}${b}, but without paging.${r}
+    ${a}You get syntax highlighting and everything, but you'll be able to copy and paste it.${r}
+
+  ${r}- ${b}The auto-installer now warns you if ${c}.bashrc${r}${b} isn't sourced.${r}
+    ${a}Because if you're not sourcing your ${c}.bashrc${r}${a}, you’re probably also the kind of person who ignores seatbelt warnings.${r}
+
+  ${r}- ${b}Massive performance improvements across the board.${r}
+    ${a}The hostname detection is snappier, the terminal title updates are smarter, and unnecessary checks have been nuked.${r}
+
+  ${y}Tip: Use ${c}profile_command${r}${y} to measure how slow something is.${r}
+  ${y}Run something like ${c}profile_command 1000 'ls'${r}${y} to see how long it actually takes.${r}
   "
 }
 
@@ -480,6 +486,36 @@ function _get_truncated_pwd() {
 # | |    / _ \| |/ _ \| '__/ __|
 # | \__/\ (_) | | (_) | |  \__ \
 #  \____/\___/|_|\___/|_|  |___/
+__Bold='\[\e[01m\]'
+__ResetBold='\[\e[22m\]'
+__Blue='\[\e[00;34m\]'
+__BlueLight='\[\e[00;94m\]'
+__Bluelly='\[\e[38;5;31;1m\]'
+__BluellyLight='\[\e[22;38;5;31;25m\]'
+__WhiteBold='\[\e[01;37m\]'
+__White='\[\e[22;37m\]'
+__Violet='\[\e[35m\]'
+__Magenta='\[\e[01;36m\]'
+__Red='\[\e[00;31m\]'
+__RedBold='\[\e[31;01m\]'
+__RedBoldLight='\[\e[91;01m\]'
+__Green='\[\e[00;32m\]'
+__GreenBold='\[\e[01;32m\]'
+__RedLight='\[\e[22;91m\]'
+__GreenLight='\[\e[01;92m\]'
+__YellowLight='\[\e[01;93m\]'
+__VioletLight='\[\e[95m\]'
+__White='\[\e[00;37m\]'
+__WhiteBoldLight='\[\e[01;97m\]'
+__WhiteBackground='\[\e[01;40m\]'
+__Yellow='\[\e[00;33m\]'
+__YellowBold='\[\e[01;33m\]'
+__Reset='\[\e[00m\]'
+# __FancyX='\342\234\227'
+# __Checkmark='\342\234\223'
+__FancyX='✘'
+__Checkmark='✔'
+
 ## Magic with `less` (like colors and other cool stuff)
 export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
 
@@ -1747,19 +1783,14 @@ if _e "git"; then
     # Load the official git-prompt script if it exists
     if [[ -f /usr/share/git/git-prompt.sh ]]; then
         source /usr/share/git/git-prompt.sh
+        # export GIT_PS1_SHOWCOLORHINTS=1      # Enable colors (matches `git status --short` colors)
         export GIT_PS1_SHOWDIRTYSTATE=1     # Show unstaged (*) and staged (+) changes
-        export GIT_PS1_SHOWUPSTREAM="auto"   # Show if behind (↓), ahead (↑), or diverged (<>)
+        # export GIT_PS1_SHOWSTASHSTATE=1      # Show if there's a stash ($)
+        # export GIT_PS1_SHOWUNTRACKEDFILES=1  # Show if there are untracked files (%)
+        export GIT_PS1_SHOWUPSTREAM="auto"   # Show if behind (<), ahead (>), or diverged (<>)
+        export GIT_PS1_STATESEPARATOR=" "    # Clean separator
 
         function _git_prompt() {
-            local reset='\[\e[0m\]'
-            local bold='\[\e[1m\]'
-            local green='\[\e[32m\]'        # Clean branch
-            local yellow='\[\e[33m\]'       # Unstaged changes
-            local red='\[\e[31m\]'          # Detached HEAD
-            local light_red='\[\e[91m\]'    # Conflict (merge/rebase)
-            local blue='\[\e[34m\]'         # Upstream ahead/behind
-            local cyan='\[\e[36m\]'         # Untracked files
-
             # Fetch Git status using __git_ps1
             local git_info
             if [[ -n "$(command -v __git_ps1)" ]]; then
@@ -1767,36 +1798,36 @@ if _e "git"; then
             fi
 
             # Determine the branch color
-            local branch_color="$bold$green"  # Default: Clean branch
-            if [[ "$git_info" == "HEAD" ]]; then
-                branch_color="$bold$red"      # Detached HEAD
+            local branch_color="$__Bold$__Green"  # Default: Clean branch
+            if [[ "$git_info" =~ /([0-9a-f\.]+)/ ]]; then
+                branch_color="$__Bold$__Red"      # Detached HEAD
             elif [[ "$git_info" == *"|"* ]]; then
-                branch_color="$bold$light_red" # Conflict (Rebase/Merge in progress)
+                branch_color="$__Bold$__RedLight" # Conflict (Rebase/Merge in progress)
             elif [[ "$git_info" == *"*"* ]]; then
-                branch_color="$bold$yellow"   # Unstaged changes
+                branch_color="$__Bold$__Yellow"   # Unstaged changes
             fi
 
             # Format upstream indicators
             if [[ "$git_info" == *"<>"* ]]; then
-                git_info="${git_info//<>/$bold$light_red<>$reset}" # Diverged (light red)
+                git_info="${git_info//<>/$__Bold$__RedLight<>$__Reset}" # Diverged (light red)
             else
-                git_info="${git_info//</$cyan↓$reset}"  # Behind upstream (blue)
-                git_info="${git_info//>/$cyan↑$reset}"  # Ahead upstream (blue)
+                git_info="${git_info//</$__Bluelly↓$__Reset}"  # Behind upstream (blue)
+                git_info="${git_info//>/$__Bluelly↑$__Reset}"  # Ahead upstream (blue)
             fi
 
             # Remove `*` (unstaged indicator)
             git_info="${git_info//\*/}"
             # Highlight staged changes (`+`) in bold green
-            git_info="${git_info//+/ $bold$green+$reset}"
+            git_info="${git_info//+/$__Bold$__Green+$__Reset}"
             # Remove `=` (no-op, since it won’t be displayed anyway)
             git_info="${git_info//=/}"
             # Remove `%` (untracked files indicator)
-            git_info="${git_info//%/}"
+            # git_info="${git_info//%/}"
             # Remove ` ` (untracked files indicator)
             git_info="${git_info// /}"
 
             # Return formatted Git prompt
-            [[ -n "$git_info" ]] && echo -ne " ${branch_color}[${git_info}${branch_color}]$reset"
+            [[ -n "$git_info" ]] && echo -ne " ${branch_color}[${git_info}${branch_color}]$__Reset"
         }
     else
         function _git_prompt() {
@@ -1832,12 +1863,12 @@ function _pre_command() {
     local current_cmd="${history_entry#*[0-9] }"
 
     # Fast ignore certain commands
-    [[ "$current_cmd" =~ ^(echo|printf|cd|ls|_set_prompt|\033]0) ]] && return
-    [[ "$BASH_COMMAND" =~ ^(echo|printf|cd|ls|_set_prompt|\033]0) ]] && return
+    [[ "$current_cmd" =~ ^(echo|printf|cd|ls|_set_prompt|__vte_prompt_command|\033]0) ]] && return
+    [[ "$BASH_COMMAND" =~ ^(echo|printf|cd|ls|_set_prompt|__vte_prompt_command|\033]0) ]] && return
 
     # Fastest way to set terminal title
     local prefix
-    [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] && prefix="[SSH] "
+    [[ -n "$SSH_CLIENT" ]] && prefix="[SSH] "
 
     printf "\033]0;%s%s\007" "$prefix" "$current_cmd"
 
@@ -1856,64 +1887,30 @@ function _set_prompt() {
     # Not working crazy shit that's supposed to actually erase previous dups (https://goo.gl/DXAcPO)
     # history -n; history -w; history -c; history -r;
 
-    # Colors
-    # TODO: refactor this legacy mess
-    local Bold='\[\e[01m\]'
-    local ResetBold='\[\e[22m\]'
-    local Blue='\[\e[00;34m\]'
-    local BlueLight='\[\e[00;94m\]'
-    # local Bluelly='\[\e[38;5;31;1m\]'
-    # local BluellyLight='\[\e[22;38;5;31;25m\]'
-
-    local WhiteBold='\[\e[01;37m\]'
-    local White='\[\e[22;37m\]'
-    local Violet='\[\e[35m\]'
-    local Magenta='\[\e[01;36m\]'
-    local Red='\[\e[00;31m\]'
-    local RedBold='\[\e[31;01m\]'
-    local RedBoldLight='\[\e[91;01m\]'
-    local Green='\[\e[00;32m\]'
-    local GreenBold='\[\e[01;32m\]'
-    local RedLight='\[\e[22;91m\]'
-    local GreenLight='\[\e[01;92m\]'
-    local YellowLight='\[\e[01;93m\]'
-    local VioletLight='\[\e[95m\]'
-    local White='\[\e[00;37m\]'
-    local WhiteBoldLight='\[\e[01;97m\]'
-    local WhiteBackground='\[\e[01;40m\]'
-    local Yellow='\[\e[00;33m\]'
-    local YellowBold='\[\e[01;33m\]'
-
-    local Reset='\[\e[00m\]'
-    # local FancyX='\342\234\227'
-    # local Checkmark='\342\234\223'
-    local FancyX='✘'
-    local Checkmark='✔'
-
     # Prints  ---\n\n after previous command without spawning
     # a newline after it, so you can actually easily notice
     # if it's output has an EOF linebreak.
-    PS1="$Yellow---$Reset\\n\\n"
+    PS1="$__Yellow---$__Reset\\n\\n"
 
     # Prints the error code
     if [[ $_last_command == 0 ]]; then
-        PS1+="$GreenBold$Checkmark 000 "
+        PS1+="$__GreenBold$__Checkmark 000 "
     else
-        PS1+="$RedBold$FancyX $(printf "%03d" $_last_command) "
+        PS1+="$__RedBold$__FancyX $(printf "%03d" $_last_command) "
     fi
 
-    PS1+="${_ENV_COLOR}${Bold}\\u${ResetBold}@${_HOSTNAME}"
+    PS1+="${_ENV_COLOR}${__Bold}\\u${__ResetBold}@${_HOSTNAME}"
     ## Nicely shows you're in a python virtual environment
-    [[ -n "$VIRTUAL_ENV" || -n $_PYENV_INITIALIZED ]] && PS1+=" $Magenta$(_virtualenv_info)"
+    [[ -n "$VIRTUAL_ENV" || -n $_PYENV_INITIALIZED ]] && PS1+=" $__Magenta$(_virtualenv_info)"
     PS1+="$(_git_prompt)"
-    PS1+="$_ENV_COLOR$Reset $Blue\\w"
+    PS1+="$_ENV_COLOR$__Reset $__Blue\\w"
 
     # Sets the prompt color according to
     # user (if logged in as root gets red)
     if [[ $(id -u) -eq 0 ]]; then
-        PS1+="\\n${RedBold}\\\$ ${RedLight}"
+        PS1+="\\n${__RedBold}\\\$ ${__RedLight}"
     else
-        PS1+="\\n${YellowBold}\\\$ ${Yellow}"
+        PS1+="\\n${__YellowBold}\\\$ ${__Yellow}"
     fi
 
     # Aligns stuff when you don't close quotes
