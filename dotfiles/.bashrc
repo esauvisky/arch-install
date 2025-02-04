@@ -1370,14 +1370,13 @@ if _e "pacman"; then
 
             cd "$CURRDIR"
         }
-        function _yay() {
+        function yay() {
             if [[ $# == 0 ]]; then
                 # if running simply `yay`, then ask for packages to ignore
                 command yay --noanswerupgrade -Syu
             fi
             command yay "$@"
         }
-        alias yay="_yay"
     fi
     alias pacman="pacman "
     alias pacs="sudo pacman -S --needed --asdeps"
@@ -1781,8 +1780,13 @@ if _e "git"; then
     }
 
     # Load the official git-prompt script if it exists
-    if [[ -f /usr/share/git/git-prompt.sh ]]; then
+    if [[ -f "$HOME/.git_prompt.sh" ]]; then
+        source "$HOME/.git_prompt.sh"
+    elif [[ -f /usr/share/git/git-prompt.sh ]]; then
         source /usr/share/git/git-prompt.sh
+    fi
+
+    if [[ -f /usr/share/git/git-prompt.sh || -f "$HOME/.git_prompt.sh" ]]; then
         # export GIT_PS1_SHOWCOLORHINTS=1      # Enable colors (matches `git status --short` colors)
         export GIT_PS1_SHOWDIRTYSTATE=1     # Show unstaged (*) and staged (+) changes
         # export GIT_PS1_SHOWSTASHSTATE=1      # Show if there's a stash ($)

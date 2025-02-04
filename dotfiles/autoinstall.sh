@@ -12,7 +12,7 @@ if [[ $1 == "--quiet" ]]; then
     QUIET=true
 fi
 
-dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc" ".nanorc")
+dotfiles=(".bashrc" ".bash_completion" ".dircolors" ".inputrc" ".toprc" ".nanorc" ".git_prompt.sh")
 grcconfs=(conf.efibootmgr conf.free conf.log grc.conf)
 
 # progress bar
