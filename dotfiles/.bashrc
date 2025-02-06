@@ -1461,21 +1461,52 @@ if _e "git"; then
     }
 
     function gitr() {
-        # Get the remote URL from the current Git repository
+        # Get the remote URL
         remote_url="$(git config --get remote.origin.url)"
 
-        if [ -n "$remote_url" ]; then
-            # Transform the SSH URL to HTTPS if needed
-            if [[ "$remote_url" == git@* ]]; then
-                remote_url=${remote_url/git@/}
-                remote_url=${remote_url/:/\/}
-                remote_url="https:\/\/${remote_url%%.git}"
-            fi
-            xdg-open "$remote_url"
-        else
+        if [ -z "$remote_url" ]; then
             echo "No remote URL found in the current Git repository."
+            return 1
         fi
+
+        # Convert SSH URL to HTTPS if needed
+        if [[ "$remote_url" == git@* ]]; then
+            remote_url=${remote_url/git@/}
+            remote_url=${remote_url/:/\/}
+            remote_url="https://${remote_url%%.git}"
+        else
+            remote_url="${remote_url%%.git}"
+        fi
+
+        # Get the current branch or commit hash if in detached HEAD
+        branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
+
+        # Get the relative path from the root
+        relative_path=$(git rev-parse --show-prefix)
+
+        # Default to repo root on the current branch
+        target_url="$remote_url/tree/$branch/$relative_path"
+
+        # If a file argument is provided, include it
+        if [ -n "$1" ]; then
+            file_path="$relative_path/$1"
+
+            # Check if file argument includes a line number (format: file:line)
+            if [[ "$1" =~ ^(.+):([0-9]+)$ ]]; then
+                file_path="$relative_path/${BASH_REMATCH[1]}"
+                line_number="${BASH_REMATCH[2]}"
+                target_url="$remote_url/blob/$branch/$file_path#L$line_number"
+            else
+                target_url="$remote_url/blob/$branch/$file_path"
+            fi
+        fi
+
+        # Open in browser
+        echo "Opening: $target_url"
+        xdg-open "$target_url"
     }
+
+
 
     function gits() {
         # Fetching the git status and color-coding changes.
