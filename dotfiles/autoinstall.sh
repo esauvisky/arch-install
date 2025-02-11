@@ -114,9 +114,9 @@ if [[ $QUIET == "false" ]]; then
         read -r answer < /dev/tty
         if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
-                pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat colordiff nano inetutils nano-syntax-highlighting sudo
+                pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat colordiff nano inetutils nano-syntax-highlighting sudo bash-completion
             elif hash sudo 2>/dev/null; then
-                sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat colordiff nano inetutils nano-syntax-highlighting
+                sudo pacman -S --needed --noconfirm grc cowsay fortune-mod lolcat colordiff nano inetutils nano-syntax-highlighting bash-completion
             else
                 echo -e "\e[34;01mYou need sudo to install this. Install it and try again."
             fi
@@ -126,9 +126,9 @@ if [[ $QUIET == "false" ]]; then
         read -r answer < /dev/tty
         if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
             if [[ $(id -u) -eq 0 ]]; then
-                apt install grc cowsay fortune-mod lolcat colordiff nano sudo
+                apt install grc cowsay fortune-mod lolcat colordiff nano sudo bash-completion
             elif hash sudo 2>/dev/null; then
-                sudo apt install grc cowsay fortune-mod lolcat colordiff nano
+                sudo apt install grc cowsay fortune-mod lolcat colordiff nano bash-completion
             else
                 echo -e "\e[34;01mYou need sudo to install this. Install it and try again."
             fi
@@ -169,9 +169,29 @@ if [[ $QUIET == "false" ]]; then
     if [[ $answer == "" || $answer == "y" || $answer == "Y" ]]; then
         echo -e "\e[34;01mCopying files to /etc/skel..."
         if [[ $(id -u) -eq 0 ]]; then
-            cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc /etc/nanorc ~/.grc /etc/skel/
+            cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc ~/.grc /etc/skel/
+            cp /etc/nanorc /etc/skel/.nanorc
+            if [[ $ADD_TO_BASH_PROFILE -eq 1 ]]; then
+                {
+                    echo ""
+                    echo "# Source the .bashrc file"
+                    echo "if [ -f ~/.bashrc ]; then"
+                    echo "  source ~/.bashrc"
+                    echo "fi"
+                } >>"/etc/skel/.bash_profile"
+            fi
         else
-            sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc /etc/nanorc ~/.grc /etc/skel/
+            sudo cp -r ~/.bashrc ~/.bash_completion ~/.dircolors ~/.inputrc ~/.toprc ~/.grc /etc/skel/
+            sudo cp /etc/nanorc /etc/skel/.nanorc
+            if [[ $ADD_TO_BASH_PROFILE -eq 1 ]]; then
+                {
+                    echo ""
+                    echo "# Source the .bashrc file"
+                    echo "if [ -f ~/.bashrc ]; then"
+                    echo "  source ~/.bashrc"
+                    echo "fi"
+                } >>"/etc/skel/.bash_profile"
+            fi
         fi
     fi
 
