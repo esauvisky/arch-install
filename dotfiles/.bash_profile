@@ -23,4 +23,5 @@
 #fi
 
 # Carrega o .bashrc
+[[ -f ~/.bash_globals ]] && . ~/.bash_globals
 [[ -f ~/.bashrc ]] && . ~/.bashrc
