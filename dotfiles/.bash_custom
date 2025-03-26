@@ -6,6 +6,8 @@
 #     nvm use lts/carbon
 # fi
 
+alias dcu="docker compose up --build --force-recreate"
+alias dcud="docker compose up --build --force-recreate -d"
 
 # MagicCD
 alias cdc='_magicCD 2 $HOME/Coding/'
@@ -22,6 +24,7 @@ alias cdp='_magicCD 2 $HOME/Pokemod/'
 alias subl='subl3open'
 alias subl3='subl3open'
 alias ls="lsd -ltr --classify --human-readable --literal --sort time --icon-theme unicode --date relative --permission octal --blocks permission,user,size,date,name"
+alias clip="xclip -i -selection clipboard"
 
 # Fixes kitty on ssh
 # if [[ $(is_ssh) && $TERM == "xterm-kitty" ]]; then

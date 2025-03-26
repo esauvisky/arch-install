@@ -24,9 +24,10 @@ fi
 # ENVVARS #
 ###########
 ## Links bash to gnome-keyring-daemon
-eval "$(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh)"
-dbus-update-activation-environment --systemd DISPLAY
-export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
+# dbus-update-activation-environment --systemd DISPLAY
+# eval "$(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh)"
+# export "$(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh,gpg)"
+# dbus-update-activation-environment --all --systemd
 
 ## Fixes HiDPI QT5 Applications (that respect the config)
 ## In particular, fixes copyq menu below

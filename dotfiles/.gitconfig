@@ -10,6 +10,7 @@
 	excludesfile = /home/emi/.gitignore-global
 	autocrlf = input
 	editor = subl -n -w
+	compression = 0
 [alias]
 	all = "!f() { find -mindepth 1 -maxdepth 3 -name .git -type d | xargs -I{} bash -c \"echo -e \\\"\\E[1m\\E[34m\\n\\n----- Working with \\\"{}\\\"\\E[0m\\\"; git -C \\\"{}/../\\\" ${*}\"; }; f"
 	stashu = "!git stash push -S; git stash; git stash pop --index stash@{1}"
@@ -26,3 +27,7 @@
     cmd = meld \"$LOCAL\" \"$REMOTE\" --label \"DIFF (ORIGINAL MY)\"
 [init]
 	defaultBranch = main
+[pack]
+	window = 1
+[http]
+	postBuffer = 52428800
