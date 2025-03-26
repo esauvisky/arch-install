@@ -25,8 +25,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=34
-export _DATE="Jan 31st, 2025"
+export _RCVERSION=35
+export _DATE="Mar 26th, 2025"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -36,86 +36,23 @@ function _changelog() {
     local i=$'\e[00m\e[96;03m' # emphasis
     local g=$'\e[32;01m'       # green
     local c=$'\e[97m'          # code
+    local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 34 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
-    echo -e "${n}This update is all about speed. Because, let's be honest, it was getting slow.${r}
+${y}Changelog 35 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+    echo -e "
+    ${a}This update introduces history cleanup and system-safe pip installs.${r}
 
-  ${r}- ${b}The ${c}git${r}${b} prompt got a major overhaul.${r}
-    ${a}It's faster now. A lot faster. But it might look a bit weird at first.${r}
-    ${a}Yes, it might take you a second to get used to, but you’ll thank me later.${r}
+  ${r}- ${b}System-safe ${c}pip${r}${b} installs using ${c}pipman${r}.${r}
+    ${a}If use Arch btw, ${c}pip install${r}${a} will now automatically create PKGBUILDs of the packages and install
+    ${a}them with ${c}pacman${r}${a}, so you don't need to use --break-system-packages (and thus break your system packages).${r}
+    ${f}IMPORTANT!${r}${a} Make sure to install ${c}pipman${r}${a} from the AUR with ${c}yay -S pipman-git${r}${a} to take advantage of this.${r}
 
-  ${r}- ${b}Python environments now show up in the prompt.${r}
-    ${a}If you're using ${c}pyenv${r}${a} or a virtualenv, you'll actually know about it now.${r}
-    ${a}No more running ${c}python -V${r}${a} every five minutes to check if you're in the right version.${r}
-
-  ${r}- ${b}Simple ${c}cat${r}${b} now just uses ${c}bat${r}${b}, but without paging.${r}
-    ${a}You get syntax highlighting and everything, but you'll be able to copy and paste it.${r}
-
-  ${r}- ${b}The auto-installer now warns you if ${c}.bashrc${r}${b} isn't sourced.${r}
-    ${a}Because if you're not sourcing your ${c}.bashrc${r}${a}, you’re probably also the kind of person who ignores seatbelt warnings.${r}
-
-  ${r}- ${b}Massive performance improvements across the board.${r}
-    ${a}The hostname detection is snappier, the terminal title updates are smarter, and unnecessary checks have been nuked.${r}
-
-  ${y}Tip: Use ${c}profile_command${r}${y} to measure how slow something is.${r}
-  ${y}Run something like ${c}profile_command 1000 'ls'${r}${y} to see how long it actually takes.${r}
+  ${r}- ${b}Automatic ${c}bash history cleanup${r}${b} to hide your past mistakes.${r}
+    ${a}Embarrassing typos and endless retries won't haunt your command history anymore. Enjoy a cleaner, less judgemental terminal experience.${r}
+    ${a}Specifically, this removes duplicate commands and excessively long entries. You can also manually call ${c}cleanup_bash_history${r}.
   "
 }
-
-
-###################
-# CHAT GPT PROMPT #
-###################
-# Below there's a diff of changes for this .bashrc version release:
-# DIFF:
-
-# END DIFF
-# You can see an example showcasing most available colors and text modifiers below:
-# COLORS:
-#     local a=$'\e[37;03m'       # cyan
-#     local r=$'\e[00m'          # reset
-#     local b=$'\e[1m'           # bold
-#     local y=$'\e[33;01m'       # yellow
-#     local i=$'\e[00m\e[96;03m' # emphasis
-#     local g=$'\e[32;01m'       # green
-#     local c=$'\e[97;03m'       # code
-# END COLORS
-
-# Using the diff, return a sound list of changes for the changelog of this version. Finally, pick your favorite change and add a tip at the bottom.
-# Here's an example of how a response should look like:
-
-# EXAMPLE:
-#   ${r}- A new directory ${b}${c}/var/cache/pacman/pkg/${r}${b} was added to ${c}cdcool${r}${b}. ${a}Check tips below!${r}
-#   ${r}${b}- Added a new function called ${c}pipi${r}.
-#     It's a smart pip package installer which automatically adds installed packages to ${c}requirements.txt${r}${b} along with their versions.${r}
-#   ${r}${b}- The ${c}journalctl${r}${b} aliases ${c}je${r}${b} and ${c}jb${r}${b}, were updated.${r}
-#     The ${c}je${r} alias now displays the most recent 100 log entries, and the ${c}jb${r} alias has had the ${c}-e${r} flag added to display the last part of the logs.${r}
-#   ${r}${b}- The git status display function ${c}gits${r}${b} was ${a}refactored${r}.
-#     It now color codes the git status output according to the type of changes made to the git repository.${r}
-#   ${r}${b}- The ${c}gitd${r}${b} alias was introduced${r} to show a more compact and informative git diff.
-#   ${r}- New git configurations were added to improve your git experience.
-
-#   ${i}Tip: try using MagicCD's commands, ${c}cdcool${r}${i} and ${c}cdX${r}${i} to quickly jump to important directories:${r}
-#    - Edit your ${c}~/.bash_custom${r} file and add aliases like this:
-#      ${c}alias cdc='_magicCD 2 $HOME/Coding/'${r}
-#   ${i}This will present a menu with all subdirectories in $HOME/Coding/ that include the sequence ${c}scr${r}:${r}
-#    $ ${c}cdc scri${r}
-#    ${r}- /home/emi/Coding/pop-shell/scripts
-#    ${n}- /home/emi/Coding/w3af/scripts${r}
-#    - /home/emi/Coding/Scripts
-#    - /home/emi/Coding/magenta-studio/scripts
-#    - /home/emi/Coding/Mobile-Security-Framework-MobSF/scripts${r}
-#   ${i}Select with ${b}UP/DOWN${r} ${i}keys and press ${b}ENTER${r}${i} to quickly navigate there.
-# END EXAMPLE
-
-# Do not return changes that aren't useful for a "final user", like if I updated the version and it shows in the diff above, it's not necessary to tell the final user of my script, as it's obvious. Here are examples of bad changes:
-# BLACKLIST:
-#   ${b}${a}- Incremented ${c}.bashrc${r}${a} version with ${c}_RCVERSION${r}${a}. This represents a new version of the .bashrc file to account for these changes.${r}
-# END BLACKLIST
-
-# Now return the text but for the changes in the DIFF above. Use the colors from and usage from the example to figure out how to use modifiers. Keep it pretty.
-# RESPONSE:
 
 function check_updates() {
     if [[ $(($(date +%s) - $(cat "$HOME/.emishrc_last_check"))) -gt 86400 ]]; then
@@ -630,6 +567,170 @@ function h() {
     printf "\e[01;95m================\e[00m\n"
 }
 
+##  +-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+##  |B|a|s|h| |H|i|s|t|o|r|y| |C|l|e|a|n|u|p|
+##  +-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+## Cleans up your bash history file by removing duplicates and the top 5% long entries.
+cleanup_bash_history() {
+#   set -o errexit; set -o errtrace; set -o pipefail # Exit on errors
+  local file="$HOME/.bash_eternal_history"
+  if [[ ! -f "$file" ]]; then
+    echo "No history file found at $file. Nothing to do."
+    return
+  elif ! _e "awk" || ! _e "sort" || ! _e "head" || ! _e "cut" || ! _e "wc"; then
+    echo "awk, sort, head, cut, and wc are required for this function."
+    return
+  fi
+
+  # Temporary files for our intermediate data.
+  local tmp_blocks tmp_info tmp_new tmp_remove_ids tmp_final
+  tmp_blocks=$(mktemp) || return 1
+  tmp_info=$(mktemp) || return 1
+  tmp_new=$(mktemp) || return 1
+  tmp_remove_ids=$(mktemp) || return 1
+  tmp_final=$(mktemp) || return 1
+
+  total_commands=$(grep -c '^#[0-9][0-9]*$' "$file")
+  five_percent=$((total_commands/20))
+
+  echo "Before cleanup, history file size: $(wc -c < "$file") bytes."
+  echo "Total commands: $total_commands. Will remove the longest $five_percent."
+
+  # Step 1. Split the file into command blocks.
+  # Each block starts with a timestamp line (a line that starts with '#' and digits)
+  # and includes all following lines until the next timestamp line.
+  # We write each block to tmp_blocks with markers and also output block id and its length.
+  awk -v out_blocks="$tmp_blocks" -v out_info="$tmp_info" '
+    BEGIN { block_id = 0; block = "" }
+    # When a line looks like a timestamp line…
+    /^#[0-9]+$/ {
+      # If we already have a block, output it first.
+      if (block != "") {
+        print "BLOCKSTART " block_id >> out_blocks
+        printf "%s", block >> out_blocks
+        print "BLOCKEND" >> out_blocks
+        # Record block id and its length (number of characters).
+        print block_id "\t" length(block) >> out_info
+      }
+      block_id++
+      block = $0 "\n"
+      next
+    }
+    # Otherwise, continue appending to the current block.
+    { block = block $0 "\n" }
+    END {
+      if (block != "") {
+        print "BLOCKSTART " block_id >> out_blocks
+        printf "%s", block >> out_blocks
+        print "BLOCKEND" >> out_blocks
+        print block_id "\t" length(block) >> out_info
+      }
+    }
+  ' "$file"
+
+  # Step 2. Find the blocks with the greatest character count.
+  # Sort descending by length (field 2), pick top $five_percent, and extract the block ids.
+  sort -k2,2nr "$tmp_info" | head -n "$five_percent" | cut -f1 > "$tmp_remove_ids"
+
+  # Step 3. Reassemble the history file, skipping blocks whose id is in the removal list.
+  # We read the file we generated with block markers.
+  awk -v remove_ids_file="$tmp_remove_ids" '
+    BEGIN {
+      # Read the list of block ids to remove into an array.
+      while (getline id < remove_ids_file) {
+        remove[id] = 1
+      }
+      in_block = 0
+      skip = 0
+    }
+    # Identify the start of a block.
+    /^BLOCKSTART/ {
+      in_block = 1
+      split($0, a, " ")
+      current_id = a[2]
+      skip = (current_id in remove)
+      # Print the block content (including the timestamp) only if not skipping.
+      next
+    }
+    # Identify the end of a block.
+    /^BLOCKEND/ {
+      in_block = 0
+      skip = 0
+      next
+    }
+    # For lines inside a block, print them only if we are not skipping.
+    {
+      if (in_block && !skip) print
+    }
+  ' "$tmp_blocks" > "$tmp_new"
+
+  echo "After long-entry removal, history file size: $(wc -c < "$tmp_new") bytes."
+
+  # Step 4. Remove duplicate commands, keeping only the latest usage.
+  # Here, we treat a "block" as starting with a timestamp line (matching ^#[0-9]+$)
+  # followed by one or more lines (the command itself). We compare the command portion (i.e. all lines except the first)
+  # and if duplicates are found, only the last occurrence is kept.
+  awk '
+    # Helper function to trim whitespace.
+    function trim(s) { sub(/^[ \t\r\n]+/, "", s); sub(/[ \t\r\n]+$/, "", s); return s }
+
+    # When a line is a timestamp line, it signals the start of a new block.
+    /^#[0-9]+$/ {
+      if (block != "") {
+        blocks[++n] = block
+        # Split block into lines; assume first line is timestamp.
+        num = split(block, arr, "\n")
+        cmd = ""
+        for(i = 2; i <= num; i++) {
+          cmd = cmd arr[i] "\n"
+        }
+        commands[n] = trim(cmd)
+      }
+      block = $0 "\n"
+      next
+    }
+    { block = block $0 "\n" }
+    END {
+      if (block != "") {
+        blocks[++n] = block
+        num = split(block, arr, "\n")
+        cmd = ""
+        for(i = 2; i <= num; i++) {
+          cmd = cmd arr[i] "\n"
+        }
+        commands[n] = trim(cmd)
+      }
+      # Process blocks in reverse order so that the first time we encounter a command (from the bottom)
+      # is its latest occurrence.
+      for(i = n; i >= 1; i--) {
+        if (!(commands[i] in seen)) {
+          keep[i] = 1
+          seen[commands[i]] = 1
+        } else {
+          keep[i] = 0
+        }
+      }
+      # Output blocks in the original order (chronologically) if marked to keep.
+      for(i = 1; i <= n; i++) {
+        if (keep[i])
+          printf "%s", blocks[i]
+      }
+    }
+  ' "$tmp_new" > "$tmp_final"
+
+  echo "After duplicate removal, history file size: $(wc -c < "$tmp_final") bytes."
+
+  echo "Backing up $file to $file.bak"
+  cp "$file" "$file.bak"
+  echo "Moving cleaned file to $file"
+  cp "$tmp_final" "$file"
+
+  command rm -f "$tmp_blocks" "$tmp_info" "$tmp_new" "$tmp_remove_ids" "$tmp_final"
+
+  echo "Done. Restart your shells or they will overwrite the new history file with the old one."
+}
+
+
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+
 ##  |E|a|s|y| |E|x|t|r|a|c|t|
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+
@@ -891,173 +992,23 @@ if _e python || _e python3; then
         fi
     fi
 
-    # Enhanced pip function with additional checks and features
     function pip() {
         local cmd="$1"
 
-        if [[ "$cmd" == "install" && -n "$VIRTUAL_ENV" ]]; then
-            local packages=()
-            local flags=()
-            local has_flags=0
+        if _e "pipman" && [[ "$cmd" == "install" && -z "$VIRTUAL_ENV" ]]; then
+            shift
 
-            # Process arguments to check for flags
-            for arg in "$@"; do
-                if [[ "$arg" != -* && "$arg" != "install" ]]; then
-                    packages+=("$arg")
+            local params=()  # I seriously hate bash
+            for param in "$@"; do
+                if [[ "$param" != "--break-system-packages" ]]; then
+                    params+=("$param")
                 fi
             done
 
-            command pip "$@"
-            error_code=$?
-
-            # Proceed only if there are packages and no flags
-            if [[ ${#packages[@]} -gt 0 && $error_code -eq 0 ]]; then
-                # Find requirements.txt file in the current or parent directories
-                local cur_dir="$PWD"
-                local req_file=""
-
-                while [ "$cur_dir" != "/" ]; do
-                    if [ -f "$cur_dir/requirements.txt" ]; then
-                        req_file="$cur_dir/requirements.txt"
-                        break
-                    fi
-                    cur_dir=$(dirname "$cur_dir")
-                done
-
-                # Read existing packages from requirements.txt
-                local req_packages=()
-                if [[ -f "$req_file" ]]; then
-                    # Read package names from requirements.txt
-                    # Remove comments and blank lines
-                    while read -r line; do
-                        line=$(echo "$line" | sed 's/#.*//g' | xargs)
-                        if [[ -n "$line" ]]; then
-                            pkg_name=$(echo "$line" | cut -d'=' -f1 | cut -d'<' -f1 | cut -d'>' -f1)
-                            req_packages+=("$pkg_name")
-                        fi
-                    done < "$req_file"
-                fi
-
-                # Read packages from temporary list
-                local dir_hash=$( echo "$PWD" | md5sum | cut -d' ' -f1)
-                mkdir -p "/tmp/pip"
-                local tmp_file="/tmp/pip/$dir_hash.txt"
-                local tmp_packages=()
-                if [[ -f "$tmp_file" ]]; then
-                    while read -r line; do
-                        tmp_packages+=("$line")
-                    done < "$tmp_file"
-                fi
-
-                # Combine req_packages and tmp_packages
-                local known_packages=("${req_packages[@]}" "${tmp_packages[@]}")
-
-                # Check if any of the installed packages are not in known_packages
-                local new_packages=()
-                for pkg in "${packages[@]}"; do
-                    found=0
-                    for known_pkg in "${known_packages[@]}"; do
-                        if [[ "$pkg" == "$known_pkg" ]]; then
-                            found=1
-                            break
-                        fi
-                    done
-                    if [[ $found -eq 0 ]]; then
-                        new_packages+=("$pkg")
-                    fi
-                done
-
-                # Only prompt if at least one new package
-                if [[ ${#new_packages[@]} -gt 0 ]]; then
-                    echo -e "\e[01;91m\nInstallation successful."
-                    echo -e "\e[00;96mDo you want to add installed packages to requirements.txt? [y/N] \e[00m"
-                    read -r user_input
-                    if [[ "$user_input" =~ ^[Yy]$ ]]; then
-                        # Add the new packages to the temporary list
-                        for pkg in "${new_packages[@]}"; do
-                            # Avoid duplicates in the temporary list
-                            if [[ -f "$tmp_file" ]]; then
-                                if ! grep -Fxq "$pkg" "$tmp_file"; then
-                                    echo "$pkg" >> "$tmp_file"
-                                fi
-                            else
-                                echo "$pkg" >> "$tmp_file"
-                            fi
-                        done
-
-                        # If requirements.txt not found, create it in the current directory
-                        if [[ -z "$req_file" ]]; then
-                            req_file="$PWD/requirements.txt"
-                            touch "$req_file"
-                            echo -e "\e[01;96mCreated new requirements.txt at $req_file.\e[00m"
-                        fi
-                        # Read the temporary list and add packages to requirements.txt
-                        if [[ -f "$tmp_file" ]]; then
-                            while read -r pkg; do
-                                pkg_name=$(echo "$pkg" | cut -d'=' -f1 | cut -d'<' -f1 | cut -d'>' -f1)
-                                # Avoid duplicates in requirements.txt
-                                if ! grep -Eq "^$pkg_name(==|>=|<=|~=|!=|>|<|$)" "$req_file"; then
-                                    # Retrieve package information
-                                    local pkg_info
-                                    pkg_info=$(pip show "$pkg")
-                                    if [[ -n "$pkg_info" ]]; then
-                                        local name version
-                                        name=$(echo "$pkg_info" | grep '^Name:' | awk '{print $2}')
-                                        version=$(echo "$pkg_info" | grep '^Version:' | awk '{print $2}')
-                                        if [[ -n "$name" && -n "$version" ]]; then
-                                            echo "${name}==${version}" >> "$req_file"
-                                        else
-                                            echo "$pkg" >> "$req_file"
-                                        fi
-                                    else
-                                        echo -e "\e[01;93mDidn't find package information for $pkg.\e[00m"
-                                    fi
-                                fi
-                            done < "$tmp_file"
-                            echo -e "\n\e[01;92mAdded packages to $req_file:\e[00m"
-                            echo -e "\e[97m$(cat "$req_file")\e[00m"
-                            # Clear the temporary list
-                            rm "$tmp_file"
-                        fi
-                    else
-                        # Add the current packages to the temporary list
-                        # if the user doesn't want to add them to requirements.txt
-                        for pkg in "${req_packages[@]}"; do
-                            if ! grep -qm1 "$pkg" "$tmp_file"; then
-                                echo "$pkg" >> "$tmp_file"
-                            fi
-                        done
-                    fi
-                fi
-            fi
-        elif [[ "$cmd" == "uninstall" && -n "$VIRTUAL_ENV" && $error_code -eq 0 ]]; then
-            # Remove packages from the temporary list
-            local tmp_file="/tmp/pip_installed_packages.txt"
-            if [[ -f "$tmp_file" ]]; then
-                local tmp_packages=()
-                while read -r line; do
-                    tmp_packages+=("$line")
-                done < "$tmp_file"
-
-                local updated_tmp_packages=()
-                for pkg in "${tmp_packages[@]}"; do
-                    remove_pkg=0
-                    for arg in "$@"; do
-                        if [[ "$pkg" == "$arg" ]]; then
-                            remove_pkg=1
-                            break
-                        fi
-                    done
-                    if [[ $remove_pkg -eq 0 ]]; then
-                        updated_tmp_packages+=("$pkg")
-                    fi
-                done
-
-                # Write updated list back to tmp_file
-                printf "%s\n" "${updated_tmp_packages[@]}" > "$tmp_file"
-            fi
+            mkdir -p "$HOME/.pipman"
+            echo -e '\e[01;93mCreating PKGBUILDs...\e[00m'
+            pipman -t "$HOME/.pipman" -S "${params[@]}"
         else
-            # Handle all other pip commands normally
             command pip "$@"
         fi
     }
