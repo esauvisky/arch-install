@@ -277,6 +277,8 @@
         # nano /etc/mkinitcpio.conf
             MODULES=(i915 amdgpu)
         # mkinicpio -p linux
+  
+  > **Recommended**: To reduce the large GTT memory reservation by the amdgpu driver, create or edit a configuration file using sudo nano /etc/modprobe.d/amdgpu-gtt.conf and add the following line to limit the GTT size to 16 GiB (16384 MiB): options amdgpu gttsize=16384. Save the file, then update your initial ramdisk using the appropriate command for your distribution (e.g., sudo update-initramfs -u for Debian/Ubuntu, sudo dracut -f for Fedora, or sudo mkinitcpio -P for Arch), and finally, sudo reboot your system; after rebooting, check free -h to confirm significantly more RAM is available.
 
 - Adicionar usuário
 
