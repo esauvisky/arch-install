@@ -14,7 +14,7 @@
             (visible yes))))
 (GimpToolGroup "tool group"
     (visible yes)
-    (active-tool "gimp-ellipse-select-tool")
+    (active-tool "gimp-rect-select-tool")
     (children
         (GimpToolInfo "gimp-rect-select-tool"
             (icon-name "gimp-tool-rect-select")
@@ -55,7 +55,7 @@
     (visible yes))
 (GimpToolGroup "tool group"
     (visible yes)
-    (active-tool "gimp-perspective-tool")
+    (active-tool "gimp-cage-tool")
     (children
         (GimpToolInfo "gimp-perspective-tool"
             (icon-name "gimp-tool-perspective")

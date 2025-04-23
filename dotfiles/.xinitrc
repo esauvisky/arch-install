@@ -33,6 +33,8 @@ fi
 ## In particular, fixes copyq menu below
 export QT_AUTO_SCREEN_SCALE_FACTOR=1
 
+source ~/.bash_globals
+
 #############
 # AUTOSTART #
 #############
@@ -80,6 +82,7 @@ export QT_AUTO_SCREEN_SCALE_FACTOR=1
 solaar -w hide &
 imwheel &
 .config/xkb/set_custom_layout.sh &
+.adb-mount-manager.sh &
 ## guake daemon
 # guake &
 

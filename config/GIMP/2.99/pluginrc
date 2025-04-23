@@ -4821,6 +4821,26 @@
         (proc-arg 1 "GParamInt" "gint" "grid-size" "_Grid" "Grid" 3 1 200 10)
         (proc-arg 5 "GParamBoolean" "gboolean" "ignore-bottom-layer" "Ignore the _bottom layer even if visible" "Ignore the bottom layer even if visible" 3 1)
         (proc-arg 5 "GParamBoolean" "gboolean" "use-bottom-layer" "_Use the (invisible) bottom layer as the base" "Use the (invisible) bottom layer as the base" 3 0)))
+(plug-in-def "${gimp_plug_in_dir}/plug-ins/file-iff/file-iff" 1720979386
+    (proc-def "file-iff-load" 1
+         "Load file in the IFF file format"
+         "Load file in the IFF file format"
+         "Alex S."
+         "Alex S."
+         "2023"
+         "Amiga IFF"
+         0
+        (icon icon-name -1 "")
+        (load-proc
+            (extensions "iff,ilbm,lbm,acbm,ham,ham6,ham8")
+            (magics "0,string,FORM")
+            (mime-types "image/x-ilbm"))
+         ""
+         0
+         2 1
+        (proc-arg 3 "GParamEnum" "GimpRunMode" "run-mode" "Run mode" "The run mode" 3 1)
+        (proc-arg 0 "GParamObject" "GFile" "file" "File" "The file to load" 3)
+        (proc-arg 10 "GimpParamImage" "GimpImage" "image" "Image" "Output image" 3 1)))
 (plug-in-def "${gimp_plug_in_dir}/extensions/org.gimp.extension.goat-exercises/goat-exercise-gjs.js" 1720979386
     (proc-def "plug-in-goat-exercise-gjs" 1
          "Exercise a goat in the JavaScript language (GJS)"

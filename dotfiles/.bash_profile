@@ -18,10 +18,12 @@
 #     startx
 # fi
 
-#if [[ -z $DISPLAY && $(tty) == /dev/tty2 ]]; then
-#    GDK_BACKEND=x11 startx
-#fi
+if [[ -z $DISPLAY && $(tty) == /dev/tty2 && $EUID -gt 0 ]]; then
+   GDK_BACKEND=x11 startx
+fi
 
 # Carrega o .bashrc
-[[ -f ~/.bash_globals ]] && . ~/.bash_globals
 [[ -f ~/.bashrc ]] && . ~/.bashrc
+
+# Carrega globais não comitadas como chaves de APIs ou PATHs
+[[ -f ~/.bash_globals ]] && . ~/.bash_globals

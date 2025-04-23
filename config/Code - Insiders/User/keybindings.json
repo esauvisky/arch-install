@@ -127,7 +127,6 @@
         "command": "editor.action.copyLinesDownAction",
         "when": "editorTextFocus"
     },
-
     /////////////////
     //? Navigation //
     /////////////////
@@ -155,7 +154,7 @@
     {
         "key": "alt+t",
         "command": "workbench.action.terminal.new",
-        "when": "!terminal.visible && terminalCount == '0'"
+        "when": "!terminal.visible || terminalCount == '0'"
     },
     {
         "key": "alt+t",
@@ -878,7 +877,8 @@
     },
     {
         "key": "ctrl+shift+e",
-        "command": "workbench.action.toggleSidebarVisibility"
+        "command": "workbench.action.toggleSidebarVisibility",
+        "when": "!sideBarVisible"
     },
     {
         "key": "ctrl+b",
@@ -1124,11 +1124,57 @@
         "command": "closeFindWidget",
         "when": "editorFocus && findWidgetVisible && !isComposings"
     },
+    // {
+    //     "key": "escape",
+    //     "command": "runCommands",
+    //     "args": {
+    //         "commands": [
+    //             "cancelSelection",
+    //             "removeSecondaryCursors"
+    //         ]
+    //     },
+    //     "when": "editorHasSelection && editorTextFocus && editorHasMultipleSelections"
+    // },
     {
         "key": "escape",
-        "command": "cancelSelection",
-        "when": "editorHasSelection && editorTextFocus"
+        "when": "editorHasSelection && editorTextFocus",
+        "command": "moveby.calculation",
+        "args": {
+            "lineNrEx": "selections[selections.length-1].start.line",
+            "charNrEx": "selections[selections.length-1].end.character"
+        }
     },
+    // {
+    //     "key": "escape",
+    //     "command": "cancelSelection",
+    //     "when": "editorHasSelection && editorTextFocus"
+    // },
+    {
+        "key": "ctrl+v",
+        "command": "-editor.action.clipboardPasteAction"
+    },
+    {
+        "key": "ctrl+v",
+        "when": "editorTextFocus",
+        "command": "selectby.pasteClipboard"
+    },
+    // {
+    //     "key": "ctrl+d",
+    //     "command": "-editor.action.addSelectionToNextFindMatch",
+    //     "when": "editorFocus"
+    // },
+    // {
+    //     "key": "ctrl+d",
+    //     "command": "selectby.addSelectionToNextFindMatchMultiCursor",
+    //     "when": "editorFocus",
+    //     "args": {
+    //         "properties": [
+    //             "end",
+    //             "start",
+    //             "wrap"
+    //         ]
+    //     }
+    // },
     {
         "key": "ctrl+p",
         "command": "-workbench.action.quickOpenNavigateNextInFilePicker",
@@ -1756,5 +1802,5 @@
         "key": "ctrl+k e",
         "command": "-workbench.files.action.focusOpenEditorsView",
         "when": "workbench.explorer.openEditorsView.active"
-    }
+    },
 ]

@@ -45,7 +45,7 @@
         "editor.defaultFormatter": "eeyore.yapf",
         "editor.formatOnType": false,
         "editor.wordBasedSuggestions": "off",
-        "diffEditor.ignoreTrimWhitespace": true
+        "diffEditor.ignoreTrimWhitespace": false
     },
     "[scss]": {
         "editor.defaultFormatter": "sibiraj-s.vscode-scss-formatter"
@@ -53,9 +53,9 @@
     "[xml]": {
         "editor.defaultFormatter": "DotJoshJohnson.xml"
     },
-    "[yaml]": {
-        "editor.defaultFormatter": "redhat.vscode-yaml"
-    },
+    // "[yaml]": {
+    //     "editor.defaultFormatter": "redhat.vscode-yaml"
+    // },
     // APK Lab settings
     "apklab.apkSignerPath": "/home/emi/.apklab/uber-apk-signer-1.3.0.jar",
     "apklab.apktoolPath": "/home/emi/.apklab/apktool_2.9.3.jar",
@@ -149,7 +149,6 @@
     "editor.mouseWheelZoom": true,
     "editor.multiCursorLimit": 50000,
     "editor.multiCursorMergeOverlapping": true,
-    "editor.multiCursorModifier": "ctrlCmd",
     // Editor settings - Overview ruler and rendering
     "editor.overviewRulerBorder": true,
     "editor.renderControlCharacters": false,
@@ -382,7 +381,6 @@
         }
     },
     "gitlens.mode.statusBar.enabled": false,
-    "gitlens.plusFeatures.enabled": false,
     "gitlens.remotes": [],
     "gitlens.showWelcomeOnInstall": false,
     "gitlens.showWhatsNewAfterUpgrades": false,
@@ -481,9 +479,10 @@
     "python.globalModuleInstallation": false,
     "python.jediMemoryLimit": -1,
     "python.languageServer": "Pylance",
+    "python.experiments.optOutFrom": [],
+    "python.analysis.aiCodeActions": {"generateDocstring": true},
     "python.analysis.autoFormatStrings": true,
     "python.analysis.gotoDefinitionInStringLiteral": true,
-    "python.analysis.importFormat": "relative",
     "python.analysis.indexing": true,
     "python.analysis.typeCheckingMode": "standard",
     "python.analysis.diagnosticMode": "workspace",
@@ -652,6 +651,12 @@
         },
         "javascript:S6635": {
             "level": "off"
+        },
+        "python:S5542": {
+            "level": "off"
+        },
+        "python:S2208": {
+            "level": "off"
         }
     },
     // Task settings
@@ -713,7 +718,13 @@
         "`"
     ],
     // TypeScript settings
-    "typescript.format.enable": false,
+    "typescript.format.enable": true,
+    "typescript.format.insertSpaceAfterCommaDelimiter": true,
+    "typescript.format.insertSpaceAfterConstructor": false,
+    "typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": true,
+    "typescript.format.semicolons": "insert",
+
     "typescript.implementationsCodeLens.enabled": true,
     "typescript.preferences.importModuleSpecifier": "non-relative",
     "typescript.suggest.completeFunctionCalls": true,
@@ -800,7 +811,7 @@
     "xmlTools.splitAttributesOnFormat": false,
     "xmlTools.splitXmlnsOnFormat": false,
     // Notebook settings
-    "notebook.lineNumbers": "off",
+    "notebook.lineNumbers": "on",
     "notebook.undoRedoPerCell": false,
     "notebook.globalToolbar": true,
     "notebook.output.scrolling": false,
@@ -864,7 +875,7 @@
     "gradle.showStoppedDaemons": true,
     "scm.showChangesSummary": false,
     "scm.showOutgoingChanges": "never",
-    "github.copilot.editor.enableAutoCompletions": false,
+    "github.copilot.editor.enableAutoCompletions": true,
     "diffEditor.ignoreTrimWhitespace": false,
     "peacock.surpriseMeOnStartup": true,
     "peacock.surpriseMeFromFavoritesOnly": false,
@@ -899,13 +910,7 @@
     "terminal.integrated.confirmOnExit": "hasChildProcesses",
     "terminal.integrated.drawBoldTextInBrightColors": false,
     "openscad-formatter.clang-format.style": "{ BasedOnStyle: Microsoft, UseTab: ForIndentation, ColumnLimit: 250,StatementMacros: [rotate,translate]}",
-    "flexigpt.defaultProvider": "openai",
-    "flexigpt.openai.defaultChatCompletionModel": "gpt-4o",
-    "flexigpt.openai.defaultCompletionModel": "gpt-4o",
-    "flexigpt.googlegl.defaultChatCompletionModel": "gemini-1.5-pro",
-    "flexigpt.googlegl.defaultCompletionModel": "gemini-1.5-flash",
     "scad-lsp.fmtExePath": "clang-format",
-    "scad-lsp.defaultParam": true,
     "scad-lsp.fmtStyle": "LLVM",
     "scad-lsp.launchPath": "openscad",
     "java.configuration.runtimes": [
@@ -956,51 +961,7 @@
     "gitlab.duoChat.enabled": false,
     "gitlab.duoCodeSuggestions.openTabsContext": false,
     "gitlab.showProjectMergeRequests": false,
-    "gitlab.customQueries": [
-
-        // {
-        //     "name": "Issues assigned to me",
-        //     "type": "issues",
-        //     "scope": "assigned_to_me",
-        //     "state": "opened",
-        //     "noItemText": "No issues assigned to you."
-        // },
-        // {
-        //     "name": "Issues created by me",
-        //     "type": "issues",
-        //     "scope": "created_by_me",
-        //     "state": "opened",
-        //     "noItemText": "No issues created by you."
-        // },
-        // {
-        //     "name": "Merge requests assigned to me",
-        //     "type": "merge_requests",
-        //     "scope": "assigned_to_me",
-        //     "state": "opened",
-        //     "noItemText": "No merge requests assigned to you."
-        // },
-        // {
-        //     "name": "Merge requests I'm reviewing",
-        //     "type": "merge_requests",
-        //     "reviewer": "<current_user>",
-        //     "state": "opened",
-        //     "noItemText": "No merge requests for you to review."
-        // },
-        // {
-        //     "name": "Merge requests created by me",
-        //     "type": "merge_requests",
-        //     "scope": "created_by_me",
-        //     "state": "opened",
-        //     "noItemText": "No merge requests created by you."
-        // },
-        // {
-        //     "name": "All project merge requests",
-        //     "type": "merge_requests",
-        //     "scope": "all",
-        //     "state": "opened",
-        //     "noItemText": "The project has no merge requests"
-        // }
-    ],
+    "gitlab.customQueries": [{}],
     "workbench.editor.enablePreviewFromCodeNavigation": true,
     "workbench.editor.highlightModifiedTabs": true,
     "workbench.editor.pinnedTabSizing": "compact",
@@ -1023,4 +984,16 @@
     "[dockerfile]": {
         "editor.defaultFormatter": "ms-azuretools.vscode-docker"
     },
+    "scad-lsp.defaultParam": true,
+    "[shellscript]": {
+        "editor.defaultFormatter": "mads-hartmann.bash-ide-vscode"
+    },
+    "supermaven.enableFixWithSupermaven": true,
+    "supermaven.otherWarning": false,
+    "cmake.pinnedCommands": [
+        "workbench.action.tasks.configureTaskRunner",
+        "workbench.action.tasks.runTask"
+    ],
+    "editor.multiCursorModifier": "ctrlCmd",
+    "moveby.revealType": "AtTop"
 }

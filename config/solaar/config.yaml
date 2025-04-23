@@ -1,4 +1,4 @@
-- 1.1.13
+- 1.1.14
 - _NAME: Wireless Mouse MX Master 2S
   _dpi-sliding: 32
   _modelId: B01940690000
@@ -19,11 +19,6 @@
   scroll-ratchet: 2
   smart-shift: 50
 - _NAME: M720 Triathlon
-  _absent: [hi-res-scroll, lowres-scroll-mode, scroll-ratchet, smart-shift, thumb-scroll-invert, thumb-scroll-mode, onboard_profiles, report_rate, report_rate_extended,
-    dpi, dpi_extended, speed-change, backlight, backlight_level, backlight_duration_hands_out, backlight_duration_hands_in, backlight_duration_powered,
-    backlight-timed, led_control, led_zone_, rgb_control, rgb_zone_, brightness_control, per-key-lighting, fn-swap, disable-keyboard-keys, crown-smooth,
-    divert-crown, divert-gkeys, m-key-leds, mr-key-led, multiplatform, gesture2-gestures, gesture2-divert, gesture2-params, sidetone, equalizer, adc_power_management]
-  _battery: 0
   _modelId: B015405E0000
   _sensitive: {hires-scroll-mode: ignore, hires-smooth-invert: ignore, hires-smooth-resolution: ignore}
   _serial: C672FFD4
@@ -78,12 +73,6 @@
   scroll-ratchet: 2
   smart-shift: 50
 - _NAME: Wireless Touch Keyboard K400 Plus
-  _absent: [hi-res-scroll, lowres-scroll-mode, hires-smooth-invert, hires-smooth-resolution, hires-scroll-mode, scroll-ratchet, smart-shift, thumb-scroll-invert,
-    thumb-scroll-mode, onboard_profiles, report_rate, report_rate_extended, pointer_speed, dpi, dpi_extended, speed-change, backlight, backlight_level,
-    backlight_duration_hands_out, backlight_duration_hands_in, backlight_duration_powered, backlight-timed, led_control, led_zone_, rgb_control, rgb_zone_,
-    brightness_control, per-key-lighting, reprogrammable-keys, persistent-remappable-keys, crown-smooth, divert-crown, divert-gkeys, m-key-leds, mr-key-led,
-    multiplatform, change-host, sidetone, equalizer, adc_power_management]
-  _battery: 4096
   _modelId: 404D00000000
   _sensitive: {fn-swap: true, hires-scroll-mode: ignore, hires-smooth-invert: ignore, hires-smooth-resolution: ignore}
   _serial: 977ECC55
