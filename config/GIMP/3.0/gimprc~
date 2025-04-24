@@ -1,0 +1,38 @@
+# GIMP gimprc
+# 
+# This is your personal gimprc file.  Any variable defined in this file takes
+# precedence over the value defined in the system-wide gimprc:
+# /etc/gimp/2.0/gimprc
+# Most values can be set within GIMP by changing some options in the
+# Preferences dialog.
+
+(import-raw-plug-in "${gimp_plug_in_dir}/plug-ins/nufraw-gimp")
+(monitor-xresolution 109)
+(monitor-yresolution 109)
+(save-tool-options no)
+(image-convert-indexed-max-colors 6)
+(selection-feather-radius 1)
+(selection-grow-radius 2)
+(selection-border-radius 1)
+(fill-options
+    (style solid)
+    (antialias yes)
+    (feather no)
+    (feather-radius 10))
+(stroke-options
+    (style solid)
+    (antialias yes)
+    (feather no)
+    (feather-radius 10)
+    (method line)
+    (width 6)
+    (unit pixels)
+    (cap-style butt)
+    (join-style miter)
+    (miter-limit 10)
+    (dash-offset 0)
+    (dash-info 0)
+    (emulate-brush-dynamics no))
+
+
+# end of gimprc

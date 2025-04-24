@@ -1,0 +1,348 @@
+
+# Stack traces obtained from PID 111783 - Thread 111783 #
+
+[New LWP 131378]
+[New LWP 111959]
+[New LWP 111887]
+[New LWP 111857]
+[New LWP 111854]
+[New LWP 111852]
+[New LWP 111851]
+[New LWP 111850]
+[New LWP 111849]
+[New LWP 111848]
+[New LWP 111847]
+[New LWP 111846]
+[New LWP 111845]
+[New LWP 111844]
+[New LWP 111843]
+[New LWP 111842]
+[New LWP 111841]
+[New LWP 111840]
+[New LWP 111839]
+[New LWP 111838]
+[New LWP 111837]
+[New LWP 111836]
+[New LWP 111835]
+[New LWP 111834]
+[New LWP 111833]
+[New LWP 111832]
+[New LWP 111831]
+[New LWP 111830]
+[New LWP 111829]
+[New LWP 111828]
+[New LWP 111827]
+[New LWP 111826]
+[New LWP 111825]
+[New LWP 111824]
+[New LWP 111823]
+[New LWP 111822]
+[New LWP 111821]
+[New LWP 111819]
+[New LWP 111818]
+[New LWP 111817]
+[New LWP 111816]
+[New LWP 111815]
+[New LWP 111814]
+[New LWP 111813]
+[New LWP 111812]
+[New LWP 111811]
+[New LWP 111810]
+[New LWP 111809]
+[New LWP 111808]
+[New LWP 111807]
+[New LWP 111806]
+[New LWP 111805]
+[New LWP 111804]
+[New LWP 111803]
+[New LWP 111802]
+[New LWP 111801]
+[New LWP 111800]
+[New LWP 111799]
+[New LWP 111798]
+[New LWP 111797]
+[New LWP 111796]
+[New LWP 111795]
+[New LWP 111794]
+[New LWP 111793]
+[New LWP 111792]
+[New LWP 111791]
+[New LWP 111790]
+[New LWP 111789]
+[New LWP 111788]
+[New LWP 111787]
+[New LWP 111786]
+[New LWP 111785]
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.archlinux.org>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/libthread_db.so.1".
+0x00007be995b359ba in read () from /usr/lib/libc.so.6
+  Id   Target Id                                         Frame 
+* 1    Thread 0x7be9939cee40 (LWP 111783) "gimp-2.99"    0x00007be995b359ba in read () from /usr/lib/libc.so.6
+  2    Thread 0x7be8f8a006c0 (LWP 131378) "paint"        0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  3    Thread 0x7be8fb4006c0 (LWP 111959) "swap writer"  0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  4    Thread 0x7be8fbe006c0 (LWP 111887) "dconf worker" 0x00007be995b3539d in poll () from /usr/lib/libc.so.6
+  5    Thread 0x7be911c006c0 (LWP 111857) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  6    Thread 0x7be9136006c0 (LWP 111854) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  7    Thread 0x7be913a006c0 (LWP 111852) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  8    Thread 0x7be913e006c0 (LWP 111851) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  9    Thread 0x7be91c6006c0 (LWP 111850) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  10   Thread 0x7be91ca006c0 (LWP 111849) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  11   Thread 0x7be91ce006c0 (LWP 111848) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  12   Thread 0x7be91d2006c0 (LWP 111847) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  13   Thread 0x7be91d6006c0 (LWP 111846) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  14   Thread 0x7be91da006c0 (LWP 111845) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  15   Thread 0x7be91de006c0 (LWP 111844) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  16   Thread 0x7be91e2006c0 (LWP 111843) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  17   Thread 0x7be91e6006c0 (LWP 111842) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  18   Thread 0x7be91ea006c0 (LWP 111841) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  19   Thread 0x7be91ee006c0 (LWP 111840) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  20   Thread 0x7be91f2006c0 (LWP 111839) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  21   Thread 0x7be91f6006c0 (LWP 111838) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  22   Thread 0x7be91fa006c0 (LWP 111837) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  23   Thread 0x7be91fe006c0 (LWP 111836) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  24   Thread 0x7be9284006c0 (LWP 111835) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  25   Thread 0x7be9288006c0 (LWP 111834) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  26   Thread 0x7be928c006c0 (LWP 111833) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  27   Thread 0x7be9290006c0 (LWP 111832) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  28   Thread 0x7be9294006c0 (LWP 111831) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  29   Thread 0x7be9298006c0 (LWP 111830) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  30   Thread 0x7be929c006c0 (LWP 111829) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  31   Thread 0x7be92a0006c0 (LWP 111828) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  32   Thread 0x7be92a4006c0 (LWP 111827) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  33   Thread 0x7be92a8006c0 (LWP 111826) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  34   Thread 0x7be92ac006c0 (LWP 111825) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  35   Thread 0x7be92b0006c0 (LWP 111824) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  36   Thread 0x7be92b4006c0 (LWP 111823) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  37   Thread 0x7be9344006c0 (LWP 111822) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  38   Thread 0x7be9348006c0 (LWP 111821) "gimp-2.99"    0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  39   Thread 0x7be9352006c0 (LWP 111819) "async"        0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  40   Thread 0x7be94f4006c0 (LWP 111818) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  41   Thread 0x7be94fe006c0 (LWP 111817) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  42   Thread 0x7be958c006c0 (LWP 111816) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  43   Thread 0x7be9596006c0 (LWP 111815) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  44   Thread 0x7be95a0006c0 (LWP 111814) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  45   Thread 0x7be95aa006c0 (LWP 111813) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  46   Thread 0x7be95b4006c0 (LWP 111812) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  47   Thread 0x7be95be006c0 (LWP 111811) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  48   Thread 0x7be964c006c0 (LWP 111810) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  49   Thread 0x7be9656006c0 (LWP 111809) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  50   Thread 0x7be9660006c0 (LWP 111808) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  51   Thread 0x7be966a006c0 (LWP 111807) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  52   Thread 0x7be9674006c0 (LWP 111806) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  53   Thread 0x7be967e006c0 (LWP 111805) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  54   Thread 0x7be970c006c0 (LWP 111804) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  55   Thread 0x7be9716006c0 (LWP 111803) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  56   Thread 0x7be9720006c0 (LWP 111802) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  57   Thread 0x7be972a006c0 (LWP 111801) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  58   Thread 0x7be9734006c0 (LWP 111800) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  59   Thread 0x7be973e006c0 (LWP 111799) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  60   Thread 0x7be97cc006c0 (LWP 111798) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  61   Thread 0x7be97d6006c0 (LWP 111797) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  62   Thread 0x7be97e0006c0 (LWP 111796) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  63   Thread 0x7be97ea006c0 (LWP 111795) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  64   Thread 0x7be97f4006c0 (LWP 111794) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  65   Thread 0x7be97fe006c0 (LWP 111793) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  66   Thread 0x7be988c006c0 (LWP 111792) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  67   Thread 0x7be9896006c0 (LWP 111791) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  68   Thread 0x7be98a0006c0 (LWP 111790) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  69   Thread 0x7be98aa006c0 (LWP 111789) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  70   Thread 0x7be98b4006c0 (LWP 111788) "worker"       0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+  71   Thread 0x7be98be006c0 (LWP 111787) "gdbus"        0x00007be995b3539d in poll () from /usr/lib/libc.so.6
+  72   Thread 0x7be990c006c0 (LWP 111786) "gmain"        0x00007be995b3539d in poll () from /usr/lib/libc.so.6
+  73   Thread 0x7be9916006c0 (LWP 111785) "pool-spawner" 0x00007be995b40e9d in syscall () from /usr/lib/libc.so.6
+#0  0x00007be995b359ba in read () from /usr/lib/libc.so.6
+No symbol table info available.
+#1  0x00007be997591289 in read (__fd=<optimized out>, __buf=0x7ffc9f2c5d40, __nbytes=255) at /usr/include/bits/unistd.h:28
+No locals.
+#2  gimp_stack_trace_print (prog_name=<optimized out>, stream=stream@entry=0x648af5ea6f70, trace=trace@entry=0x0) at ../gimp-2.99.18/libgimpbase/gimputils.c:1394
+        status = 31721
+        stack_printed = 0
+        gtrace = 0x0
+        gimp_pid = "111783\000\000\000\373\216\240I\362", <incomplete sequence \354\215>
+        buffer = "\200],\237\374\177\000\000\240],\237\374\177\000\000\000\000\000\000\000\000\000\000\004\000\000\000\000\000\000\000\020_,\237\374\177\000\000\250\305\v\227\351{\000\000\220],\237\374\177\000\000\211\306\n\227\351{\000\000\020_,\237\374\177\000\000\020\301\f\227\351{\000\000\220_,\237\374\177\000\000\277\377\t\227\351{", '\000' <repeats 26 times>, "\005\374\t\227\351{\000\000\020[\367\254\212d\000\000\004\000\000\000\000\000\000\000\325\000\000\000\351{\000\000\000e\373\254\212d\000\000\270],\237\374\177\000\000\020\301\f\227\351{\000\000\240],\237\374\177", '\000' <repeats 14 times>, "\351{\000\000"...
+        read_n = <optimized out>
+        sync_fd = {19, 21}
+        out_fd = {22, 23}
+        fork_pid = <optimized out>
+        pid = 111783
+        eintr_count = 0
+        tid = <optimized out>
+#3  0x0000648a90f7dc76 in gimp_eek (reason=reason@entry=0x648a9123d5c8 "fatal error", message=<optimized out>, use_handler=use_handler@entry=1) at ../gimp-2.99.18/app/errors.c:355
+        fd = 0x648af5ea6f70
+        has_backtrace = 1
+        pid = "111783\000\000\346\214\366\226\351{\000"
+        gimpdebug = 0x648a9123d5aa "/usr/lib/gimp-debug-tool-2.99"
+        args = {0x648a9123d5aa "/usr/lib/gimp-debug-tool-2.99", 0x648aad181d50 "/usr/bin/gimp-2.99", 0x7ffc9f2c6200 "111783", 0x648a9123d5c8 "fatal error", 0x648af5928b2e "Segmentation fault", 0x648aad31fe90 "/home/emi/.config/GIMP/2.99/CrashLog/gimp-crash-1723805723.txt", 0x0, 0x7ffc9f2c61f0 "0", 0x0}
+        timestamp = "0\000\000\000\000\000\000\000\317\344!\222\000\000\000"
+        config = <optimized out>
+        eek_handled = 0
+        debug_policy = GIMP_DEBUG_POLICY_WARNING
+        iter = <optimized out>
+        num_idx = <optimized out>
+        i = 0
+#4  0x0000648a90f7df2c in gimp_fatal_error (message=<optimized out>) at ../gimp-2.99.18/app/errors.c:206
+No locals.
+#5  0x0000648a90f7df7f in gimp_sigfatal_handler (sig_num=<optimized out>) at ../gimp-2.99.18/app/signals.c:196
+No locals.
+#6  <signal handler called>
+No symbol table info available.
+#7  0x00007be996146a98 in gtk_widget_hide () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#8  0x0000648a9116432a in quit_close_all_dialog_container_changed (images=<optimized out>, image=<optimized out>, private=0x648acbf51b80) at ../gimp-2.99.18/app/dialogs/quit-dialog.c:381
+        num_images = 0
+        accel_string = 0x648ae0e254f0 "Ctrl+D"
+        hint = <optimized out>
+        markup = <optimized out>
+#9  0x00007be99707f64a in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#10 0x00007be9970afce5 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#11 0x00007be9970a05dc in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#12 0x00007be9970a0842 in g_signal_emit_valist () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#13 0x00007be9970a0904 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#14 0x0000648a90d8b50f in gimp_container_remove (container=0x648af8e9b650, object=0x648ab09ca780) at ../gimp-2.99.18/app/core/gimpcontainer.c:682
+        list = <optimized out>
+        n_children = 1
+        __func__ = "gimp_container_remove"
+#15 0x0000648a90dd179d in gimp_list_clear (container=0x648af8e9b650) at ../gimp-2.99.18/app/core/gimplist.c:318
+        list = 0x648af8e9b650
+#16 0x0000648a90d8b084 in gimp_container_clear (container=0x648af8e9b650) at ../gimp-2.99.18/app/core/gimpcontainer.c:820
+        __func__ = <optimized out>
+        _g_boolean_var_31 = <optimized out>
+        __inst = <optimized out>
+        __t = <optimized out>
+        __r = <optimized out>
+#17 gimp_container_clear (container=0x648af8e9b650) at ../gimp-2.99.18/app/core/gimpcontainer.c:813
+        __func__ = "gimp_container_clear"
+#18 0x0000648a90d8c485 in gimp_container_dispose (object=0x648af8e9b650) at ../gimp-2.99.18/app/core/gimpcontainer.c:245
+        container = 0x648af8e9b650
+#19 0x00007be99708ec1d in g_object_unref () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#20 0x0000648a91154710 in quit_close_all_dialog_free (private=0x648acbf51b80) at ../gimp-2.99.18/app/dialogs/quit-dialog.c:317
+No locals.
+#21 0x00007be997089797 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#22 0x00007be996f5aea8 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#23 0x00007be99708ba0d in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#24 0x00007be99615dea1 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#25 0x00007be99708efd6 in g_object_run_dispose () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#26 0x0000648a9115e480 in quit_close_all_dialog_response (dialog=<optimized out>, response_id=-6, private=<optimized out>) at ../gimp-2.99.18/app/dialogs/quit-dialog.c:331
+        gimp = 0x648aacf52660
+        do_quit = 1
+#27 0x00007be99707f64a in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#28 0x00007be9970afce5 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#29 0x00007be9970a05dc in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#30 0x00007be9970a0842 in g_signal_emit_valist () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#31 0x00007be9970a0904 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#32 0x00007be9970a0732 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#33 0x00007be9970a0842 in g_signal_emit_valist () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#34 0x00007be9970a0904 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#35 0x00007be995eb7d12 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#36 0x00007be99707f64a in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#37 0x00007be9970afe22 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#38 0x00007be9970a05dc in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#39 0x00007be9970a0842 in g_signal_emit_valist () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#40 0x00007be9970a0904 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#41 0x00007be995eb7b4e in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#42 0x00007be995e751dc in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#43 0x00007be9970a0732 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#44 0x00007be9970a0842 in g_signal_emit_valist () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#45 0x00007be9970a0904 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#46 0x00007be995f980e4 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#47 0x00007be997083d56 in g_cclosure_marshal_VOID__BOXEDv () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#48 0x00007be9970a0732 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#49 0x00007be9970a0842 in g_signal_emit_valist () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#50 0x00007be9970a0904 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#51 0x00007be995f92095 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#52 0x00007be995f999d3 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#53 0x00007be995f9a39f in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#54 0x00007be995f53876 in gtk_event_controller_handle_event () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#55 0x00007be996148402 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#56 0x00007be995e7396a in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#57 0x00007be9970a0732 in ?? () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#58 0x00007be9970a0842 in g_signal_emit_valist () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#59 0x00007be9970a0904 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+No symbol table info available.
+#60 0x00007be996157d15 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#61 0x00007be995fe54b5 in ?? () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#62 0x00007be995fe6273 in gtk_main_do_event () from /usr/lib/libgtk-3.so.0
+No symbol table info available.
+#63 0x00007be9966c03c7 in ?? () from /usr/lib/libgdk-3.so.0
+No symbol table info available.
+#64 0x00007be99671c200 in ?? () from /usr/lib/libgdk-3.so.0
+No symbol table info available.
+#65 0x00007be996f7cab9 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#66 0x00007be996fde9e7 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#67 0x00007be996f7bfc5 in g_main_context_iteration () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#68 0x00007be996d11c66 in g_application_run () from /usr/lib/libgio-2.0.so.0
+No symbol table info available.
+#69 0x0000648a90f7d5bc in app_run (full_prog_name=<optimized out>, filenames=<optimized out>, alternate_system_gimprc=0x0, alternate_gimprc=0x0, session_name=<optimized out>, batch_interpreter=<optimized out>, batch_commands=0x0, quit=0, as_new=0, no_interface=0, no_data=<optimized out>, no_fonts=<optimized out>, no_splash=0, be_verbose=0, use_shm=<optimized out>, use_cpu_accel=1, console_messages=0, use_debug_handler=0, show_playground=1, show_debug_menu=1, stack_trace_mode=GIMP_STACK_TRACE_QUERY, pdb_compat_mode=<optimized out>, backtrace_file=0x648aacd6d550 "/home/emi/.config/GIMP/2.99/CrashLog/gimp-crash-1723805723.txt") at ../gimp-2.99.18/app/app.c:317
+        gimp = 0x648aacf52660
+        app = 0x648aad103390
+        default_folder = 0x0
+        gimpdir = <optimized out>
+        abort_message = 0x0
+        retval = 0
+        __func__ = "app_run"
+#70 0x0000648a90d86565 in main (argc=<optimized out>, argv=<optimized out>) at ../gimp-2.99.18/app/main.c:786
+        context = 0x648aacd89c80
+        error = 0x0
+        abort_message = <optimized out>
+        basename = <optimized out>
+        system_gimprc_file = 0x0
+        user_gimprc_file = 0x0
+        gimp_group = <optimized out>
+        backtrace_file = 0x648aacd6d550 "/home/emi/.config/GIMP/2.99/CrashLog/gimp-crash-1723805723.txt"
+        retval = <optimized out>
+        i = <optimized out>
+[Inferior 1 (process 111783) detached]

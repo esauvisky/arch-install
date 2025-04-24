@@ -1,0 +1,284 @@
+
+# Stack traces obtained from PID 1246362 - Thread 1246362 #
+
+[New LWP 1246626]
+[New LWP 1246488]
+[New LWP 1246445]
+[New LWP 1246439]
+[New LWP 1246435]
+[New LWP 1246434]
+[New LWP 1246433]
+[New LWP 1246432]
+[New LWP 1246431]
+[New LWP 1246430]
+[New LWP 1246429]
+[New LWP 1246428]
+[New LWP 1246427]
+[New LWP 1246426]
+[New LWP 1246425]
+[New LWP 1246424]
+[New LWP 1246423]
+[New LWP 1246422]
+[New LWP 1246421]
+[New LWP 1246420]
+[New LWP 1246419]
+[New LWP 1246418]
+[New LWP 1246417]
+[New LWP 1246416]
+[New LWP 1246415]
+[New LWP 1246414]
+[New LWP 1246413]
+[New LWP 1246412]
+[New LWP 1246411]
+[New LWP 1246410]
+[New LWP 1246409]
+[New LWP 1246408]
+[New LWP 1246407]
+[New LWP 1246406]
+[New LWP 1246405]
+[New LWP 1246404]
+[New LWP 1246402]
+[New LWP 1246397]
+[New LWP 1246396]
+[New LWP 1246395]
+[New LWP 1246394]
+[New LWP 1246393]
+[New LWP 1246392]
+[New LWP 1246391]
+[New LWP 1246390]
+[New LWP 1246389]
+[New LWP 1246388]
+[New LWP 1246387]
+[New LWP 1246386]
+[New LWP 1246385]
+[New LWP 1246384]
+[New LWP 1246383]
+[New LWP 1246382]
+[New LWP 1246381]
+[New LWP 1246380]
+[New LWP 1246379]
+[New LWP 1246378]
+[New LWP 1246377]
+[New LWP 1246376]
+[New LWP 1246375]
+[New LWP 1246374]
+[New LWP 1246373]
+[New LWP 1246372]
+[New LWP 1246371]
+[New LWP 1246370]
+[New LWP 1246369]
+[New LWP 1246368]
+[New LWP 1246367]
+[New LWP 1246366]
+[New LWP 1246365]
+[New LWP 1246364]
+
+This GDB supports auto-downloading debuginfo from the following URLs:
+  <https://debuginfod.archlinux.org>
+Enable debuginfod for this session? (y or [n]) [answered N; input not from terminal]
+Debuginfod has been disabled.
+To make this setting permanent, add 'set debuginfod enabled off' to .gdbinit.
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/libthread_db.so.1".
+0x00007f637c796c5a in read () from /usr/lib/libc.so.6
+  Id   Target Id                                          Frame 
+* 1    Thread 0x7f637a5fbe40 (LWP 1246362) "gimp-2.99"    0x00007f637c796c5a in read () from /usr/lib/libc.so.6
+  2    Thread 0x7f62ea0006c0 (LWP 1246626) "swap writer"  0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  3    Thread 0x7f62eb4006c0 (LWP 1246488) "dconf worker" 0x00007f637c79663d in poll () from /usr/lib/libc.so.6
+  4    Thread 0x7f6300c006c0 (LWP 1246445) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  5    Thread 0x7f63026006c0 (LWP 1246439) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  6    Thread 0x7f6302a006c0 (LWP 1246435) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  7    Thread 0x7f6302e006c0 (LWP 1246434) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  8    Thread 0x7f63032006c0 (LWP 1246433) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  9    Thread 0x7f63036006c0 (LWP 1246432) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  10   Thread 0x7f6303a006c0 (LWP 1246431) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  11   Thread 0x7f6303e006c0 (LWP 1246430) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  12   Thread 0x7f630c6006c0 (LWP 1246429) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  13   Thread 0x7f630ca006c0 (LWP 1246428) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  14   Thread 0x7f630ce006c0 (LWP 1246427) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  15   Thread 0x7f630d2006c0 (LWP 1246426) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  16   Thread 0x7f630d6006c0 (LWP 1246425) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  17   Thread 0x7f630da006c0 (LWP 1246424) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  18   Thread 0x7f630de006c0 (LWP 1246423) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  19   Thread 0x7f630e2006c0 (LWP 1246422) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  20   Thread 0x7f630e6006c0 (LWP 1246421) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  21   Thread 0x7f630ea006c0 (LWP 1246420) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  22   Thread 0x7f630ee006c0 (LWP 1246419) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  23   Thread 0x7f630f2006c0 (LWP 1246418) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  24   Thread 0x7f630f6006c0 (LWP 1246417) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  25   Thread 0x7f630fa006c0 (LWP 1246416) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  26   Thread 0x7f630fe006c0 (LWP 1246415) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  27   Thread 0x7f63186006c0 (LWP 1246414) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  28   Thread 0x7f6318a006c0 (LWP 1246413) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  29   Thread 0x7f6318e006c0 (LWP 1246412) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  30   Thread 0x7f63192006c0 (LWP 1246411) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  31   Thread 0x7f63196006c0 (LWP 1246410) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  32   Thread 0x7f6319a006c0 (LWP 1246409) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  33   Thread 0x7f6319e006c0 (LWP 1246408) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  34   Thread 0x7f631a2006c0 (LWP 1246407) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  35   Thread 0x7f631a6006c0 (LWP 1246406) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  36   Thread 0x7f631aa006c0 (LWP 1246405) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  37   Thread 0x7f63244006c0 (LWP 1246404) "gimp-2.99"    0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  38   Thread 0x7f631be006c0 (LWP 1246402) "async"        0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  39   Thread 0x7f633e0006c0 (LWP 1246397) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  40   Thread 0x7f633ea006c0 (LWP 1246396) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  41   Thread 0x7f633f4006c0 (LWP 1246395) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  42   Thread 0x7f633fe006c0 (LWP 1246394) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  43   Thread 0x7f6348c006c0 (LWP 1246393) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  44   Thread 0x7f63496006c0 (LWP 1246392) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  45   Thread 0x7f634a0006c0 (LWP 1246391) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  46   Thread 0x7f634aa006c0 (LWP 1246390) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  47   Thread 0x7f634b4006c0 (LWP 1246389) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  48   Thread 0x7f634be006c0 (LWP 1246388) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  49   Thread 0x7f6354c006c0 (LWP 1246387) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  50   Thread 0x7f63556006c0 (LWP 1246386) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  51   Thread 0x7f63560006c0 (LWP 1246385) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  52   Thread 0x7f6356a006c0 (LWP 1246384) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  53   Thread 0x7f63574006c0 (LWP 1246383) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  54   Thread 0x7f6357e006c0 (LWP 1246382) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  55   Thread 0x7f6360c006c0 (LWP 1246381) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  56   Thread 0x7f63616006c0 (LWP 1246380) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  57   Thread 0x7f63620006c0 (LWP 1246379) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  58   Thread 0x7f6362a006c0 (LWP 1246378) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  59   Thread 0x7f63634006c0 (LWP 1246377) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  60   Thread 0x7f6363e006c0 (LWP 1246376) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  61   Thread 0x7f636cc006c0 (LWP 1246375) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  62   Thread 0x7f636d6006c0 (LWP 1246374) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  63   Thread 0x7f636e0006c0 (LWP 1246373) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  64   Thread 0x7f636ea006c0 (LWP 1246372) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  65   Thread 0x7f636f4006c0 (LWP 1246371) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  66   Thread 0x7f636fe006c0 (LWP 1246370) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  67   Thread 0x7f63750006c0 (LWP 1246369) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  68   Thread 0x7f6375a006c0 (LWP 1246368) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  69   Thread 0x7f63764006c0 (LWP 1246367) "worker"       0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+  70   Thread 0x7f6376e006c0 (LWP 1246366) "gdbus"        0x00007f637c79663d in poll () from /usr/lib/libc.so.6
+  71   Thread 0x7f63778006c0 (LWP 1246365) "gmain"        0x00007f637c79663d in poll () from /usr/lib/libc.so.6
+  72   Thread 0x7f63782006c0 (LWP 1246364) "pool-spawner" 0x00007f637c7a21fd in syscall () from /usr/lib/libc.so.6
+#0  0x00007f637c796c5a in read () at /usr/lib/libc.so.6
+#1  0x00007f637e1d8289 in read (__fd=<optimized out>, __buf=0x7ffec0ca9b40, __nbytes=255) at /usr/include/bits/unistd.h:28
+#2  gimp_stack_trace_print (prog_name=<optimized out>, stream=stream@entry=0x636fa5d24c70, trace=trace@entry=0x0) at ../gimp-2.99.18/libgimpbase/gimputils.c:1394
+        status = 25455
+        stack_printed = 0
+        gtrace = 0x0
+        gimp_pid = "1246362\000\000\000\000\000\000\000\000"
+        buffer = '\000' <repeats 41 times>, "Z\303x\242\337,\203", '\000' <repeats 16 times>, "\020\234\312\300\376\177\000\000\240v\350\213oc\000\000\200\235\312\300\376\177\000\000J\346\r~c\177\000\000\340\303\302\216oc\000\000@", '\000' <repeats 11 times>, "\002", '\000' <repeats 11 times>, "\002\000\000\000\000\000\000\000\fw\274}c\177\000\000\240=\032\246oc\000\0001\363\020~t]\000\000\300\216+\246oc\000\000\000Z\303x\242\337,\203\001\000\000\000\000\000\000\000p\236\312\300\376\177\000\000\001\000\000\000\000\000\000\000М"...
+        read_n = <optimized out>
+        sync_fd = {20, 21}
+        out_fd = {22, 23}
+        fork_pid = <optimized out>
+        pid = 1246362
+        eintr_count = 0
+        tid = <optimized out>
+#3  0x0000636f82116c76 in gimp_eek (reason=reason@entry=0x636f823d65c8 "fatal error", message=<optimized out>, use_handler=use_handler@entry=1) at ../gimp-2.99.18/app/errors.c:355
+        fd = 0x636fa5d24c70
+        has_backtrace = 1
+        pid = "1246362\000\346|\274}c\177\000"
+        gimpdebug = 0x636f823d65aa "/usr/lib/gimp-debug-tool-2.99"
+        args = {0x636f823d65aa "/usr/lib/gimp-debug-tool-2.99", 0x636f8c1dc410 "/usr/bin/gimp-2.99", 0x7ffec0caa000 "1246362", 0x636f823d65c8 "fatal error", 0x636f9d6dd00e "Aborted", 0x636f8c289080 "/home/emi/.config/GIMP/2.99/CrashLog/gimp-crash-1724361632.txt", 0x0, 0x7ffec0ca9ff0 "0", 0x0}
+        timestamp = "0\000\000\000\000\000\000\000\006\266\373{\000\000\000"
+        config = <optimized out>
+        eek_handled = 0
+        debug_policy = GIMP_DEBUG_POLICY_WARNING
+        iter = <optimized out>
+        num_idx = <optimized out>
+        i = 0
+#4  0x0000636f82116f2c in gimp_fatal_error (message=<optimized out>) at ../gimp-2.99.18/app/errors.c:206
+#5  0x0000636f82116f7f in gimp_sigfatal_handler (sig_num=<optimized out>) at ../gimp-2.99.18/app/signals.c:196
+#6  0x00007f637c6c81d0 in <signal handler called> () at /usr/lib/libc.so.6
+#7  0x00007f637c7213f4 in ??? () at /usr/lib/libc.so.6
+#8  0x00007f637c6c8120 in raise () at /usr/lib/libc.so.6
+#9  0x00007f637c6af4c3 in abort () at /usr/lib/libc.so.6
+#10 0x00007f637c6b0354 in ??? () at /usr/lib/libc.so.6
+#11 0x00007f637c72b765 in ??? () at /usr/lib/libc.so.6
+#12 0x00007f637c72dc4c in ??? () at /usr/lib/libc.so.6
+#13 0x00007f637c7305ce in free () at /usr/lib/libc.so.6
+#14 0x0000636f82368fcf in threshold_picked (config=0x636fa621bd80, identifier=0x636f823f7b4b, x=<optimized out>, y=<optimized out>, sample_format=<optimized out>, picked_color=0x636fa6464c30) at ../gimp-2.99.18/app/propgui/gimppropgui-color-to-alpha.c:63
+        color = 0x636fa6541050
+        threshold = <optimized out>
+#15 0x0000636f81f822ff in gimp_marshal_VOID__POINTER_OBJECT_ENUM_POINTER_POINTER_BOXED (return_value=<optimized out>, n_param_values=<optimized out>, invocation_hint=<optimized out>, closure=0x636f8c8a0230, param_values=0x7ffec0cab220, marshal_data=<optimized out>) at app/core/gimpmarshal.c:1329
+        cc = <optimized out>
+        data1 = 0x636fa6228580
+        data2 = <optimized out>
+        callback = 0x636f82168a80 <gimp_filter_tool_color_picked>
+        cc = <optimized out>
+        data1 = <optimized out>
+        data2 = <optimized out>
+        callback = <optimized out>
+        __func__ = {<optimized out> <repeats 61 times>}
+        _g_boolean_var_52 = <optimized out>
+#16 gimp_marshal_VOID__POINTER_OBJECT_ENUM_POINTER_POINTER_BOXED (closure=0x636f8c8a0230, return_value=<optimized out>, n_param_values=<optimized out>, param_values=0x7ffec0cab220, invocation_hint=<optimized out>, marshal_data=<optimized out>) at app/core/gimpmarshal.c:1296
+        cc = 0x636f8c8a0230
+        data1 = <optimized out>
+        data2 = <optimized out>
+        callback = <optimized out>
+        __func__ = "gimp_marshal_VOID__POINTER_OBJECT_ENUM_POINTER_POINTER_BOXED"
+#17 0x00007f637e0de64a in g_closure_invoke () at /usr/lib/libgobject-2.0.so.0
+#18 0x00007f637e10ee22 in ??? () at /usr/lib/libgobject-2.0.so.0
+#19 0x00007f637e0ff5dc in ??? () at /usr/lib/libgobject-2.0.so.0
+#20 0x00007f637e0ff842 in g_signal_emit_valist () at /usr/lib/libgobject-2.0.so.0
+#21 0x00007f637e0ff904 in g_signal_emit () at /usr/lib/libgobject-2.0.so.0
+#22 0x0000636f82169426 in gimp_color_tool_pick (tool=0x636fa6228580, coords=0x7ffec0cab740, display=0x636f8c449500, pick_state=GIMP_COLOR_PICK_STATE_START) at ../gimp-2.99.18/app/tools/gimpcolortool.c:641
+        klass = <optimized out>
+        sample_format = 0x636f8bed59a0
+        pixel = {6.9529322375813677e-310, 5.4016779958440828e-310, 5.401656554609269e-310, 6.953091214736435e-310}
+        color = 0x636fa6464c30
+#23 0x0000636f82167cf7 in gimp_color_tool_button_press (time=<optimized out>, state=<optimized out>, press_type=<optimized out>, tool=0x636fa6228580, coords=0x7ffec0cab740, display=0x636f8c449500) at ../gimp-2.99.18/app/tools/gimpcolortool.c:209
+        color_tool = <optimized out>
+        color_tool = <optimized out>
+#24 gimp_color_tool_button_press (tool=0x636fa6228580, coords=0x7ffec0cab740, time=<optimized out>, state=<optimized out>, press_type=<optimized out>, display=0x636f8c449500) at ../gimp-2.99.18/app/tools/gimpcolortool.c:191
+        color_tool = 0x636fa6228580
+#25 0x0000636f821a50db in gimp_tool_button_press (tool=0x636fa6228580, coords=0x7ffec0cab740, time=156430243, state=GDK_BUTTON1_MASK, press_type=GIMP_BUTTON_PRESS_NORMAL, display=0x636f8c449500) at ../gimp-2.99.18/app/tools/gimptool.c:722
+        __func__ = "gimp_tool_button_press"
+#26 0x0000636f82368124 in gimp_display_shell_canvas_tool_events (canvas=<optimized out>, event=<optimized out>, shell=0x636f8f889f20) at ../gimp-2.99.18/app/display/gimpdisplayshell-tool-events.c:568
+        active_tool = <optimized out>
+        motion_mode = <optimized out>
+        last_motion = {x = 3031.2416318643063, y = 2675.8529976066475, pressure = 1, xtilt = 0, ytilt = 0, wheel = 0.5, distance = 0, rotation = 0, slider = 0, velocity = 0.21886753875125387, direction = 0.36157320470526544, xscale = 0.68476147477486637, yscale = 0.68476147477486637, angle = 0, reflect = 0}
+        bevent = <optimized out>
+        button_state = <optimized out>
+        display = 0x636f8c449500
+        image = <optimized out>
+        gimp = 0x636f8c052170
+        mod_manager = <optimized out>
+        display_coords = {x = 910.677490234375, y = 538.321044921875, pressure = 1, xtilt = 0, ytilt = 0, wheel = 0.5, distance = 0, rotation = 0, slider = 0, velocity = 0, direction = 0, xscale = 1, yscale = 1, angle = 0, reflect = 0}
+        image_coords = {x = 3031.2416318643063, y = 2675.8529976066475, pressure = 1, xtilt = 0, ytilt = 0, wheel = 0.5, distance = 0, rotation = 0, slider = 0, velocity = 0.21886753875125387, direction = 0.36157320470526544, xscale = 0.68476147477486637, yscale = 0.68476147477486637, angle = 0, reflect = 0}
+        state = GDK_BUTTON1_MASK
+        time = 156430243
+        device_changed = <optimized out>
+        return_val = 0
+        update_sw_cursor = 0
+        __func__ = "gimp_display_shell_canvas_tool_events"
+#27 0x00007f637cc787d5 in ??? () at /usr/lib/libgtk-3.so.0
+#28 0x00007f637e0de64a in g_closure_invoke () at /usr/lib/libgobject-2.0.so.0
+#29 0x00007f637e10ece5 in ??? () at /usr/lib/libgobject-2.0.so.0
+#30 0x00007f637e0fee40 in ??? () at /usr/lib/libgobject-2.0.so.0
+#31 0x00007f637e0ff842 in g_signal_emit_valist () at /usr/lib/libgobject-2.0.so.0
+#32 0x00007f637e0ff904 in g_signal_emit () at /usr/lib/libgobject-2.0.so.0
+#33 0x00007f637cf57d15 in ??? () at /usr/lib/libgtk-3.so.0
+#34 0x00007f637cde54b5 in ??? () at /usr/lib/libgtk-3.so.0
+#35 0x00007f637cde6273 in gtk_main_do_event () at /usr/lib/libgtk-3.so.0
+#36 0x00007f637cb3b3c7 in ??? () at /usr/lib/libgdk-3.so.0
+#37 0x00007f637cb97200 in ??? () at /usr/lib/libgdk-3.so.0
+#38 0x00007f637dbdbab9 in ??? () at /usr/lib/libglib-2.0.so.0
+#39 0x00007f637dc3d9e7 in ??? () at /usr/lib/libglib-2.0.so.0
+#40 0x00007f637dbdafc5 in g_main_context_iteration () at /usr/lib/libglib-2.0.so.0
+#41 0x00007f637d970c66 in g_application_run () at /usr/lib/libgio-2.0.so.0
+#42 0x0000636f821165bc in app_run (full_prog_name=<optimized out>, filenames=<optimized out>, alternate_system_gimprc=0x0, alternate_gimprc=0x0, session_name=<optimized out>, batch_interpreter=<optimized out>, batch_commands=0x0, quit=0, as_new=0, no_interface=0, no_data=<optimized out>, no_fonts=<optimized out>, no_splash=0, be_verbose=0, use_shm=<optimized out>, use_cpu_accel=1, console_messages=0, use_debug_handler=0, show_playground=1, show_debug_menu=1, stack_trace_mode=GIMP_STACK_TRACE_QUERY, pdb_compat_mode=<optimized out>, backtrace_file=0x636f8be6a550 "/home/emi/.config/GIMP/2.99/CrashLog/gimp-crash-1724361632.txt") at ../gimp-2.99.18/app/app.c:317
+        gimp = 0x636f8c052170
+        app = 0x636f8c415ed0
+        default_folder = 0x0
+        gimpdir = <optimized out>
+        abort_message = 0x0
+        retval = 0
+        __func__ = "app_run"
+#43 0x0000636f81f1f565 in main (argc=<optimized out>, argv=<optimized out>) at ../gimp-2.99.18/app/main.c:786
+        context = 0x636f8be86c80
+        error = 0x0
+        abort_message = <optimized out>
+        basename = <optimized out>
+        system_gimprc_file = 0x0
+        user_gimprc_file = 0x0
+        gimp_group = <optimized out>
+        backtrace_file = 0x636f8be6a550 "/home/emi/.config/GIMP/2.99/CrashLog/gimp-crash-1724361632.txt"
+        retval = <optimized out>
+        i = <optimized out>
+[Inferior 1 (process 1246362) detached]

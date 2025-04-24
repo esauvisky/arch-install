@@ -1,0 +1,14 @@
+# GIMP user context
+
+(tool "gimp-perspective-clone-tool")
+(paint-info "gimp-perspective-clone")
+(brush "2. Hardness 100")
+(dynamics "Pressure Size")
+(mybrush "100% Opaque")
+(pattern "Pine")
+(gradient "FG to BG (RGB)")
+(palette "Color History")
+(font "Sans-serif")
+(tool-preset "Virtual core pointer")
+
+# end of user context

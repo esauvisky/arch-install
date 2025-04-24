@@ -1,0 +1,8 @@
+# GIMP gimp-rotate-tool options
+
+(direction backward)
+(show-preview no)
+(grid-type n-lines)
+(grid-size 30)
+
+# end of gimp-rotate-tool options

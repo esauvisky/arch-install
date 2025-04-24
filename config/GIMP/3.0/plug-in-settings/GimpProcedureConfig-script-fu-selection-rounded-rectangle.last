@@ -1,0 +1,7 @@
+# settings
+
+(run-mode interactive)
+(adjustment 50)
+(toggle no)
+
+# end of settings
