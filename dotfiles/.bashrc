@@ -25,8 +25,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=35
-export _DATE="Mar 26th, 2025"
+export _RCVERSION=36
+export _DATE="Jul 20th, 2025"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -39,18 +39,32 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 35 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 36 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
-    ${a}This update introduces history cleanup and system-safe pip installs.${r}
+    ${a}This update is all about intelligence and safety, with major upgrades to the Python workflow, history management, and Git tooling.${r}
 
-  ${r}- ${b}System-safe ${c}pip${r}${b} installs using ${c}pipman${r}.${r}
-    ${a}If use Arch btw, ${c}pip install${r}${a} will now automatically create PKGBUILDs of the packages and install
-    ${a}them with ${c}pacman${r}${a}, so you don't need to use --break-system-packages (and thus break your system packages).${r}
-    ${f}IMPORTANT!${r}${a} Make sure to install ${c}pipman${r}${a} from the AUR with ${c}yay -S pipman-git${r}${a} to take advantage of this.${r}
+  ${r}- ${b}Python Environment Dashboard in your Prompt.${r}
+    ${a}The prompt is now a powerhouse of Python context. It shows active ${c}pyenv${r}${a} and ${c}virtualenv${r}${a} info, including the origin file (like ${c}.python-version${r}${a}).${r}
+    ${a}It even warns you in ${f}red${r}${a} if your environment is misconfigured (e.g., your active Python doesn't match the one specified in ${c}pyenv${r}${a}).${r}
 
-  ${r}- ${b}Automatic ${c}bash history cleanup${r}${b} to hide your past mistakes.${r}
-    ${a}Embarrassing typos and endless retries won't haunt your command history anymore. Enjoy a cleaner, less judgemental terminal experience.${r}
-    ${a}Specifically, this removes duplicate commands and excessively long entries. You can also manually call ${c}cleanup_bash_history${r}.
+  ${r}- ${b}Interactive Virtual Environment Creator.${r}
+    ${a}The new ${c}venv${r}${a} command gives you an interactive menu to create a virtual environment with any Python version managed by ${c}pyenv${r}${a}.${r}
+    ${a}It will even offer to install the selected Python version on the fly if it's not already present.${r}
+
+  ${r}- ${b}System-Safe ${c}pip${r}${b} Installs.${r}
+    ${a}Running ${c}pip install${r}${a} outside a virtual environment is now intercepted by a wrapper.${r}
+    ${a}Instead of polluting your system packages, it uses ${c}pipman${r}${a} to build a proper system package, keeping your base installation clean and safe.${r}
+
+  ${r}- ${b}Automated History Hygiene with ${c}cleanup_bash_history${r}${b}.${r}
+    ${a}A new function to declutter your eternal history file. It removes duplicate commands (keeping the latest) and prunes the top 5% longest commands.${r}
+    ${a}Keeps your history relevant, searchable, and manageable without losing valuable entries.${r}
+
+  ${r}- ${b}Smarter Tooling and Completions.${r}
+    ${a}Tab-completion for service logs (${c}st <tab>${r}${a}) is now instant and accurate, using ${c}systemctl${r}${a} to find all system and user units.${r}
+    ${a}The custom ${c}gits${r}${a} (git status) provides a much richer, emoji-enhanced output for a clearer view of your repository's state.${r}
+
+  ${y}Tip: Tired of remembering archive commands? Use ${c}extract <file>${r}${y}.${r}
+  ${y}It automatically handles ${c}.zip${r}${y}, ${c}.tar.gz${r}${y}, ${c}.rar${r}${y}, and dozens of other formats.${r}
   "
 }
 
