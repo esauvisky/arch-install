@@ -876,7 +876,7 @@
     "scm.showChangesSummary": false,
     "scm.showOutgoingChanges": "never",
     "github.copilot.editor.enableAutoCompletions": true,
-    "diffEditor.ignoreTrimWhitespace": false,
+    "diffEditor.ignoreTrimWhitespace": true,
     "peacock.surpriseMeOnStartup": true,
     "peacock.surpriseMeFromFavoritesOnly": false,
     "peacock.affectSideBarBorder": true,
