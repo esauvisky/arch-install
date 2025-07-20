@@ -27,3 +27,4 @@ __pycache__/
 
 # Frontend Build
 frontend/build
+.history/
