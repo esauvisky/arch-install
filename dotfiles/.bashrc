@@ -1313,20 +1313,33 @@ function _systemctl_exists_user() {
 }
 
 if _e "journalctl"; then
-    alias je='journalctl -efn 100 -o with-unit --no-hostname'
-    alias jb='journalctl -b -o with-unit --no-hostname -e'
+    alias je='journalctl -efn 100 --no-hostname'
+    alias jb='journalctl -eb --no-hostname'
     function st() {
         if _systemctl_exists_user "${1}"; then
-            journalctl --output cat -lxef _SYSTEMD_USER_UNIT="${1}"
+            journalctl --output cat -lxe _SYSTEMD_USER_UNIT="${1}"
         else
-            journalctl --output cat -lxef _SYSTEMD_UNIT="${1}"
+            journalctl --output cat -lxe _SYSTEMD_UNIT="${1}"
         fi
     }
     function _complete_journalctl() {
         local cur
+        local units
         COMPREPLY=()
         cur=${COMP_WORDS[COMP_CWORD]}
-        COMPREPLY=($(compgen -W "$(journalctl -F _SYSTEMD_UNIT) $(journalctl -F _SYSTEMD_USER_UNIT)" -- $cur))
+
+        # Get loaded system and user units of specific types using systemctl
+        # --all includes inactive units which might still have logs
+        # --no-legend removes the header line
+        # --no-pager prevents output from being piped to less
+        units=$( ( \
+                    systemctl list-units --all --no-legend --no-pager --type=service,target,socket ; \
+                    systemctl --user list-units --all --no-legend --no-pager --type=service,target,socket 2>/dev/null \
+                 ) | awk '{print $1}' | sort -u )
+                 # Added 2>/dev/null for the user command to suppress errors if the user manager isn't running
+
+        # Generate completions based on the list of known units
+        COMPREPLY=( $(compgen -W "${units}" -- "$cur") )
     }
     complete -F _complete_journalctl st
     complete -F _complete_alias je jb
