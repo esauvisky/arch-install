@@ -1066,6 +1066,80 @@ if _e python || _e python3; then
             command pip "$@"
         fi
     }
+
+    function venv() {
+        local python_version selected_version python_executable
+
+        # Check if pyenv is available
+        if ! _e "pyenv"; then
+            echo "pyenv is not available. Creating venv with system python..."
+            python3 -m venv .venv
+            source .venv/bin/activate
+            return
+        fi
+
+        # If an argument is provided, use it as the python version
+        if [[ $# -eq 1 ]]; then
+            python_version="$1"
+        else
+            # Get available python versions from pyenv
+            local versions=()
+            readarray -t versions < <(pyenv versions --bare | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+
+            if [[ ${#versions[@]} -eq 0 ]]; then
+                echo "No Python versions found in pyenv. Install one with: pyenv install <version>"
+                return 1
+            fi
+
+            echo "Available Python versions:"
+            select_option "${versions[@]}" "Type custom version"
+            local choice=$?
+
+            if [[ $choice -eq $((${#versions[@]})) ]]; then
+                # User chose to type custom version
+                echo -n "Enter Python version: "
+                read -r python_version
+            else
+                python_version="${versions[$choice]}"
+            fi
+        fi
+
+        # Check if the specified version is installed
+        if ! pyenv versions --bare | grep -q "^${python_version}$"; then
+            echo "Python $python_version is not installed. Installing..."
+            if ! pyenv install "$python_version"; then
+                echo "Failed to install Python $python_version"
+                return 1
+            fi
+        fi
+
+        # Get the python executable path
+        python_executable="$(pyenv prefix "$python_version")/bin/python"
+
+        if [[ ! -x "$python_executable" ]]; then
+            echo "Python executable not found at $python_executable"
+            return 1
+        fi
+
+        echo "Creating virtual environment with Python $python_version..."
+
+        # Remove existing .venv if it exists
+        if [[ -d ".venv" ]]; then
+            echo "Removing existing .venv directory..."
+            rm -rf .venv
+        fi
+
+        # Create the virtual environment
+        if "$python_executable" -m venv .venv; then
+            echo "Virtual environment created successfully."
+            echo "Activating virtual environment..."
+            source .venv/bin/activate
+            echo "Virtual environment activated. Python version: $(python --version)"
+        else
+            echo "Failed to create virtual environment"
+            return 1
+        fi
+    }
 fi
 
 ## Node
