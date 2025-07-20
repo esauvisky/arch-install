@@ -969,34 +969,82 @@ if _e python || _e python3; then
     ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
     ## Disables the native embedded venv prompt so we can make our own
     export VIRTUAL_ENV_DISABLE_PROMPT=0
-    function _virtualenv_info() {
-        local venv_name=""
+    _python_info() {
+        local pyenv_version pyenv_origin venv_origin
+        local git_root_dir pyenv_info venv_info
+        local py_major py_minor py_patch
+        local venv_major venv_minor venv_patch
+        local pyenv_major pyenv_minor
 
-        if [[ -n "$VIRTUAL_ENV" || -n "$_PYENV_INITIALIZED" ]]; then
-            venv_name=$(python -V)
-            venv_name="${venv_name#Python }"
-            if [[ -n "$VIRTUAL_ENV" ]]; then
-                venv_name="py${venv_name%.*}:${VIRTUAL_ENV##*/}"
+        # Build output
+        local out_info="$__BlueLight($__Reset"
+
+        if _e git; then
+            git_root_dir="$(git rev-parse --show-toplevel 2>/dev/null)"
+        fi
+
+        # Get current python version
+        read -r py_major py_minor py_patch < <(python -c 'import sys; v=sys.version_info; print(f"{v.major} {v.minor} {v.micro}")' 2>/dev/null || echo "0 0 0")
+
+        # Get pyenv information
+        if [[ -n "$PYENV_SHELL" ]]; then
+            pyenv_version="$(command pyenv version-name)"
+            pyenv_origin="$(command pyenv version-origin)"
+            if _e git && [[ -n "$git_root_dir" ]]; then
+                pyenv_origin="${pyenv_origin#"$git_root_dir"/}"
+            fi
+            pyenv_origin="${pyenv_origin//"$HOME"/\~}"
+
+            if [[ -n "$git_root_dir" ]]; then
+                pyenv_origin="${pyenv_origin#"$git_root_dir"/}"
+            fi
+
+            # Extract major.minor from pyenv version
+            IFS='.' read -r pyenv_major pyenv_minor pyenv_patch <<< "$pyenv_version"
+            if [[ "$py_major" -eq "$pyenv_major" && "$py_minor" -eq "$pyenv_minor" && "$py_patch" -eq "$pyenv_patch" ]]; then
+                pyenv_info="${__Reset}${__Blue}${pyenv_origin}:${__Bold}${pyenv_major}.${pyenv_minor}"
             else
-                venv_name="py${venv_name%.*}"
+                out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
+                pyenv_info="${__Reset}${__Red}${pyenv_origin}:${__Bold}${pyenv_version}"
+            fi
+        fi
+
+        # Get virtualenv information
+        if [[ -n "$VIRTUAL_ENV" ]]; then
+            venv_origin="$VIRTUAL_ENV"
+            if [[ -n "$git_root_dir" ]]; then
+                venv_origin="${VIRTUAL_ENV#"$git_root_dir"/}"
+            fi
+            venv_origin="${venv_origin//"$HOME"/\~}"
+            if [[ -f "$VIRTUAL_ENV/pyvenv.cfg" ]]; then
+                while IFS= read -r line; do
+                    [[ $line == version* ]] && {
+                        ver=${line#*= }
+                        IFS='.' read -r venv_major venv_minor venv_patch _ <<< "$ver"
+                        break
+                    }
+                done < "$VIRTUAL_ENV/pyvenv.cfg"
             fi
 
-            echo "($venv_name)"
+
+            if [[ "$py_major" -eq "$venv_major" && "$py_minor" -eq "$venv_minor" && "$py_patch" -eq "$venv_patch" ]]; then
+                venv_info="${__Reset}${__BlueLight}${venv_origin}${__Bold}:${venv_major}.${venv_minor}"
+            else
+                out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
+                venv_info="${__Reset}${__Red}${venv_origin}:${__Bold}${venv_major}.${venv_minor}.${venv_patch}"
+            fi
         fi
+
+        if [[ -n "$pyenv_info" && -n "$venv_info" ]]; then
+            out_info="$out_info${pyenv_info}$__BlueLight|${__Reset}${venv_info}$__BlueLight)${__Reset}"
+        elif [[ -n "$pyenv_info" ]]; then
+            out_info="$out_info${pyenv_info}$__BlueLight)$__Reset"
+        elif [[ -n "$venv_info" ]]; then
+            out_info="$out_info${venv_info}$__BlueLight)$__Reset"
+        fi
+
+        echo "$out_info"
     }
-
-    if _e pyenv; then
-        pyenv() {
-            if [[ -z $_PYENV_INITIALIZED ]]; then
-                _PYENV_INITIALIZED=1
-                eval "$(command pyenv init -)"
-            fi
-            pyenv "$@"
-        }
-        if _e virtualenv; then
-            alias virtualenv="virtualenv -p \$(pyenv which python)"
-        fi
-    fi
 
     function pip() {
         local cmd="$1"
@@ -1893,7 +1941,7 @@ function _set_prompt() {
 
     PS1+="${_ENV_COLOR}${__Bold}\\u${__ResetBold}@${_HOSTNAME}"
     ## Nicely shows you're in a python virtual environment
-    [[ -n "$VIRTUAL_ENV" || -n $_PYENV_INITIALIZED ]] && PS1+=" $__Magenta$(_virtualenv_info)"
+    [[ -n "$VIRTUAL_ENV" || -n $PYENV_SHELL ]] && PS1+=" $(_python_info)"
     PS1+="$(_git_prompt)"
     PS1+="$_ENV_COLOR$__Reset $__Blue\\w"
 
