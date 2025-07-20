@@ -416,7 +416,6 @@ function _get_truncated_pwd() {
         echo -n "${newPWD}"
     fi
 }
-
 #  _____       _
 # /  __ \     | |
 # | /  \/ ___ | | ___  _ __ ___
@@ -426,27 +425,34 @@ function _get_truncated_pwd() {
 __Bold='\[\e[01m\]'
 __ResetBold='\[\e[22m\]'
 __Blue='\[\e[00;34m\]'
-__BlueLight='\[\e[00;94m\]'
-__Bluelly='\[\e[38;5;31;1m\]'
-__BluellyLight='\[\e[22;38;5;31;25m\]'
+__BlueLight='\[\e[22;94m\]'
+__BlueBold='\[\e[01;34m\]'
+__BlueLightBold='\[\e[01;94m\]'
+__White='\[\e[00;37m\]'
 __WhiteBold='\[\e[01;37m\]'
-__White='\[\e[22;37m\]'
-__Violet='\[\e[35m\]'
-__Magenta='\[\e[01;36m\]'
+__WhiteLight='\[\e[22;97m\]'
+__WhiteLightBold='\[\e[01;97m\]'
+__WhiteBackground='\[\e[01;40m\]'
+__Violet='\[\e[00;35m\]'
+__VioletBold='\[\e[01;35m\]'
+__VioletLight='\[\e[22;95m\]'
+__VioletLightBold='\[\e[01;95m\]'
+__Cyan='\[\e[00;36m\]'
+__CyanBold='\[\e[01;36m\]'
+__CyanLight='\[\e[22;96m\]'
+__CyanLightBold='\[\e[01;96m\]'
 __Red='\[\e[00;31m\]'
-__RedBold='\[\e[31;01m\]'
-__RedBoldLight='\[\e[91;01m\]'
+__RedBold='\[\e[01;31m\]'
+__RedLight='\[\e[22;91m\]'
+__RedLightBold='\[\e[01;91m\]'
 __Green='\[\e[00;32m\]'
 __GreenBold='\[\e[01;32m\]'
-__RedLight='\[\e[22;91m\]'
-__GreenLight='\[\e[01;92m\]'
-__YellowLight='\[\e[01;93m\]'
-__VioletLight='\[\e[95m\]'
-__White='\[\e[00;37m\]'
-__WhiteBoldLight='\[\e[01;97m\]'
-__WhiteBackground='\[\e[01;40m\]'
+__GreenLight='\[\e[22;92m\]'
+__GreenLightBold='\[\e[01;92m\]'
 __Yellow='\[\e[00;33m\]'
 __YellowBold='\[\e[01;33m\]'
+__YellowLight='\[\e[22;93m\]'
+__YellowLightBold='\[\e[01;93m\]'
 __Reset='\[\e[00m\]'
 # __FancyX='\342\234\227'
 # __Checkmark='\342\234\223'
@@ -1797,8 +1803,8 @@ if _e "git"; then
             if [[ "$git_info" == *"<>"* ]]; then
                 git_info="${git_info//<>/$__Bold$__RedLight<>$__Reset}" # Diverged (light red)
             else
-                git_info="${git_info//</$__Bluelly↓$__Reset}"  # Behind upstream (blue)
-                git_info="${git_info//>/$__Bluelly↑$__Reset}"  # Ahead upstream (blue)
+                git_info="${git_info//</$__Blue↓$__Reset}"  # Behind upstream (blue)
+                git_info="${git_info//>/$__Blue↑$__Reset}"  # Ahead upstream (blue)
             fi
 
             # Remove `*` (unstaged indicator)
