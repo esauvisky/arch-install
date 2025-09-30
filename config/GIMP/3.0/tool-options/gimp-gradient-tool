@@ -1,5 +1,7 @@
 # GIMP gimp-gradient-tool options
 
+(foreground
+    (color "HSVA float" 16 "\0\0\0\0\0\0\200\77\0\0\200\77\0\0\200\77" 0))
 (gradient "FG to BG (RGB)")
 (brush-size 51)
 (brush-hardness 0.5)

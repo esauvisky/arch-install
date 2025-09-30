@@ -1,6 +1,10 @@
 # GIMP gimp-crop-tool options
 
-(pattern "Pine")
+(aspect-denominator 1024)
+(aspect-numerator 672)
+(foreground
+    (color "HSVA float" 16 "\0\0\0\0\0\0\200\77\0\0\200\77\0\0\200\77" 0))
+(pattern "Clipboard Image copy #4")
 (layer-only yes)
 
 # end of gimp-crop-tool options

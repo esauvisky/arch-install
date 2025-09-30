@@ -1,7 +1,9 @@
 # GIMP gimp-mypaint-brush-tool options
 
+(foreground
+    (color "HSVA float" 16 "\0\0\0\0\0\0\200\77\0\0\200\77\0\0\200\77" 0))
 (mybrush "100% Opaque")
-(pattern "Pine")
+(pattern "Clipboard Image copy #4")
 (brush-size 51)
 (brush-hardness 0.5)
 (radius 3.0099999904632568)

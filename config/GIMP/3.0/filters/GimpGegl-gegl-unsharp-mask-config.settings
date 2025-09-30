@@ -1,5 +1,10 @@
 # settings
 
+(GimpGegl-gegl-unsharp-mask-config "2025-07-25 22:54:28"
+    (time 1753494868)
+    (std-dev 3.6819999999999973)
+    (scale 0.46999999999999997)
+    (threshold 0))
 (GimpGegl-gegl-unsharp-mask-config "2023-10-21 22:30:20"
     (time 1697938220)
     (std-dev 12.391999999999999)
@@ -44,11 +49,6 @@
     (time 1596373046)
     (std-dev 5.6920000000000002)
     (scale 0.60000000000000009)
-    (threshold 0))
-(GimpGegl-gegl-unsharp-mask-config "2020-02-16 00:53:41"
-    (time 1581825221)
-    (std-dev 2.0840000000000001)
-    (scale 2.016)
     (threshold 0))
 (GimpGegl-gegl-unsharp-mask-config "Canon EOS 50D Refocus"
     (time 0)

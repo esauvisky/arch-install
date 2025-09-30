@@ -1,6 +1,15 @@
 # GIMP gimp-text-tool options
 
+(foreground
+    (color "HSVA float" 16 "\0\0\0\0\0\0\200\77\0\0\200\77\0\0\200\77" 0))
 (palette "Color History")
 (font "Sans-serif")
+(font-size 14)
+(box-mode fixed)
+(outline stroke-fill)
+(outline-foreground
+    (color "HSVA float" 16 "\0\0\0\0\0\0\0\0\0\0\200\77\0\0\200\77" 0))
+(outline-width 0.29999999999999999)
+(outline-cap-style square)
 
 # end of gimp-text-tool options

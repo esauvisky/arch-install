@@ -1,0 +1,90 @@
+#!/bin/bash
+###########
+# ENVVARS #
+###########
+## Set Wayland-specific environment variables
+export XDG_SESSION_TYPE=wayland
+export GDK_BACKEND=wayland
+export QT_QPA_PLATFORM=wayland
+export MOZ_ENABLE_WAYLAND=1
+export CLUTTER_BACKEND=wayland
+
+## Fixes HiDPI QT5 Applications (that respect the config)
+export QT_AUTO_SCREEN_SCALE_FACTOR=1
+
+source ~/.bash_globals
+
+#############
+# AUTOSTART #
+#############
+## Do not use .config/autostart. Instead, add the immutable attribute on it,
+## and bring everything you want to automatically start to here.
+## This avoids random crap you do not want to autostart from autostarting, like
+## dropbox, which doesn't work if it starts too early, steam, and other bullshit.
+
+## Also, if no logic is needed, it's preferable to create systemd units into
+## .config/systemd/user and enable them manually, or even create on-the-go units.
+
+## Starts Deluge only if there's something to be downloaded
+# sleep 5 && (
+#     deluged && sleep 5 &&
+#     if [[ $(deluge-console info | egrep -c 'Error|Downloading') -eq 0 ]]; then
+#         killall deluged
+#     else
+#         killall deluged && systemd-run --user --unit deluge deluge
+#     fi) &
+
+## Starts electrum
+# sleep 10 && systemd-run --user --unit electrum electrum --dir ~/.config/electrum --wallet ~/Documents/Wallets/native_wallet gui -m &
+
+# ## Starts slack if it's job hours
+# if [[ $(date +%u) -lt 6 && $(date +%_H) -ge 8 && $(date +%_H) -lt 18 ]]; then
+#    echo 'Starting slack application...'
+#    sleep 10s && slack -u &
+# fi
+
+## Starts Telegram
+# sleep 5s && # Note: xdotool doesn't work in Wayland, need alternative window management
+# sleep 2s && 64gram-desktop &
+
+## Starts discord
+# sleep 5s && # Note: xdotool doesn't work in Wayland, need alternative window management
+# sleep 2s && discord &
+
+## Starts spotify
+# sleep 5s && # Note: xdotool doesn't work in Wayland, need alternative window management
+# sleep 2s && spotify &
+
+# sleep 2s && openrgb &
+
+#syncthing-gtk &
+solaar -w hide &
+# Note: imwheel is X11-specific, may need alternative for Wayland
+# imwheel &
+
+# Note: XKB custom layout setup needs to be handled differently in Wayland
+# (while :; do sleep 5s && .config/xkb/set_custom_layout.sh; done) &
+
+(while :; do sleep 5s && .adb-mount-manager.sh; done) &
+## guake daemon
+# guake &
+
+# Copyq daemon - should work in Wayland
+(while :; do sleep 5s && copyq; done) &
+
+## Gnome: Ignore Lid Switch
+#/usr/lib/gnome-tweak-tool-lid-inhibitor &
+## Gnome: Allows to lock the screen
+# gnome-screensaver &
+## Gnome: turns on bluetooth automatically
+# sleep 5s && rfkill unblock bluetooth &
+
+############
+# SESSIONS #
+############
+## Main Wayland Session
+export XDG_CURRENT_DESKTOP=GNOME
+export XDG_SESSION_DESKTOP=gnome
+
+# Start GNOME on Wayland
+exec gnome-session --systemd-service

@@ -1,8 +1,10 @@
 # GIMP gimp-bucket-fill-tool options
 
-(pattern "Pine")
+(foreground
+    (color "HSVA float" 16 "\0\0\0\0\0\0\200\77\0\0\200\77\0\0\200\77" 0))
+(pattern "Clipboard Image copy #4")
 (brush-size 51)
 (brush-hardness 0.5)
-(fill-area selection)
+(fill-mode pattern)
 
 # end of gimp-bucket-fill-tool options

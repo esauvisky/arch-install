@@ -2,6 +2,8 @@
     // Remove alguimas keybindings padrões
     { "keys": ["alt+q"], "command": "noop" },
 
+
+    {"keys": ["ctrl+shift+i"], "command": "auto_format_file"},
     // Abre e fecha a sidebar
     { "keys": ["f9"], "command": "toggle_side_bar" },
     // Navega pelas abas de forma absoluta

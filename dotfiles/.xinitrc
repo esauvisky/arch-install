@@ -1,4 +1,5 @@
 #!/bin/bash
+# NOTE: For Wayland, use ~/.config/wayland-session instead of this file
 ####################
 # Xorg Boilerplate #
 ####################

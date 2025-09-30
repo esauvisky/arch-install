@@ -1,5 +1,13 @@
 # settings
 
+(GimpGegl-gegl-lens-blur-config "2025-07-25 22:54:00"
+    (time 1753494840)
+    (radius 2)
+    (highlight-factor 0)
+    (highlight-threshold-low 0)
+    (highlight-threshold-high 1)
+    (clip yes)
+    (linear-mask no))
 (GimpGegl-gegl-lens-blur-config "2023-10-05 20:01:16"
     (time 1696546876)
     (radius 4)

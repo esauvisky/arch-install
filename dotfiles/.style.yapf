@@ -122,7 +122,7 @@ dedent_closing_brackets=False
 disable_ending_comma_heuristic=False
 
 # Place each dictionary entry onto its own line.
-each_dict_entry_on_separate_line=False
+each_dict_entry_on_separate_line=True
 
 # The regex for an i18n comment. The presence of this comment stops
 # reformatting of that line, because the comments are required to be
@@ -309,7 +309,7 @@ split_penalty_excess_character=50
 
 # The penalty incurred by adding a line split to the unwrapped line. The
 # more line splits added the higher the penalty.
-split_penalty_for_added_line_split=20000
+split_penalty_for_added_line_split=2000
 
 # The penalty of splitting a list of "import as" names. For example:
 #

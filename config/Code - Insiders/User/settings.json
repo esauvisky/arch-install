@@ -3,7 +3,9 @@
     "[c]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"
     },
-    "[csharp]": {},
+    "[csharp]": {
+        "editor.defaultFormatter": null
+    },
     "[css]": {
         "editor.defaultFormatter": "sibiraj-s.vscode-scss-formatter"
     },
@@ -45,7 +47,7 @@
         "editor.defaultFormatter": "eeyore.yapf",
         "editor.formatOnType": false,
         "editor.wordBasedSuggestions": "off",
-        "diffEditor.ignoreTrimWhitespace": false
+        "diffEditor.ignoreTrimWhitespace": false,
     },
     "[scss]": {
         "editor.defaultFormatter": "sibiraj-s.vscode-scss-formatter"
@@ -138,7 +140,6 @@
     // Editor settings - Minimap
     "editor.minimap.autohide": false,
     "editor.minimap.maxColumn": 120,
-    "editor.minimap.renderCharacters": true,
     "editor.minimap.scale": 1,
     "editor.minimap.showRegionSectionHeaders": false,
     "editor.minimap.showSlider": "always",
@@ -151,16 +152,15 @@
     "editor.multiCursorMergeOverlapping": true,
     // Editor settings - Overview ruler and rendering
     "editor.overviewRulerBorder": true,
-    "editor.renderControlCharacters": false,
     "editor.renderLineHighlight": "all",
-    "editor.renderLineHighlightOnlyWhenFocus": false,
-    "editor.renderWhitespace": "none",
+    "editor.renderFinalNewline": "on",
+    "editor.renderLineHighlightOnlyWhenFocus": true,
     // Editor settings - Scrollbar and suggestions
-    "editor.scrollbar.horizontal": "visible",
+    "editor.scrollbar.horizontal": "auto",
     "editor.scrollbar.horizontalScrollbarSize": 20,
-    "editor.scrollbar.vertical": "hidden",
+    "editor.scrollbar.vertical": "auto",
     "editor.scrollbar.verticalScrollbarSize": 20,
-    "editor.showFoldingControls": "mouseover",
+    "editor.showFoldingControls": "never",
     "editor.smoothScrolling": true,
     // Editor settings - Sticky scroll and parameter hints
     "editor.stickyScroll.enabled": false,
@@ -180,10 +180,11 @@
     "editor.snippetSuggestions": "bottom",
     "editor.inlineSuggest.enabled": true,
     "editor.inlineSuggest.suppressSuggestions": true,
+    "editor.inlineSuggest.edits.allowCodeShifting": "always",
     // Editor settings - Suggest and completion
     "editor.acceptSuggestionOnCommitCharacter": false,
-    "editor.acceptSuggestionOnEnter": "smart",
-    "editor.suggest.snippetsPreventQuickSuggestions": true,
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
     "editor.suggest.filterGraceful": false,
     "editor.suggest.localityBonus": false,
     "editor.suggest.matchOnWordStartOnly": true,
@@ -201,7 +202,7 @@
     "editor.suggest.showValues": true,
     "editor.suggest.showModules": true,
     "editor.suggest.showWords": false,
-    "editor.suggest.insertMode": "replace",
+    "editor.suggest.insertMode": "insert",
     "editor.suggest.showIcons": true,
     "editor.suggest.showFiles": true,
     "editor.suggest.showFolders": true,
@@ -467,6 +468,7 @@
         "reportOptionalSubscript": "none"
     },
     "python.experiments.enabled": true,
+    "python.experiments.optOutFrom": ["pythonTerminalEnvVarActivation", "pythonSurveyNotification"],
     "python.interpreter.infoVisibility": "onPythonRelated",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.autoImportUserSymbols": true,
@@ -479,7 +481,6 @@
     "python.globalModuleInstallation": false,
     "python.jediMemoryLimit": -1,
     "python.languageServer": "Pylance",
-    "python.experiments.optOutFrom": [],
     "python.analysis.aiCodeActions": {"generateDocstring": true},
     "python.analysis.autoFormatStrings": true,
     "python.analysis.gotoDefinitionInStringLiteral": true,
@@ -515,6 +516,12 @@
     "search.smartCase": true,
     "search.sortOrder": "fileNames",
     "search.useGlobalIgnoreFiles": false,
+    "search.exclude": {
+        "**/.history": true,
+        ".history": true,
+        ".gitlab-ci-local": true,
+        ".aider*": true,
+    },
     "search.actionsPosition": "auto",
     // Security settings
     "security.workspace.trust.banner": "always",
@@ -657,6 +664,12 @@
         },
         "python:S2208": {
             "level": "off"
+        },
+        "javascript:S2486": {
+            "level": "off"
+        },
+        "python:S107": {
+            "level": "off"
         }
     },
     // Task settings
@@ -744,6 +757,7 @@
     "window.title": "${rootName}${separator}vscode",
     "window.titleBarStyle": "custom",
     // Workbench color customizations
+    "workbench.colorTheme": "Braver's Solarized Dark",
     "workbench.colorCustomizations": {
         "activityBarBadge.background": "#d8c769",
         "breadcrumb.activeSelectionForeground": "#d8c769",
@@ -757,6 +771,13 @@
         "menu.selectionForeground": "#d8c769",
         "menubar.selectionForeground": "#d8c769",
         "notificationLink.foreground": "#d8c769",
+        // Based on Solarized Green: #859900
+        "diffEditor.insertedLineBackground": "#85990010", // ~12% opacity
+        "diffEditor.insertedTextBackground": "#85990020", // ~25% opacity
+
+        // Based on Solarized Red: #dc322f
+        "diffEditor.removedLineBackground": "#dc322f20",  // ~12% opacity
+        "diffEditor.removedTextBackground": "#dc322f20",   // ~25% opacity
         "panelTitle.activeBorder": "#d8c769",
         "pickerGroup.foreground": "#d8c769",
         "progressBar.background": "#d8c769",
@@ -787,7 +808,6 @@
         "terminalCursor.foreground": "#93A1A1",
         "textLink.foreground": "#d8c769"
     },
-    "workbench.colorTheme": "Braver's Solarized Dark",
     "workbench.commandPalette.preserveInput": true,
     "workbench.editor.centeredLayoutAutoResize": true,
     "workbench.editor.closeOnFileDelete": true,
@@ -858,7 +878,7 @@
     "gitlens.ai.experimental.openai.model": "gpt-4o",
     "workbench.editor.splitInGroupLayout": "vertical",
     "github.copilot.editor.enableCodeActions": false,
-    "sonarlint.focusOnNewCode": false,
+    "sonarlint.focusOnNewCode": true,
     "smalise.cache.memoryLimit": 2048,
     "android-debug.ndkRoot": "/opt/android-ndk",
     "android-debug.sdkRoot": "/opt/android-sdk",
@@ -876,7 +896,7 @@
     "scm.showChangesSummary": false,
     "scm.showOutgoingChanges": "never",
     "github.copilot.editor.enableAutoCompletions": true,
-    "diffEditor.ignoreTrimWhitespace": true,
+    "diffEditor.ignoreTrimWhitespace": false,
     "peacock.surpriseMeOnStartup": true,
     "peacock.surpriseMeFromFavoritesOnly": false,
     "peacock.affectSideBarBorder": true,
@@ -908,7 +928,8 @@
     "interactiveWindow.executeWithShiftEnter": true,
     "terminal.integrated.defaultProfile.linux": "bash",
     "terminal.integrated.confirmOnExit": "hasChildProcesses",
-    "terminal.integrated.drawBoldTextInBrightColors": false,
+    "terminal.integrated.drawBoldTextInBrightColors": true,
+    "terminal.integrated.copyOnSelection": true,
     "openscad-formatter.clang-format.style": "{ BasedOnStyle: Microsoft, UseTab: ForIndentation, ColumnLimit: 250,StatementMacros: [rotate,translate]}",
     "scad-lsp.fmtExePath": "clang-format",
     "scad-lsp.fmtStyle": "LLVM",
@@ -995,5 +1016,69 @@
         "workbench.action.tasks.runTask"
     ],
     "editor.multiCursorModifier": "ctrlCmd",
-    "moveby.revealType": "AtTop"
+    "moveby.revealType": "AtTop",
+    "docker.extension.enableComposeLanguageServer": false,
+    "python.analysis.enablePytestSupport": false,
+    "peacock.favoriteColors": [
+
+        {
+            "name": "Angular Red",
+            "value": "#dd0531"
+        },
+        {
+            "name": "Azure Blue",
+            "value": "#007fff"
+        },
+        {
+            "name": "JavaScript Yellow",
+            "value": "#f9e64f"
+        },
+        {
+            "name": "Mandalorian Blue",
+            "value": "#1857a4"
+        },
+        {
+            "name": "Node Green",
+            "value": "#215732"
+        },
+        {
+            "name": "React Blue",
+            "value": "#61dafb"
+        },
+        {
+            "name": "Something Different",
+            "value": "#832561"
+        },
+        {
+            "name": "Svelte Orange",
+            "value": "#ff3d00"
+        },
+        {
+            "name": "Vue Green",
+            "value": "#42b883"
+        }
+    ],
+    "rainbow_csv.highlight_rows": true,
+    "editor.semanticHighlighting.enabled": true,
+    "editor.wordWrapColumn": 120,
+    "dataWrangler.outputRenderer.columnInsights.displayByDefault": true,
+    "editor.renderControlCharacters": false,
+    "omnisharp.enableMsBuildLoadProjectsOnDemand": true,
+    "dotnet.automaticallySyncWithActiveItem": true,
+    "dotnet.previewSolution-freeWorkspaceMode": true,
+    "dotnet.testWindow.skipTargetFrameworkCompatibilityCheck": true,
+    "[dockercompose]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        },
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    }
 }

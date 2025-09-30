@@ -1,11 +1,15 @@
 # GIMP gimp-smudge-tool options
 
-(brush "2. Hardness 100")
+(foreground
+    (color "HSVA float" 16 "\0\0\0\0\0\0\200\77\0\0\200\77\0\0\200\77" 0))
+(brush "floor")
 (dynamics "Pressure Size")
-(pattern "Pine")
+(pattern "Clipboard Image copy #4")
 (gradient "FG to BG (RGB)")
 (palette "Color History")
 (brush-size 5)
+(brush-spacing 0.20000000000000001)
+(brush-hardness 0.5)
 (dynamics-enabled no)
 
 # end of gimp-smudge-tool options

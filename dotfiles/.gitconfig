@@ -1,5 +1,5 @@
 [user]
-	email = esauvisky@gmail.com
+	email = 
 	name = emi
 	# signingkey = 48BB2CE13A282092
 	signingKey = FEF4818C534D5986
@@ -31,3 +31,8 @@
 	window = 1
 [http]
 	postBuffer = 52428800
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process

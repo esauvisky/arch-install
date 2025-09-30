@@ -613,6 +613,11 @@
     },
     {
         "key": "ctrl+shift+-",
+        "command": "-workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        "key": "ctrl+shift+-",
         "command": "workbench.action.zoomOut"
     },
     {
@@ -1665,7 +1670,7 @@
     {
         "key": "tab",
         "command": "editor.action.inlineSuggest.commit",
-        "when": "inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetHasFocusedSuggestion"
+        "when": "inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !suggestWidgetHasFocusedSuggestion",
     },
     {
         "key": "tab",
@@ -1784,11 +1789,6 @@
         "when": "canNavigateForward"
     },
     {
-        "key": "ctrl+shift+-",
-        "command": "-workbench.action.navigateForward",
-        "when": "canNavigateForward"
-    },
-    {
         "key": "alt+t",
         "command": "-gl.generateTests",
         "when": "config.gitlab.duoChat.enabled && editorHasSelection && gitlab:chatAvailable && gitlab:chatAvailableForProject"
@@ -1801,6 +1801,32 @@
     {
         "key": "ctrl+k e",
         "command": "-workbench.files.action.focusOpenEditorsView",
-        "when": "workbench.explorer.openEditorsView.active"
+        "when": "workbench.explorer.openEditorsView.active",
+    },
+
+    // Terminal fixes
+    {
+        "key": "ctrl+backspace",
+        "command": "workbench.action.terminal.sendSequence",
+        "when": "terminalFocus",
+        "args": {
+            "text": "\u0008"
+        }
+    },
+    {
+        "key": "alt+left",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            "text": "\u001b[1;3D",
+        },
+        "when": "terminalFocus"
+    },
+    {
+        "key": "alt+right",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            "text": "\u001b[1;3C"
+        },
+        "when": "terminalFocus"
     },
 ]

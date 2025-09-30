@@ -587,6 +587,129 @@ function h() {
     printf "\e[01;95m================\e[00m\n"
 }
 
+# if _e "fzf"; then
+#     #
+#     # hi - Two-Stage Interactive History Explorer (Find & Browse)
+#     #
+#     # A powerful two-stage history tool using fzf.
+#     # 1. FIND MODE: Fuzzy search history on the left, see live context on the right.
+#     # 2. BROWSE MODE: Press the right arrow key to "lock in" the context and
+#     #    browse it chronologically in a single panel.
+#     #
+#     # Requires: fzf, bat (optional, for syntax highlighting)
+#     #
+#     hi() {
+#         # --- PREPARATION ---
+#         local history_file="$HOME/.bash_eternal_history"
+#         if [[ ! -f "$history_file" ]]; then
+#             echo "History file not found: $history_file"; return 1;
+#         fi
+
+#         # Create a temporary, indexed file for fast lookups.
+#         local indexed_history
+#         indexed_history=$(mktemp)
+#         # The awk script structures the eternal history file into single-line entries.
+#         awk '
+#             function format_time(ts) { return strftime("%Y-%m-%d %H:%M:%S", substr(ts, 2)); }
+#             /^#[0-9]+$/ {
+#                 if (cmd != "") { print NR " | " date " | " cmd; }
+#                 date=format_time($0); cmd=""; next;
+#             }
+#             { cmd = (cmd == "" ? $0 : cmd "\n" $0) }
+#             END { if (cmd != "") print NR " | " date " | " cmd }
+#         ' "$history_file" > "$indexed_history"
+
+#         # --- HELPER FUNCTIONS (Exported for fzf's subshell) ---
+
+#         _hi_get_full_list() {
+#             cat "$indexed_history"
+#         }
+
+#         _hi_find_mode_preview() {
+#             local selected_line="$1"
+#             local context_size=20
+#             local highlighter="cat"
+#             if command -v bat &>/dev/null; then highlighter="bat --color=always -l bash -p";
+#             elif command -v batcat &>/dev/null; then highlighter="batcat --color=always -l bash -p"; fi
+
+#             local index=$(echo "$selected_line" | cut -d'|' -f1 | xargs)
+#             if [[ -z "$index" ]]; then return; fi
+
+#             local start=$((index - context_size))
+#             [[ $start -lt 1 ]] && start=1
+#             local end=$((index + context_size))
+
+#             awk -v s="$start" -v e="$end" -v m="$index" -v hl="$highlighter" '
+#                 NR >= s && NR <= e {
+#                     match($0, /^([0-9]+) \| (.*?) \| (.*)$/, p); date=p[2]; cmd=p[3];
+#                     if (NR == m) {
+#                         printf "\x1b[36m%s\x1b[0m | \x1b[44;37m", date; fflush();
+#                         system("echo \"" cmd "\" | " hl); printf "\x1b[0m";
+#                     } else {
+#                         printf "\x1b[32m%s\x1b[0m | ", date; fflush();
+#                         system("echo \"" cmd "\" | " hl);
+#                     }
+#                 }' "$indexed_history"
+#         }
+
+#         _hi_get_browse_list() {
+#             local selected_line="$1"
+#             local context_size=50
+#             local index=$(echo "$selected_line" | cut -d'|' -f1 | xargs)
+#             if [[ -z "$index" ]]; then cat "$indexed_history"; return; fi
+
+#             local start=$((index - context_size))
+#             [[ $start -lt 1 ]] && start=1
+#             local end=$((index + context_size))
+
+#             awk -v s="$start" -v e="$end" 'NR >= s && NR <= e' "$indexed_history"
+#         }
+
+#         export -f _hi_get_full_list _hi_find_mode_preview _hi_get_browse_list
+#         export indexed_history
+
+#         # --- FZF LAUNCHER ---
+
+#         # Using dedicated fzf actions is more robust than embedding option strings.
+#         local GO_TO_BROWSE="reload(_hi_get_browse_list {})"
+#               GO_TO_BROWSE+="+change-prompt(Browse > )"
+#               GO_TO_BROWSE+="+hide-preview"
+#               GO_TO_BROWSE+="+change-header([←] Back to Find)"
+#               GO_TO_BROWSE+="+change-query('')" # Clear the query in browse mode
+
+#         local GO_TO_FIND="reload(_hi_get_full_list)"
+#               GO_TO_FIND+="+change-prompt(Find > )"
+#               GO_TO_FIND+="+show-preview"
+#               GO_TO_FIND+="+change-header([→] Browse Context)"
+
+#         # Use an array for the initial fzf options to prevent word-splitting issues.
+#         local fzf_opts=(
+#             --tac --height=90% --ansi
+#             --prompt="Find > "
+#             --header="[→] Browse Context"
+#             --preview-window="right:60%:border-left"
+#             --preview='_hi_find_mode_preview {}'
+#             --bind="right:$GO_TO_BROWSE"
+#             --bind="left:$GO_TO_FIND"
+#             --bind="enter:execute(echo {} | cut -d'|' -f3- | sed 's/^ //')+accept"
+#         )
+
+#         local selected_command
+#         selected_command=$(_hi_get_full_list | fzf "${fzf_opts[@]}")
+
+#         # --- CLEANUP ---
+#         command rm -f "$indexed_history"
+#         unset -f _hi_get_full_list _hi_find_mode_preview _hi_get_browse_list
+#         unset indexed_history
+
+#         if [[ -n "$selected_command" ]]; then
+#             print -z "$selected_command"
+#         fi
+#     }
+
+#     # Bind Ctrl+R to this new function
+#     bind -x '"\C-r": hi'
+# fi
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
 ##  |B|a|s|h| |H|i|s|t|o|r|y| |C|l|e|a|n|u|p|
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
