@@ -87,4 +87,4 @@ export XDG_CURRENT_DESKTOP=GNOME
 export XDG_SESSION_DESKTOP=gnome
 
 # Start GNOME on Wayland
-exec gnome-session --systemd-service
+exec gnome-session 
