@@ -27,3 +27,8 @@ fi
 
 # Carrega globais não comitadas como chaves de APIs ou PATHs
 [[ -f ~/.bash_globals ]] && . ~/.bash_globals
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/emi/.lmstudio/bin"
+# End of LM Studio CLI section
+

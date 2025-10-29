@@ -2233,3 +2233,8 @@ fi
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/emi/.lmstudio/bin"
+# End of LM Studio CLI section
+
