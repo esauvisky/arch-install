@@ -58,19 +58,19 @@ source ~/.bash_globals
 # sleep 2s && openrgb &
 
 #syncthing-gtk &
-solaar -w hide &
-# Note: imwheel is X11-specific, may need alternative for Wayland
-# imwheel &
+#solaar -w hide &
+# Note: imwheel is X11-specific, doesn't work on Wayland
+# For scroll wheel customization on Wayland, use libinput settings instead
 
-# Note: XKB custom layout setup needs to be handled differently in Wayland
-# (while :; do sleep 5s && .config/xkb/set_custom_layout.sh; done) &
+# Note: XKB custom layout setup is handled by GNOME settings on Wayland
+# Use gsettings to configure keyboard layouts instead of XKB files
 
-(while :; do sleep 5s && .adb-mount-manager.sh; done) &
+#(while :; do sleep 5s && .adb-mount-manager.sh; done) &
 ## guake daemon
 # guake &
 
 # Copyq daemon - should work in Wayland
-(while :; do sleep 5s && copyq; done) &
+#(while :; do sleep 5s && copyq; done) &
 
 ## Gnome: Ignore Lid Switch
 #/usr/lib/gnome-tweak-tool-lid-inhibitor &

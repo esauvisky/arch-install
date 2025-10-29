@@ -85,7 +85,7 @@ source ~/.bash_globals
 solaar -w hide &
 imwheel &
 (while :; do sleep 5s && .config/xkb/set_custom_layout.sh; done) &
-(while :; do sleep 5s && .adb-mount-manager.sh; done) &
+#(while :; do sleep 5s && .adb-mount-manager.sh; done) &
 ## guake daemon
 # guake &
 
