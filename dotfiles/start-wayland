@@ -1,0 +1,15 @@
+#!/bin/bash
+# Script to start Wayland session - replaces startx
+
+# Ensure we're not in an existing session
+if [[ -n "$WAYLAND_DISPLAY" || -n "$DISPLAY" ]]; then
+    echo "Already in a graphical session. Exit first."
+    exit 1
+fi
+
+# Set up environment
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=GNOME
+
+# Start the Wayland session
+exec ~/.config/wayland-session

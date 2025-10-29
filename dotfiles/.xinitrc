@@ -1,5 +1,7 @@
 #!/bin/bash
-# NOTE: For Wayland, use ~/.config/wayland-session instead of this file
+# NOTE: This file is for X11 sessions only
+# For Wayland, use ~/.config/wayland-session instead of this file
+# To start Wayland session, run: ./start-wayland
 ####################
 # Xorg Boilerplate #
 ####################
