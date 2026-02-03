@@ -25,8 +25,9 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=36
-export _DATE="Jul 20th, 2025"
+## Used for version checking
+export _RCVERSION=37
+export _DATE="Feb 2nd, 2026"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -39,32 +40,28 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 36 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 37 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
-    ${a}This update is all about intelligence and safety, with major upgrades to the Python workflow, history management, and Git tooling.${r}
+    ${a}Major visual upgrade to the Git prompt and AI integration.${r}
 
-  ${r}- ${b}Python Environment Dashboard in your Prompt.${r}
-    ${a}The prompt is now a powerhouse of Python context. It shows active ${c}pyenv${r}${a} and ${c}virtualenv${r}${a} info, including the origin file (like ${c}.python-version${r}${a}).${r}
-    ${a}It even warns you in ${f}red${r}${a} if your environment is misconfigured (e.g., your active Python doesn't match the one specified in ${c}pyenv${r}${a}).${r}
+  ${r}- ${b}Gemini-Powered Smart Stash.${r}
+    ${a}Running ${c}git stash${r}${a} now auto-generates a message describing your diff:${r}
+       ${c}$ git stash${r}
+       Saved working directory and index state On ${w}main${r}: ${c}🤖 Refactor authentication logic${r}
 
-  ${r}- ${b}Interactive Virtual Environment Creator.${r}
-    ${a}The new ${c}venv${r}${a} command gives you an interactive menu to create a virtual environment with any Python version managed by ${c}pyenv${r}${a}.${r}
-    ${a}It will even offer to install the selected Python version on the fly if it's not already present.${r}
+  ${r}- ${b}The Split-Personality Prompt.${r}
+    ${a}The prompt now visualizes mixed states (staged + unstaged) by splitting the branch colors.${r}
 
-  ${r}- ${b}System-Safe ${c}pip${r}${b} Installs.${r}
-    ${a}Running ${c}pip install${r}${a} outside a virtual environment is now intercepted by a wrapper.${r}
-    ${a}Instead of polluting your system packages, it uses ${c}pipman${r}${a} to build a proper system package, keeping your base installation clean and safe.${r}
+       ${w}Current Status      Prompt Preview${r}
+       ${r}Clean               ${b}${w}[main]${r}
+       ${g}Staged Only         ${g}[main]${r}
+       ${y}Unstaged Only       ${y}[main]${r}
+       ${b}Mixed State         ${g}[ma${y}in]${r}  ${a}<-- New! (Half Green, Half Yellow)${r}
 
-  ${r}- ${b}Automated History Hygiene with ${c}cleanup_bash_history${r}${b}.${r}
-    ${a}A new function to declutter your eternal history file. It removes duplicate commands (keeping the latest) and prunes the top 5% longest commands.${r}
-    ${a}Keeps your history relevant, searchable, and manageable without losing valuable entries.${r}
+   ${r}- ${b}Integrated Upstream Indicators.${r}
+     ${a}Ahead ${c}↑${r}${a} and Behind ${c}↓${r}${a} arrows are now colored distinctly (${c}Blue${r}${a}/${c}Yellow${r}${a}).${r}
 
-  ${r}- ${b}Smarter Tooling and Completions.${r}
-    ${a}Tab-completion for service logs (${c}st <tab>${r}${a}) is now instant and accurate, using ${c}systemctl${r}${a} to find all system and user units.${r}
-    ${a}The custom ${c}gits${r}${a} (git status) provides a much richer, emoji-enhanced output for a clearer view of your repository's state.${r}
-
-  ${y}Tip: Tired of remembering archive commands? Use ${c}extract <file>${r}${y}.${r}
-  ${y}It automatically handles ${c}.zip${r}${y}, ${c}.tar.gz${r}${y}, ${c}.rar${r}${y}, and dozens of other formats.${r}
+   ${y}Tip: The AI Stash requires ${c}jq${r}${y} and a valid ${c}GEMINI_API_KEY${r}${y} environment variable.${r}
   "
 }
 
