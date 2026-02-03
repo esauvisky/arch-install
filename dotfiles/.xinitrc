@@ -114,6 +114,7 @@ fi
 # #exec gnome-session --session=gnome-flashback --builtin
 # exec gnome-session --session=gnome-classic --systemd --debug
 
+export XDG_CURRENT_DESKTOP=GNOME
 export XDG_SESSION_TYPE=x11
 export GDK_BACKEND=x11
 gnome-session #--systemd-service
