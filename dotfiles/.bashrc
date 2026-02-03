@@ -50,10 +50,15 @@ ${y}Changelog 37 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$
        ${c}$ git stash${r}
        Saved working directory and index state On main: 🤖 Refactor authentication logic${r}
 
-  ${r}- ${b}New 'ask' Command.${r}
-    ${a}Stuck? Just ${c}ask <question>${r}${a} to get an instant one-liner shell command:${r}
-       ${c}$ ask find all pdfs larger than 10mb${r}
-       find . -name \"*.pdf\" -size +10M${r}
+   ${r}- ${b}New 'ask' Command.${r}
+     ${a}Stuck? Just ${c}ask <question>${r}${a} to get an instant one-liner shell command.${r}
+        ${c}$ ask find all pdfs larger than 10mb${r}
+        ${a}(It will print the command in cyan; press ${c}↑${r}${a} to bring it back, review it, then Enter.)${r}
+        find . -name \"*.pdf\" -size +10M${r}
+
+     ${a}Faster workflow (no arrow-up): type your prompt directly, then press ${c}Ctrl+O${r}${a}.${r}
+        ${c}$ find all pdfs larger than 10mb${r}
+        ${a}(press ${c}Ctrl+O${r}${a} → your line is replaced with the command; review it, then Enter)${r}
 
   ${r}- ${b}The Split-Personality Prompt.${r}
     ${a}The prompt now visualizes mixed states (staged + unstaged) by splitting the branch colors.${r}
@@ -938,7 +943,11 @@ cleanup_bash_history() {
 }
 
 ## Quick LLM assistant for shell commands
-function ask() {
+# - Use: ask <question>          (prints command; then press ↑ to bring it back, or use Ctrl+O workflow below)
+# - Or:  type your question at the prompt, then press Ctrl+O (replaces the line with the command)
+# - If you type: ask <question> at the prompt, Ctrl+O will strip the leading "ask " automatically.
+
+ask() {
     if [[ $# -eq 0 ]]; then
         echo "Usage: ask <question>"
         echo "Example: ask make git ignore changes in filemodes for this repo"
@@ -950,23 +959,57 @@ function ask() {
 
     local content
     if content=$(_gemini_query "$sys_prompt" "Task: $question"); then
-
         # Print the command in Cyan
         echo -e "\e[36m$content\e[0m"
 
-        # Add to history
+        # Add both prompt and command to history
         history -s "ask $question"
         history -s "$content"
 
-        # Auto-fill the command line (requires xdotool)
-        if _e "xdotool"; then
-            (sleep 0.1 && xdotool key Up) &>/dev/null & disown
-        fi
+        # Tell user how to use it safely without xdotool
+        echo "Press ↑ to bring the command back. You can also just type the prompt and press Ctrl+O to auto-fill the command line."
     else
         echo "Failed to get response from Gemini." >&2
         return 1
     fi
 }
+
+__ask_ctrl_o() {
+    # Take whatever is currently on the readline buffer as the "question"
+    local q="$READLINE_LINE"
+
+    # If the user typed "ask ..." and hit Ctrl+O, strip the prefix.
+    if [[ "$q" == ask\ * ]]; then
+        q="${q#ask }"
+    fi
+
+    # Trim leading/trailing whitespace
+    q="${q#"${q%%[![:space:]]*}"}"
+    q="${q%"${q##*[![:space:]]}"}"
+
+    # If empty, do nothing
+    [[ -n "$q" ]] || return 0
+
+    local sys_prompt="You are a helpful shell command assistant. Respond ONLY with the exact one-liner command to run. No explanations, no markdown, no backticks."
+
+    local cmd
+    cmd="$(_gemini_query "$sys_prompt" "Task: $q")" || {
+        # Keep the original line if the LLM call fails
+        return 0
+    }
+
+    # Replace the current command line with the suggested command and move cursor to end
+    READLINE_LINE="$cmd"
+    READLINE_POINT=${#READLINE_LINE}
+
+    # Append both prompt and command to history (same behavior as 'ask')
+    history -s "ask $q"
+    history -s "$cmd"
+}
+
+# Bind Ctrl+O to generate + insert command (bash/readline)
+bind -x '"\C-o":__ask_ctrl_o'
+
 
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+
 ##  |E|a|s|y| |E|x|t|r|a|c|t|

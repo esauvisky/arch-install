@@ -158,18 +158,5 @@ alias code="code-insiders"
 ##  |A|S|K| |L|L|M| |A|s|s|i|s|t|a|n|t|
 ##  +-+-+-+ +-+-+-+-+-+-+-+-+-+-+-+
 
-## Helper function to load the ask response into readline
-function _load_ask_response() {
-    if [[ -f "/tmp/ask_response_$$" ]]; then
-        local response=$(cat "/tmp/ask_response_$$")
-        rm -f "/tmp/ask_response_$$"
-        history -s "$response"
-        READLINE_LINE="$response"
-        READLINE_POINT=${#READLINE_LINE}
-    fi
-}
-
-## Quick LLM assistant for shell commands
-
 alias cyrillify="sed 'y/aceopxyABCEHKMOPTX/асеорхуАВСЕНКМОРТХ/'"
 alias cyrillify="sed 'y/aceopxyABCEHKMOPTX/асеорхуАВСЕНКМОРТХ/'"
