@@ -1969,8 +1969,92 @@ if _e "git"; then
         done
     }
 
+    MODEL_ID="gemini-flash-lite-latest"
+
+    function _git_ai_stash_message() {
+        if [ -z "$GEMINI_API_KEY" ]; then
+            echo "Error: GEMINI_API_KEY not set." >&2
+            return 1
+        fi
+
+        if ! command -v jq &> /dev/null; then
+            echo "Error: 'jq' is required." >&2
+            return 1
+        fi
+
+        # Capture diff, limit to ~12kb
+        local diff_content
+        diff_content=$(git diff HEAD --no-color 2>/dev/null | head -c 12000)
+
+        if [ -z "$diff_content" ]; then
+            return 1
+        fi
+
+        # Print to Stderr (>2) so it appears on screen but isn't captured in the variable
+        echo -ne "\e[35m🤖 Analyzing changes with Gemini...\e[0m\n" >&2
+
+        local prompt="Write a git stash message (max 10 words, imperative mood) for the following diff."
+
+        # Construct JSON payload with Schema Validation
+        local payload
+        payload=$(jq -n \
+                  --arg prompt "$prompt" \
+                  --arg diff "$diff_content" \
+                  '{
+                    contents: [{
+                      role: "user",
+                      parts: [{text: ($prompt + "\n\n" + $diff)}]
+                    }],
+                    generationConfig: {
+                      responseMimeType: "application/json",
+                      responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                          stash_message: {type: "STRING"}
+                        }
+                      }
+                    }
+                  }')
+
+        # Call Gemini API
+        local response
+        response=$(curl -s -X POST \
+             -H "Content-Type: application/json" \
+             "https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${GEMINI_API_KEY}" \
+             -d "$payload")
+
+        # Extract the specific JSON field
+        local ai_msg
+        ai_msg=$(echo "$response" | jq -r '.candidates[0].content.parts[0].text | fromjson | .stash_message // empty')
+
+        if [ -n "$ai_msg" ] && [ "$ai_msg" != "null" ]; then
+            # Print status to Stderr
+            # echo -e "\n📝 \e[36m$ai_msg\e[0m" >&2
+            # Print ONLY the clean message to Stdout to be captured
+            echo "$ai_msg"
+            return 0
+        else
+            echo -e "\n\e[31mFailed to generate message.\e[0m" >&2
+            return 1
+        fi
+    }
+
+    # --- UPDATED GIT WRAPPER ---
     function git() {
-        if [[ $1 == "pull" && $# == 1 ]]; then
+        # Intercept "git stash" (bare) or "git stash push" (without arguments)
+        if [[ ($1 == "stash" && $# == 1) || ($1 == "stash" && $2 == "push" && $# == 2) ]]; then
+
+            local ai_message
+            # Capture stdout from function. Stderr will pass through to console.
+            if ai_message=$(_git_ai_stash_message); then
+                # We add the robot icon HERE, not in the function
+                command git stash push -m "🤖 $ai_message"
+            else
+                # Fallback to standard stash on error/empty diff
+                command git "$@"
+            fi
+
+        elif [[ $1 == "pull" && $# == 1 ]]; then
             shift
             _git_sync
         elif [[ $1 == "commit" && $2 == "--amend" && $# == 2 ]]; then
