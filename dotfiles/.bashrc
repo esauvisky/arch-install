@@ -36,6 +36,7 @@ function _changelog() {
     local y=$'\e[33;01m'       # yellow
     local i=$'\e[00m\e[96;03m' # emphasis
     local g=$'\e[32;01m'       # green
+    local w=$'\e[97;01m'       # white bold
     local c=$'\e[97m'          # code
     local f=$'\e[5;91;01m'     # flashing red bold
 
@@ -47,21 +48,28 @@ ${y}Changelog 37 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$
   ${r}- ${b}Gemini-Powered Smart Stash.${r}
     ${a}Running ${c}git stash${r}${a} now auto-generates a message describing your diff:${r}
        ${c}$ git stash${r}
-       Saved working directory and index state On ${w}main${r}: ${c}🤖 Refactor authentication logic${r}
+       Saved working directory and index state On main: 🤖 Refactor authentication logic${r}
+
+  ${r}- ${b}New 'ask' Command.${r}
+    ${a}Stuck? Just ${c}ask <question>${r}${a} to get an instant one-liner shell command:${r}
+       ${c}$ ask find all pdfs larger than 10mb${r}
+       find . -name \"*.pdf\" -size +10M${r}
 
   ${r}- ${b}The Split-Personality Prompt.${r}
     ${a}The prompt now visualizes mixed states (staged + unstaged) by splitting the branch colors.${r}
 
-       ${w}Current Status      Prompt Preview${r}
-       ${r}Clean               ${b}${w}[main]${r}
+       Status              Prompt${r}
+       ${w}Clean               ${b}${w}[main]${r}
        ${g}Staged Only         ${g}[main]${r}
        ${y}Unstaged Only       ${y}[main]${r}
-       ${b}Mixed State         ${g}[ma${y}in]${r}  ${a}<-- New! (Half Green, Half Yellow)${r}
+       ${g}Mixed ${y}State         ${g}[ma${y}in]${r}  ${a}<-- New! (Half Green, Half Yellow)${r}
 
    ${r}- ${b}Integrated Upstream Indicators.${r}
      ${a}Ahead ${c}↑${r}${a} and Behind ${c}↓${r}${a} arrows are now colored distinctly (${c}Blue${r}${a}/${c}Yellow${r}${a}).${r}
 
-   ${y}Tip: The AI Stash requires ${c}jq${r}${y} and a valid ${c}GEMINI_API_KEY${r}${y} environment variable.${r}
+   ${y}Tip: AI features require a global ${c}GEMINI_API_KEY${r}${y} environment variable.${r}
+   ${y}     Set it on ${c}$HOME/.bash_globals${r}${y} with ${c}export GEMINI_API_KEY=\"AIzaSyAw...\"
+   ${y}     To disable all AI features, use ${c}BASHRC_DISABLE_AI=1${r}${y}, and to change the model ${c}BASHRC_GEMINI_MODEL${r}${y}.${r}
   "
 }
 
@@ -78,7 +86,7 @@ function check_updates() {
     fi
 }
 
-check_updates 2>/dev/null &
+(check_updates 2>/dev/null &)
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -136,6 +144,65 @@ function _c() {
     ); then
         return 0
     else
+        return 1
+    fi
+}
+
+export BASHRC_DISABLE_AI=0
+export BASHRC_GEMINI_MODEL="gemini-flash-lite-latest"
+function _gemini_query() {
+    # 1. Kill Switch & Config Checks
+    if [[ "$BASHRC_DISABLE_AI" -eq 1 ]]; then
+        echo "AI features are disabled (BASHRC_DISABLE_AI=1)." >&2
+        return 1
+    fi
+
+    if [ -z "$GEMINI_API_KEY" ]; then
+        echo "Error: GEMINI_API_KEY not set." >&2
+        return 1
+    fi
+
+    if ! _e "jq" || ! _e "curl"; then
+        echo "Error: 'jq' and 'curl' are required." >&2
+        return 1
+    fi
+
+    local system_instruction="$1"
+    local user_input="$2"
+
+    # 2. Construct JSON Payload securely with jq
+    # We combine system and user prompt for simplicity with the v1beta API
+    local payload
+    payload=$(jq -n \
+              --arg sys "$system_instruction" \
+              --arg usr "$user_input" \
+              '{
+                contents: [{
+                  parts: [{text: ($sys + "\n\n" + $usr)}]
+                }],
+                generationConfig: {
+                    temperature: 0.2
+                }
+              }')
+
+    # 3. Call Gemini API
+    local response
+    response=$(curl -s -X POST \
+         -H "Content-Type: application/json" \
+         "https://generativelanguage.googleapis.com/v1beta/models/${BASHRC_GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}" \
+         -d "$payload")
+
+    # 4. Extract and Clean Output
+    local content
+    content=$(echo "$response" | jq -r '.candidates[0].content.parts[0].text // empty')
+
+    if [[ -n "$content" && "$content" != "null" ]]; then
+        # Strip Markdown code blocks (```bash ... ```) and whitespace
+        echo "$content" | sed 's/^```[a-z]*//; s/```$//; s/^`//; s/`$//' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+        return 0
+    else
+        # verbose error for debugging only if needed
+        # echo "Debug API Response: $response" >&2
         return 1
     fi
 }
@@ -870,6 +937,36 @@ cleanup_bash_history() {
   echo "Done. Restart your shells or they will overwrite the new history file with the old one."
 }
 
+## Quick LLM assistant for shell commands
+function ask() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: ask <question>"
+        echo "Example: ask make git ignore changes in filemodes for this repo"
+        return 1
+    fi
+
+    local question="$*"
+    local sys_prompt="You are a helpful shell command assistant. Respond ONLY with the exact one-liner command to run. No explanations, no markdown, no backticks."
+
+    local content
+    if content=$(_gemini_query "$sys_prompt" "Task: $question"); then
+
+        # Print the command in Cyan
+        echo -e "\e[36m$content\e[0m"
+
+        # Add to history
+        history -s "ask $question"
+        history -s "$content"
+
+        # Auto-fill the command line (requires xdotool)
+        if _e "xdotool"; then
+            (sleep 0.1 && xdotool key Up) &>/dev/null & disown
+        fi
+    else
+        echo "Failed to get response from Gemini." >&2
+        return 1
+    fi
+}
 
 ##  +-+-+-+-+ +-+-+-+-+-+-+-+
 ##  |E|a|s|y| |E|x|t|r|a|c|t|
@@ -1969,17 +2066,7 @@ if _e "git"; then
     MODEL_ID="gemini-flash-lite-latest"
 
     function _git_ai_stash_message() {
-        if [ -z "$GEMINI_API_KEY" ]; then
-            echo "Error: GEMINI_API_KEY not set." >&2
-            return 1
-        fi
-
-        if ! command -v jq &> /dev/null; then
-            echo "Error: 'jq' is required." >&2
-            return 1
-        fi
-
-        # Capture diff, limit to ~12kb
+        # Limit diff to ~12kb to prevent token overflow
         local diff_content
         diff_content=$(git diff HEAD --no-color 2>/dev/null | head -c 12000)
 
@@ -1987,47 +2074,13 @@ if _e "git"; then
             return 1
         fi
 
-        # Print to Stderr (>2) so it appears on screen but isn't captured in the variable
+        # Print to Stderr so it shows up but isn't captured by the caller
         echo -ne "\e[35m🤖 Analyzing changes with Gemini...\e[0m\n" >&2
 
-        local prompt="Write a git stash message (max 10 words, imperative mood) for the following diff."
+        local sys_prompt="You are a git assistant. Write a git stash message (max 10 words, imperative mood) based on the diff provided. Output ONLY the message text. No quotes, no markdown."
 
-        # Construct JSON payload with Schema Validation
-        local payload
-        payload=$(jq -n \
-                  --arg prompt "$prompt" \
-                  --arg diff "$diff_content" \
-                  '{
-                    contents: [{
-                      role: "user",
-                      parts: [{text: ($prompt + "\n\n" + $diff)}]
-                    }],
-                    generationConfig: {
-                      responseMimeType: "application/json",
-                      responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                          stash_message: {type: "STRING"}
-                        }
-                      }
-                    }
-                  }')
-
-        # Call Gemini API
-        local response
-        response=$(curl -s -X POST \
-             -H "Content-Type: application/json" \
-             "https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${GEMINI_API_KEY}" \
-             -d "$payload")
-
-        # Extract the specific JSON field
         local ai_msg
-        ai_msg=$(echo "$response" | jq -r '.candidates[0].content.parts[0].text | fromjson | .stash_message // empty')
-
-        if [ -n "$ai_msg" ] && [ "$ai_msg" != "null" ]; then
-            # Print status to Stderr
-            # echo -e "\n📝 \e[36m$ai_msg\e[0m" >&2
-            # Print ONLY the clean message to Stdout to be captured
+        if ai_msg=$(_gemini_query "$sys_prompt" "$diff_content"); then
             echo "$ai_msg"
             return 0
         else
