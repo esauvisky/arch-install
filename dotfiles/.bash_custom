@@ -170,51 +170,6 @@ function _load_ask_response() {
 }
 
 ## Quick LLM assistant for shell commands
-function ask() {
-    if [[ $# -eq 0 ]]; then
-        echo "Usage: ask <question>"
-        echo "Example: ask make git ignore changes in filemodes for this repo"
-        return 1
-    fi
 
-    local question="$*"
-    local response
-
-    if _e "curl" && [[ -n "$OPENAI_API_KEY" ]]; then
-        # OpenAI API
-        response=$(curl -s -X POST "https://api.openai.com/v1/chat/completions" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -d "{
-                \"model\": \"gpt-4.1\",
-                \"messages\": [
-                    {\"role\": \"system\", \"content\": \"You are a helpful shell command assistant. Respond ONLY with the exact one-liner command to run, no explanations, no markdown, no extra text.\"},
-                    {\"role\": \"user\", \"content\": \"$question\"}
-                ],
-                \"max_tokens\": 100,
-                \"temperature\": 0.1
-            }")
-        content=$(echo "$response" | jq -r '.choices[0].message.content')
-    else
-        echo "No LLM available. Install lms, ollama, or set OPENAI_API_KEY"
-        return 1
-    fi
-
-    if [[ -n "$content" && "$content" != "null" ]]; then
-        # Clean up the content (remove any markdown, quotes, etc.)
-        content=$(echo "$content" | sed 's/^`*//; s/`*$//; s/^"//; s/"$//')
-
-        # Print the command in a different color so user can see it
-        echo -e "\e[36m$content\e[0m"
-
-        history -s "ask $question"
-        history -s "$content"
-
-        (sleep 0.1 && xdotool key Up) &>/dev/null & disown
-    else
-        echo "Failed to get response from LLM: $response"
-        return 1
-    fi
-}
 alias cyrillify="sed 'y/aceopxyABCEHKMOPTX/асеорхуАВСЕНКМОРТХ/'"
 alias cyrillify="sed 'y/aceopxyABCEHKMOPTX/асеорхуАВСЕНКМОРТХ/'"
