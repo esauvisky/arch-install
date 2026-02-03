@@ -2139,43 +2139,81 @@ if _e "git"; then
         export GIT_PS1_STATESEPARATOR=" "    # Clean separator
 
         function _git_prompt() {
-            # Fetch Git status using __git_ps1
+            # 1. Fetch Git status
             local git_info
             if [[ -n "$(command -v __git_ps1)" ]]; then
                 git_info=$(__git_ps1 "%s")
             fi
+            [[ -z "$git_info" ]] && return
 
-            # Determine the branch color
-            local branch_color="$__Bold$__Green"  # Default: Clean branch
-            if [[ "$git_info" =~ /([0-9a-f\.]+)/ ]]; then
-                branch_color="$__Bold$__Red"      # Detached HEAD
-            elif [[ "$git_info" == *"|"* ]]; then
-                branch_color="$__Bold$__RedLight" # Conflict (Rebase/Merge in progress)
-            elif [[ "$git_info" == *"*"* ]]; then
-                branch_color="$__Bold$__Yellow"   # Unstaged changes
-            fi
-
-            # Format upstream indicators
+            # 2. Prepare Upstream Indicators (Arrows)
+            # We process these separately so we can append them later without breaking the name splitting logic
+            local upstream=""
             if [[ "$git_info" == *"<>"* ]]; then
-                git_info="${git_info//<>/$__Bold$__RedLight<>$__Reset}" # Diverged (light red)
+                upstream="$__RedLightBold<>$__Reset"
             else
-                git_info="${git_info//</$__Blue↓$__Reset}"  # Behind upstream (blue)
-                git_info="${git_info//>/$__Blue↑$__Reset}"  # Ahead upstream (blue)
+                [[ "$git_info" == *"<"* ]] && upstream+="$__YellowLightBold↓$__Reset"
+                [[ "$git_info" == *">"* ]] && upstream+="$__BlueLightBold↑$__Reset"
             fi
 
-            # Remove `*` (unstaged indicator)
-            git_info="${git_info//\*/}"
-            # Highlight staged changes (`+`) in bold green
-            git_info="${git_info//+/$__Bold$__Green+$__Reset}"
-            # Remove `=` (no-op, since it won’t be displayed anyway)
-            git_info="${git_info//=/}"
-            # Remove `%` (untracked files indicator)
-            # git_info="${git_info//%/}"
-            # Remove ` ` (untracked files indicator)
-            git_info="${git_info// /}"
+            # 3. Clean the name to get pure text for length calculation
+            # Remove symbols (*, +, <, >, =, %) and spaces
+            local clean_name="${git_info//[\*+%<>= $]/}"
 
-            # Return formatted Git prompt
-            [[ -n "$git_info" ]] && echo -ne " ${branch_color}[${git_info}${branch_color}]$__Reset"
+            # 4. Define Color Variables for the output parts
+            local bracket_open=""
+            local bracket_close=""
+            local branch_text=""
+
+            # 5. Determine Colors based on State
+            if [[ "$git_info" == *"*"* && "$git_info" == *"+"* ]]; then
+                # --- MIXED STATE (Staged + Unstaged) ---
+                # Logic: [ (Green) ... NameStart (Green) ... NameEnd (Yellow) ... ] (Yellow)
+
+                local len=${#clean_name}
+                local half=$((len / 2))
+                local part1="${clean_name:0:half}"
+                local part2="${clean_name:half}"
+
+                bracket_open="$__GreenBold"
+                # The text itself: Green Part + Yellow Part
+                branch_text="$__GreenBold$part1$__YellowBold$part2"
+                bracket_close="$__YellowBold"
+
+            elif [[ "$git_info" =~ /([0-9a-f\.]+)/ ]]; then
+                # --- DETACHED HEAD ---
+                bracket_open="$__VioletLightBold"
+                bracket_close="$__VioletLightBold"
+                branch_text="$__VioletLightBold$clean_name"
+
+            elif [[ "$git_info" == *"|"* ]]; then
+                # --- CONFLICT ---
+                bracket_open="$__RedLightBold"
+                bracket_close="$__RedLightBold"
+                branch_text="$__RedLightBold$clean_name"
+
+            elif [[ "$git_info" == *"+"* ]]; then
+                # --- STAGED ONLY ---
+                bracket_open="$__GreenBold"
+                bracket_close="$__GreenBold"
+                branch_text="$__GreenBold$clean_name"
+
+            elif [[ "$git_info" == *"*"* ]]; then
+                # --- UNSTAGED ONLY ---
+                bracket_open="$__YellowBold"
+                bracket_close="$__YellowBold"
+                branch_text="$__YellowBold$clean_name"
+
+            else
+                # --- CLEAN ---
+                bracket_open="$__WhiteLightBold"
+                bracket_close="$__WhiteLightBold"
+                branch_text="$__WhiteLightBold$clean_name"
+            fi
+
+            # 6. Construct the final prompt
+            # Structure: [OPEN_BRACKET] [ [BRANCH_NAME] [UPSTREAM_ICONS] ] [CLOSE_BRACKET]
+            echo -ne " ${bracket_open}[${branch_text}${upstream}${bracket_close}]$__Reset"
         }
     else
         function _git_prompt() {
