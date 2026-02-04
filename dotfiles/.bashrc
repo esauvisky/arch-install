@@ -26,7 +26,7 @@
 
 ## Used for version checking
 ## Used for version checking
-export _RCVERSION=37
+export _RCVERSION=38
 export _DATE="Feb 2nd, 2026"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
@@ -41,9 +41,11 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 37 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 38 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
     ${a}Major visual upgrade to the Git prompt and AI integration.${r}
+
+  ${r}- ${b}Fixes issues on Windows taking too long to start.${r}
 
   ${r}- ${b}Gemini-Powered Smart Stash.${r}
     ${a}Running ${c}git stash${r}${a} now auto-generates a message describing your diff:${r}
@@ -91,7 +93,7 @@ function check_updates() {
     fi
 }
 
-(check_updates 2>/dev/null &)
+(check_updates 2>/dev/null & disown)
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
@@ -131,10 +133,8 @@ function is_ssh() {
 
 ## Checks if a binary or built-in command exists on PATH with failovers
 function _e() {
-    (hash "$1" >&/dev/null && return 0) ||
-        ([[ $(command -v "$1" >&/dev/null) == "$1" ]] && return 0) ||         # returns true for aliases therefore the ==
-        (which --skip-alias --skip-functions "$1" >&/dev/null && return 0) || # doesn't work with built-ins
-        return 1
+    type -P "$1" >/dev/null 2>&1 && return 0
+    return 1
 }
 
 ## Checks if a binary or built-in command exists and has color support
@@ -352,6 +352,7 @@ if [ -f /usr/share/bash-completion/completions/git ]; then
 fi
 ## Node autocompletions
 if _e node; then
+    alias node='node --experimental-modules --experimental-repl-await --experimental-vm-modules --experimental-worker --experimental-import-meta-resolve'
     source <(node --completion-bash)
 fi
 
@@ -1416,11 +1417,6 @@ if _e python || _e python3; then
     }
 fi
 
-## Node
-if _e node; then
-    alias node='node --experimental-modules --experimental-repl-await --experimental-vm-modules --experimental-worker --experimental-import-meta-resolve'
-fi
-
 ## True screen clearing
 function clear() {
     echo -en "\033c"
@@ -2106,8 +2102,6 @@ if _e "git"; then
         done
     }
 
-    MODEL_ID="gemini-flash-lite-latest"
-
     function _git_ai_stash_message() {
         # Limit diff to ~12kb to prevent token overflow
         local diff_content
@@ -2448,8 +2442,3 @@ fi
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/home/emi/.lmstudio/bin"
-# End of LM Studio CLI section
-
