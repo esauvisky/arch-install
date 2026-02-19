@@ -1083,333 +1083,6 @@ cool_places=(
     "/usr/share/bash-completion/completions"
 )
 
-###   ___  _ _                                        _    _____                     _     _
-###  / _ \| (_)                                      | |  |  _  |                   (_)   | |
-### / /_\ \ |_  __ _ ___  ___  ___     __ _ _ __   __| |  | | | |_   _____ _ __ _ __ _  __| | ___  ___
-### |  _  | | |/ _` / __|/ _ \/ __|   / _` | '_ \ / _` |  | | | \ \ / / _ \ '__| '__| |/ _` |/ _ \/ __|
-### | | | | | | (_| \__ \  __/\__ \  | (_| | | | | (_| |  \ \_/ /\ V /  __/ |  | |  | | (_| |  __/\__ \
-### \_| |_/_|_|\__,_|___/\___||___/   \__,_|_| |_|\__,_|   \___/  \_/ \___|_|  |_|  |_|\__,_|\___||___/
-## Allows using aliases after sudo (the ending space is what does teh trick)
-alias sudo='sudo '
-
-
-_e "blkid" && alias blkid="${GRC}blkid"
-_e "docker" && alias docker="${GRC}docker"
-_e "docker-compose" && alias "ocker-compose='${GRC}docker-compose"
-_e "docker-machine" && alias "ocker-machine='${GRC}docker-machine"
-_e "efibootmgr" && alias efibootmgr="${GRC}efibootmgr"
-_e "du" && alias du="${GRC}du -h"
-_e "free" && alias free="${GRC}free"
-_e "fdisk" && alias fdisk="${GRC}fdisk"
-_e "findmnt" && alias findmnt="${GRC}findmnt"
-_e "make" && alias make="${GRC}make"
-_e "gcc" && alias gcc="${GRC}gcc"
-_e "g++" && alias g+"='${GRC}g++"
-_e "id" && alias id="${GRC}id"
-_e "ip" && alias ip="${GRC}ip"
-_e "iptables" && alias iptables="${GRC}iptables"
-_e "journalctl" && alias journalctl="${GRC}journalctl"
-_e "kubectl" && alias kubectl="${GRC}kubectl"
-_e "lsof" && alias lsof="${GRC}lsof"
-_e "lsblk" && alias lsblk="${GRC}lsblk"
-_e "lspci" && alias lspci="${GRC}lspci"
-_e "netstat" && alias netstat="${GRC}netstat"
-_e "ping" && alias ping="${GRC}ping"
-_e "traceroute" && alias traceroute="${GRC}traceroute"
-_e "traceroute6" && alias traceroute6="${GRC}traceroute6"
-_e "dig" && alias dig="${GRC}dig"
-_e "mount" && alias mount="${GRC}mount"
-_e "ps" && alias ps="${GRC}ps"
-_e "mtr" && alias mtr="${GRC}mtr"
-_e "semanage" && alias semanage="${GRC}semanage"
-_e "getsebool" && alias getsebool="${GRC}getsebool"
-_e "ifconfig" && alias ifconfig="${GRC}ifconfig"
-_e "sockstat" && alias sockstat="${GRC}sockstat"
-
-## Navigation
-alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
-alias g="xdg-open"
-
-
-### Python
-if _e python || _e python3; then
-    ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    ##  |d|i|s|a|b|l|e|_|v|e|n|v|_|p|r|o|m|p|t|
-    ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-    ## Disables the native embedded venv prompt so we can make our own
-    export VIRTUAL_ENV_DISABLE_PROMPT=0
-    _python_info() {
-        local pyenv_version pyenv_origin venv_origin
-        local git_root_dir pyenv_info venv_info
-        local py_major py_minor py_patch
-        local venv_major venv_minor venv_patch
-        local pyenv_major pyenv_minor
-
-        # Build output
-        local out_info="$__BlueLight($__Reset"
-
-        if _e git; then
-            git_root_dir="$(git rev-parse --show-toplevel 2>/dev/null)"
-        fi
-
-        # Get current python version
-        read -r py_major py_minor py_patch < <(python -c 'import sys; v=sys.version_info; print(f"{v.major} {v.minor} {v.micro}")' 2>/dev/null || echo "0 0 0")
-
-        # Get pyenv information
-        if [[ -n "$PYENV_SHELL" ]]; then
-            pyenv_version="$(command pyenv version-name)"
-            pyenv_origin="$(command pyenv version-origin)"
-            if _e git && [[ -n "$git_root_dir" ]]; then
-                pyenv_origin="${pyenv_origin#"$git_root_dir"/}"
-            fi
-            pyenv_origin="${pyenv_origin//"$HOME"/\~}"
-
-            if [[ -n "$git_root_dir" ]]; then
-                pyenv_origin="${pyenv_origin#"$git_root_dir"/}"
-            fi
-
-            # Extract major.minor from pyenv version
-            IFS='.' read -r pyenv_major pyenv_minor pyenv_patch <<< "$pyenv_version"
-            if [[ "$py_major" -eq "$pyenv_major" && "$py_minor" -eq "$pyenv_minor" && "$py_patch" -eq "$pyenv_patch" ]]; then
-                pyenv_info="${__Reset}${__Blue}${pyenv_origin}:${__Bold}${pyenv_major}.${pyenv_minor}"
-            else
-                out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
-                pyenv_info="${__Reset}${__Red}${pyenv_origin}:${__Bold}${pyenv_version}"
-            fi
-        fi
-
-        # Get virtualenv information
-        if [[ -n "$VIRTUAL_ENV" ]]; then
-            venv_origin="$VIRTUAL_ENV"
-            if [[ -n "$git_root_dir" ]]; then
-                venv_origin="${VIRTUAL_ENV#"$git_root_dir"/}"
-            fi
-            venv_origin="${venv_origin//"$HOME"/\~}"
-            if [[ -f "$VIRTUAL_ENV/pyvenv.cfg" ]]; then
-                while IFS= read -r line; do
-                    [[ $line == version* ]] && {
-                        ver=${line#*= }
-                        IFS='.' read -r venv_major venv_minor venv_patch _ <<< "$ver"
-                        break
-                    }
-                done < "$VIRTUAL_ENV/pyvenv.cfg"
-            fi
-
-
-            if [[ "$py_major" -eq "$venv_major" && "$py_minor" -eq "$venv_minor" && "$py_patch" -eq "$venv_patch" ]]; then
-                venv_info="${__Reset}${__BlueLight}${venv_origin}${__Bold}:${venv_major}.${venv_minor}"
-            else
-                out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
-                venv_info="${__Reset}${__Red}${venv_origin}:${__Bold}${venv_major}.${venv_minor}.${venv_patch}"
-            fi
-        fi
-
-        if [[ -n "$pyenv_info" && -n "$venv_info" ]]; then
-            out_info="$out_info${pyenv_info}$__BlueLight|${__Reset}${venv_info}$__BlueLight)${__Reset}"
-        elif [[ -n "$pyenv_info" ]]; then
-            out_info="$out_info${pyenv_info}$__BlueLight)$__Reset"
-        elif [[ -n "$venv_info" ]]; then
-            out_info="$out_info${venv_info}$__BlueLight)$__Reset"
-        fi
-
-        echo "$out_info"
-    }
-
-    function pip() {
-        local cmd="$1"
-
-        if _e "pipman" && [[ "$cmd" == "install" && -z "$VIRTUAL_ENV" ]]; then
-            shift
-
-            local params=()  # I seriously hate bash
-            for param in "$@"; do
-                if [[ "$param" != "--break-system-packages" ]]; then
-                    params+=("$param")
-                fi
-            done
-
-            mkdir -p "$HOME/.pipman"
-            echo -e '\e[01;93mCreating PKGBUILDs...\e[00m'
-            pipman -t "$HOME/.pipman" -S "${params[@]}"
-        else
-            command pip "$@"
-        fi
-    }
-
-    function venv() {
-        local python_version selected_version python_executable
-
-        # Check if pyenv is available
-        if ! _e "pyenv"; then
-            echo "pyenv is not available. Creating venv with system python..."
-            python3 -m venv .venv
-            source .venv/bin/activate
-            return
-        fi
-
-        # If an argument is provided, use it as the python version
-        if [[ $# -eq 1 ]]; then
-            python_version="$1"
-        else
-            # Get available python versions from pyenv
-            local versions=()
-            readarray -t versions < <(pyenv versions --bare | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
-
-            if [[ ${#versions[@]} -eq 0 ]]; then
-                echo "No Python versions found in pyenv. Install one with: pyenv install <version>"
-                return 1
-            fi
-
-            echo "Available Python versions:"
-            select_option "${versions[@]}" "Type custom version"
-            local choice=$?
-
-            if [[ $choice -eq $((${#versions[@]})) ]]; then
-                # User chose to type custom version
-                echo -n "Enter Python version: "
-                read -r python_version
-            else
-                python_version="${versions[$choice]}"
-            fi
-        fi
-
-        # Check if the specified version is installed
-        if ! pyenv versions --bare | grep -q "^${python_version}$"; then
-            echo "Python $python_version is not installed. Installing..."
-            if ! pyenv install "$python_version"; then
-                echo "Failed to install Python $python_version"
-                return 1
-            fi
-        fi
-
-        # Get the python executable path
-        python_executable="$(pyenv prefix "$python_version")/bin/python"
-
-        if [[ ! -x "$python_executable" ]]; then
-            echo "Python executable not found at $python_executable"
-            return 1
-        fi
-
-        echo "Creating virtual environment with Python $python_version..."
-
-        # Remove existing .venv if it exists
-        if [[ -d ".venv" ]]; then
-            echo "Removing existing .venv directory..."
-            rm -rf .venv
-        fi
-
-        # Create the virtual environment
-        if "$python_executable" -m venv .venv; then
-            echo "Virtual environment created successfully."
-            echo "Activating virtual environment..."
-            source .venv/bin/activate
-            echo "Virtual environment activated. Python version: $(python --version)"
-        else
-            echo "Failed to create virtual environment"
-            return 1
-        fi
-    }
-fi
-
-## True screen clearing
-function clear() {
-    echo -en "\033c"
-}
-
-## use bat instead of cat if available
-function cat() {
-    if [[ -t 0 ]] && [[ $# == 1 ]] && _e bat && bat -L | grep -qm1 "[,:]${1##*.}($|,)"; then
-        command bat -P "$@"
-    else
-        command cat "$@"
-    fi
-}
-
-##  +-+-+-+-+-+ +-+-+-+-+
-##  |S|p|i|c|y| |G|r|e|p|
-##  +-+-+-+-+-+ +-+-+-+-+
-## This makes grep run without the extra arguments unless it's being either piped:
-##   cat $HOME/.bashrc | grep "LESS"
-## or normally ran interactively:
-##   grep $HOME/.bashrc "^export"
-## This way it'll work for <(grep ..) or var=$(grep ..) or echo '' | grep
-## but won't affect scripts or other complex command chains.
-##
-## It also fixes errors when stupid programs like adb or docker use grep
-## to filter autocompletion results screwing the list when pressing TAB.
-##
-## This is a replacement for the old 'alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"'
-function grep {
-    if [ -t 0 ] || [ -t 1 ]; then
-        command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
-    elif { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 ||
-        [ "$(LC_ALL=C stat -c %F -)" = fifo ] ||
-        [ -t 2 ]; then
-        # t -2 fixes adb -s [TAB] and other autocompletion
-        command grep "$@"
-    else
-        command grep "$@"
-    fi
-}
-
-##  +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
-##  |O|v|e|r|r|i|d|i|n|g| |A|l|i|a|s|e|s|
-##  +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
-## Makes diff decent
-if _e colordiff; then
-    alias diff="colordiff -B -U 5 --suppress-common-lines"
-else
-    alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
-fi
-## Watch defaults
-if watch --help 2>/dev/null | grep -qm1 color; then
-    alias watch="watch --color -n 0.5"
-else
-    alias watch="watch -n 0.5"
-fi
-## Colors on DF
-alias df="${GRC}df -H"
-## Makes dd pretty and with progress bar
-alias dd="${GRC}dd status=progress oflag=sync"
-## Makes ccze not stupid (fast and no output clearing)
-_e "ccze" && alias ccze='ccze -A -o nolookups'
-
-##  +-+-+-+-+ +-+-+
-##  |I|Q|4|7| |R|M|
-##  +-+-+-+-+ +-+-+
-## Safe rm using gio trash
-## Falls back to rm in any unsupported case
-## Only caveat: ignores -r as gio trash already
-## does it recursively without choice
-if _e gio; then
-    function rm() {
-        use_gio=true
-        local argv=("$@")
-        for index in "${!argv[@]}"; do
-            if [[ ${argv[$index]} == '-r' || ${argv[$index]} == '-R' ]]; then
-                unset -v 'argv[$index]'
-            elif [[ ${argv[$index]} =~ ^-{1}[^-]?[rR] ]]; then
-                argv[$index]=${argv[$index]//[Rr]/}
-                echo "new argv is ${argv[$index]}"
-            fi
-            if [[ ${argv[$index]} =~ ^-[^f] && ${argv[$index]} != "--force" ]]; then
-                echo "keep argv is ${argv[$index]}"
-                use_gio=false
-            fi
-        done
-
-        if $use_gio; then
-            if gio trash "${argv[@]}" 2>/dev/null; then
-                echo "Sent to Trash (gio)."
-                return 0
-            else
-                echo "Gio failed, trying rm ${*}."
-            fi
-        fi
-        command rm "${@}"
-    }
-fi
-
 ##  +-+-+-+-+-+-+-+ +-+-+-+-+-+ +-+-+-+-+-+-+
 ##  |a|n|d|r|o|i|d| |d|e|b|u|g| |b|r|i|d|g|e|
 ##  +-+-+-+-+-+-+-+ +-+-+-+-+-+ +-+-+-+-+-+-+
@@ -2215,6 +1888,356 @@ if [[ -n $VTE_VERSION && -f /etc/profile.d/vte.sh ]]; then
     PROMPT_COMMAND='_set_prompt; __vte_prompt_command'
 else
     PROMPT_COMMAND='_set_prompt'
+fi
+
+###   ___  _ _                                        _    _____                     _     _
+###  / _ \| (_)                                      | |  |  _  |                   (_)   | |
+### / /_\ \ |_  __ _ ___  ___  ___     __ _ _ __   __| |  | | | |_   _____ _ __ _ __ _  __| | ___  ___
+### |  _  | | |/ _` / __|/ _ \/ __|   / _` | '_ \ / _` |  | | | \ \ / / _ \ '__| '__| |/ _` |/ _ \/ __|
+### | | | | | | (_| \__ \  __/\__ \  | (_| | | | | (_| |  \ \_/ /\ V /  __/ |  | |  | | (_| |  __/\__ \
+### \_| |_/_|_|\__,_|___/\___||___/   \__,_|_| |_|\__,_|   \___/  \_/ \___|_|  |_|  |_|\__,_|\___||___/
+## Allows using aliases after sudo (the ending space is what does teh trick)
+alias sudo='sudo '
+
+
+_e "blkid" && alias blkid="${GRC}blkid"
+_e "docker" && alias docker="${GRC}docker"
+_e "docker-compose" && alias "ocker-compose='${GRC}docker-compose"
+_e "docker-machine" && alias "ocker-machine='${GRC}docker-machine"
+_e "efibootmgr" && alias efibootmgr="${GRC}efibootmgr"
+_e "du" && alias du="${GRC}du -h"
+_e "free" && alias free="${GRC}free"
+_e "fdisk" && alias fdisk="${GRC}fdisk"
+_e "findmnt" && alias findmnt="${GRC}findmnt"
+_e "make" && alias make="${GRC}make"
+_e "gcc" && alias gcc="${GRC}gcc"
+_e "g++" && alias g+"='${GRC}g++"
+_e "id" && alias id="${GRC}id"
+_e "ip" && alias ip="${GRC}ip"
+_e "iptables" && alias iptables="${GRC}iptables"
+_e "journalctl" && alias journalctl="${GRC}journalctl"
+_e "kubectl" && alias kubectl="${GRC}kubectl"
+_e "lsof" && alias lsof="${GRC}lsof"
+_e "lsblk" && alias lsblk="${GRC}lsblk"
+_e "lspci" && alias lspci="${GRC}lspci"
+_e "netstat" && alias netstat="${GRC}netstat"
+_e "ping" && alias ping="${GRC}ping"
+_e "traceroute" && alias traceroute="${GRC}traceroute"
+_e "traceroute6" && alias traceroute6="${GRC}traceroute6"
+_e "dig" && alias dig="${GRC}dig"
+_e "mount" && alias mount="${GRC}mount"
+_e "ps" && alias ps="${GRC}ps"
+_e "mtr" && alias mtr="${GRC}mtr"
+_e "semanage" && alias semanage="${GRC}semanage"
+_e "getsebool" && alias getsebool="${GRC}getsebool"
+_e "ifconfig" && alias ifconfig="${GRC}ifconfig"
+_e "sockstat" && alias sockstat="${GRC}sockstat"
+
+## Navigation
+alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+alias g="xdg-open"
+
+
+### Python
+if _e python || _e python3; then
+    ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ##  |d|i|s|a|b|l|e|_|v|e|n|v|_|p|r|o|m|p|t|
+    ##  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ## Disables the native embedded venv prompt so we can make our own
+    export VIRTUAL_ENV_DISABLE_PROMPT=0
+    _python_info() {
+        local pyenv_version pyenv_origin venv_origin
+        local git_root_dir pyenv_info venv_info
+        local py_version venv_version
+        local py_major py_minor py_patch
+        local venv_major venv_minor venv_patch
+        local pyenv_major pyenv_minor pyenv_patch
+
+        # Build output
+        local out_info="$__BlueLight($__Reset"
+
+        # Cache git root lookup (expensive operation)
+        if _e git && [[ -z "$_CACHED_GIT_ROOT" || "$PWD" != "$_CACHED_PWD" ]]; then
+            _CACHED_GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+            _CACHED_PWD="$PWD"
+        fi
+        git_root_dir="$_CACHED_GIT_ROOT"
+
+        # Get current python version (cache this if python doesn't change often)
+        # Use a faster approach: parse directly without invoking python
+        if [[ -n "$VIRTUAL_ENV" ]] && [[ -f "$VIRTUAL_ENV/pyvenv.cfg" ]]; then
+            # Read python version from venv config (faster than invoking python)
+            while IFS= read -r line; do
+                if [[ $line == version* ]]; then
+                    py_version="${line#*= }"
+                    IFS='.' read -r py_major py_minor py_patch _ <<< "$py_version"
+                    break
+                fi
+            done < "$VIRTUAL_ENV/pyvenv.cfg"
+        else
+            # Only invoke python if we really need to
+            read -r py_major py_minor py_patch < <(python -c 'import sys; v=sys.version_info; print(f"{v.major} {v.minor} {v.micro}")' 2>/dev/null || echo "0 0 0")
+        fi
+
+        # Get pyenv information (only if PYENV_SHELL is set)
+        if [[ -n "$PYENV_SHELL" ]]; then
+            # Cache pyenv version-name (expensive operation)
+            if [[ -z "$_CACHED_PYENV_VERSION" ]] || ! pyenv version-name &>/dev/null; then
+                _CACHED_PYENV_VERSION="$(command pyenv version-name 2>/dev/null)"
+                _CACHED_PYENV_ORIGIN="$(command pyenv version-origin 2>/dev/null)"
+            fi
+
+            pyenv_version="$_CACHED_PYENV_VERSION"
+            pyenv_origin="$_CACHED_PYENV_ORIGIN"
+
+            # Simplify path replacements
+            if [[ -n "$git_root_dir" ]]; then
+                pyenv_origin="${pyenv_origin#"$git_root_dir"/}"
+            fi
+            pyenv_origin="${pyenv_origin/#"$HOME"/\~}"
+
+            # Extract major.minor from pyenv version (faster string manipulation)
+            IFS='.' read -r pyenv_major pyenv_minor pyenv_patch _ <<< "$pyenv_version"
+
+            if [[ "$py_major.$py_minor.$py_patch" == "$pyenv_major.$pyenv_minor.$pyenv_patch" ]]; then
+                pyenv_info="${__Reset}${__Blue}${pyenv_origin}:${__Bold}${pyenv_major}.${pyenv_minor}"
+            else
+                out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
+                pyenv_info="${__Reset}${__Red}${pyenv_origin}:${__Bold}${pyenv_version}"
+            fi
+        fi
+
+        # Get virtualenv information (only if VIRTUAL_ENV is set)
+        if [[ -n "$VIRTUAL_ENV" ]]; then
+            venv_origin="$VIRTUAL_ENV"
+            if [[ -n "$git_root_dir" ]]; then
+                venv_origin="${VIRTUAL_ENV#"$git_root_dir"/}"
+            fi
+            venv_origin="${venv_origin/#"$HOME"/\~}"
+
+            # We already read this earlier for py_version, reuse it
+            if [[ -n "$py_version" ]]; then
+                IFS='.' read -r venv_major venv_minor venv_patch _ <<< "$py_version"
+            elif [[ -f "$VIRTUAL_ENV/pyvenv.cfg" ]]; then
+                while IFS= read -r line; do
+                    if [[ $line == version* ]]; then
+                        venv_version="${line#*= }"
+                        IFS='.' read -r venv_major venv_minor venv_patch _ <<< "$venv_version"
+                        break
+                    fi
+                done < "$VIRTUAL_ENV/pyvenv.cfg"
+            fi
+
+            if [[ "$py_major.$py_minor.$py_patch" == "$venv_major.$venv_minor.$venv_patch" ]]; then
+                venv_info="${__Reset}${__BlueLight}${venv_origin}${__Bold}:${venv_major}.${venv_minor}"
+            else
+                out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
+                venv_info="${__Reset}${__Red}${venv_origin}:${__Bold}${venv_major}.${venv_minor}.${venv_patch}"
+            fi
+        fi
+
+        # Build final output
+        if [[ -n "$pyenv_info" && -n "$venv_info" ]]; then
+            out_info="$out_info${pyenv_info}$__BlueLight|${__Reset}${venv_info}$__BlueLight)${__Reset}"
+        elif [[ -n "$pyenv_info" ]]; then
+            out_info="$out_info${pyenv_info}$__BlueLight)$__Reset"
+        elif [[ -n "$venv_info" ]]; then
+            out_info="$out_info${venv_info}$__BlueLight)$__Reset"
+        else
+            return  # Don't print anything if no python env
+        fi
+
+        echo "$out_info"
+    }
+
+    function pip() {
+        local cmd="$1"
+
+        if _e "pipman" && [[ "$cmd" == "install" && -z "$VIRTUAL_ENV" ]]; then
+            shift
+
+            local params=()  # I seriously hate bash
+            for param in "$@"; do
+                if [[ "$param" != "--break-system-packages" ]]; then
+                    params+=("$param")
+                fi
+            done
+
+            mkdir -p "$HOME/.pipman"
+            echo -e '\e[01;93mCreating PKGBUILDs...\e[00m'
+            pipman -t "$HOME/.pipman" -S "${params[@]}"
+        else
+            command pip "$@"
+        fi
+    }
+
+    function venv() {
+        local python_version python_executable
+
+        # Check if pyenv is available
+        if ! _e "pyenv"; then
+            echo "pyenv is not available. Creating venv with system python..."
+            python3 -m venv .venv
+            source .venv/bin/activate
+            return
+        fi
+
+        # If an argument is provided, use it as the python version
+        if [[ $# -eq 1 ]]; then
+            python_version="$1"
+        else
+            # Get available python versions from pyenv
+            local versions=()
+            readarray -t versions < <(pyenv versions --bare | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | sort -V)
+
+            if [[ ${#versions[@]} -eq 0 ]]; then
+                echo "No Python versions found in pyenv. Install one with: pyenv install <version>"
+                return 1
+            fi
+
+            echo "Available Python versions:"
+            select_option "${versions[@]}" "Type custom version"
+            local choice=$?
+
+            if [[ $choice -eq $((${#versions[@]})) ]]; then
+                # User chose to type custom version
+                echo -n "Enter Python version: "
+                read -r python_version
+            else
+                python_version="${versions[$choice]}"
+            fi
+        fi
+
+        # Check if the specified version is installed
+        if ! pyenv versions --bare | grep -q "^${python_version}$"; then
+            echo "Python $python_version is not installed. Installing..."
+            if ! pyenv install "$python_version"; then
+                echo "Failed to install Python $python_version"
+                return 1
+            fi
+        fi
+
+        # Get the python executable path
+        python_executable="$(pyenv prefix "$python_version")/bin/python"
+
+        if [[ ! -x "$python_executable" ]]; then
+            echo "Python executable not found at $python_executable"
+            return 1
+        fi
+
+        echo "Creating virtual environment with Python $python_version..."
+
+        # Remove existing .venv if it exists
+        if [[ -d ".venv" ]]; then
+            echo "Removing existing .venv directory..."
+            rm -rf .venv
+        fi
+
+        # Create the virtual environment
+        if "$python_executable" -m venv .venv; then
+            echo "Virtual environment created successfully."
+            echo "Activating virtual environment..."
+            source .venv/bin/activate
+            echo "Virtual environment activated. Python version: $(python --version)"
+        else
+            echo "Failed to create virtual environment"
+            return 1
+        fi
+    }
+fi
+
+## True screen clearing
+function clear() {
+    echo -en "\033c"
+}
+
+## use bat instead of cat if available
+function cat() {
+    if [[ -t 0 ]] && [[ $# == 1 ]] && _e bat && bat -L | grep -qm1 "[,:]${1##*.}($|,)"; then
+        command bat -P "$@"
+    else
+        command cat "$@"
+    fi
+}
+
+##  +-+-+-+-+-+ +-+-+-+-+
+##  |S|p|i|c|y| |G|r|e|p|
+##  +-+-+-+-+-+ +-+-+-+-+
+## This makes grep run without the extra arguments unless it's being either piped:
+##   cat $HOME/.bashrc | grep "LESS"
+## or normally ran interactively:
+##   grep $HOME/.bashrc "^export"
+## This way it'll work for <(grep ..) or var=$(grep ..) or echo '' | grep
+## but won't affect scripts or other complex command chains.
+##
+## It also fixes errors when stupid programs like adb or docker use grep
+## to filter autocompletion results screwing the list when pressing TAB.
+##
+## This is a replacement for the old 'alias grep="grep -n -C 2 $_COLOR_ALWAYS_ARG -E"'
+function grep {
+    if [ -t 0 ] || [ -t 1 ]; then
+        command grep -n -C 2 $_COLOR_ALWAYS_ARG -E "$@"
+    elif { [ "$(LC_ALL=C stat -c %F - <&3)" = fifo ]; } 3>&1 ||
+        [ "$(LC_ALL=C stat -c %F -)" = fifo ] ||
+        [ -t 2 ]; then
+        # t -2 fixes adb -s [TAB] and other autocompletion
+        command grep "$@"
+    else
+        command grep "$@"
+    fi
+}
+
+##  +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+##  |O|v|e|r|r|i|d|i|n|g| |A|l|i|a|s|e|s|
+##  +-+-+-+-+-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+## Makes diff decent
+if _e colordiff; then
+    alias diff="colordiff -B -U 5 --suppress-common-lines"
+else
+    alias diff="diff $_COLOR_ALWAYS_ARG -B -U 5 --suppress-common-lines"
+fi
+
+## Colors on DF
+alias df="${GRC}df -H"
+## Makes dd pretty and with progress bar
+alias dd="${GRC}dd status=progress oflag=sync"
+## Makes ccze not stupid (fast and no output clearing)
+_e "ccze" && alias ccze='ccze -A -o nolookups'
+
+##  +-+-+-+-+ +-+-+
+##  |I|Q|4|7| |R|M|
+##  +-+-+-+-+ +-+-+
+## Safe rm using gio trash
+## Falls back to rm in any unsupported case
+## Only caveat: ignores -r as gio trash already
+## does it recursively without choice
+if _e gio; then
+    function rm() {
+        use_gio=true
+        local argv=("$@")
+        for index in "${!argv[@]}"; do
+            if [[ ${argv[$index]} == '-r' || ${argv[$index]} == '-R' ]]; then
+                unset -v 'argv[$index]'
+            elif [[ ${argv[$index]} =~ ^-{1}[^-]?[rR] ]]; then
+                argv[$index]=${argv[$index]//[Rr]/}
+                echo "new argv is ${argv[$index]}"
+            fi
+            if [[ ${argv[$index]} =~ ^-[^f] && ${argv[$index]} != "--force" ]]; then
+                echo "keep argv is ${argv[$index]}"
+                use_gio=false
+            fi
+        done
+
+        if $use_gio; then
+            if gio trash "${argv[@]}" 2>/dev/null; then
+                echo "Sent to Trash (gio)."
+                return 0
+            else
+                echo "Gio failed, trying rm ${*}."
+            fi
+        fi
+        command rm "${@}"
+    }
 fi
 
 ##  +-+-+-+-+-+-+
