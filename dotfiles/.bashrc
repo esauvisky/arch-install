@@ -26,8 +26,8 @@
 
 ## Used for version checking
 ## Used for version checking
-export _RCVERSION=38
-export _DATE="Feb 2nd, 2026"
+export _RCVERSION=39
+export _DATE="Feb 18th, 2026"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -41,42 +41,30 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 38 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 39 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
-    ${a}Major visual upgrade to the Git prompt and AI integration.${r}
+    ${a}Code quality improvements, environment stability, and git infrastructure hardening.${r}
 
-  ${r}- ${b}Fixes issues on Windows taking too long to start.${r}
+  ${r}- ${b}Removed Broken Docker Aliases.${r}
+    ${a}Cleaned up ${c}docker-compose${r}${a} and ${c}docker-machine${r}${a} aliases that were no longer functional.${r}
 
-  ${r}- ${b}Gemini-Powered Smart Stash.${r}
-    ${a}Running ${c}git stash${r}${a} now auto-generates a message describing your diff:${r}
-       ${c}$ git stash${r}
-       Saved working directory and index state On main: 🤖 Refactor authentication logic${r}
+  ${r}- ${b}Refactored Git Helpers.${r}
+    ${a}Consolidated and improved ${c}ai stash${r}${a}, ${c}ai status${r}${a}, ${c}ai sync${r}${a}, and prompt logic for better maintainability.${r}
 
-   ${r}- ${b}New 'ask' Command.${r}
-     ${a}Stuck? Just ${c}ask <question>${r}${a} to get an instant one-liner shell command.${r}
-        ${c}$ ask find all pdfs larger than 10mb${r}
-        ${a}(It will print the command in cyan; press ${c}↑${r}${a} to bring it back, review it, then Enter.)${r}
-        find . -name \"*.pdf\" -size +10M${r}
+  ${r}- ${b}Enhanced Prompt Stability.${r}
+    ${a}Extended and standardized prompt color palette with better condition checks for startup messages.${r}
 
-     ${a}Faster workflow (no arrow-up): type your prompt directly, then press ${c}Ctrl+O${r}${a}.${r}
-        ${c}$ find all pdfs larger than 10mb${r}
-        ${a}(press ${c}Ctrl+O${r}${a} → your line is replaced with the command; review it, then Enter)${r}
+  ${r}- ${b}Hardened Environment Management.${r}
+    ${a}Improved command existence checks, prevented duplicate PATH entries, and removed unused fzf helper.${r}
 
-  ${r}- ${b}The Split-Personality Prompt.${r}
-    ${a}The prompt now visualizes mixed states (staged + unstaged) by splitting the branch colors.${r}
+  ${r}- ${b}Node/Git-Bash Compatibility.${r}
+    ${a}Fixed node alias conflicts on Git Bash environments to prevent shell startup issues.${r}
 
-       Status              Prompt${r}
-       ${w}Clean               ${b}${w}[main]${r}
-       ${g}Staged Only         ${g}[main]${r}
-       ${y}Unstaged Only       ${y}[main]${r}
-       ${g}Mixed ${y}State         ${g}[ma${y}in]${r}  ${a}<-- New! (Half Green, Half Yellow)${r}
+  ${r}- ${b}Updated API Key Documentation.${r}
+    ${a}Clarified that GEMINI_API_KEY should be stored in ${c}$HOME/.bash_custom${r}${a} for uncommitted settings.${r}
 
-   ${r}- ${b}Integrated Upstream Indicators.${r}
-     ${a}Ahead ${c}↑${r}${a} and Behind ${c}↓${r}${a} arrows are now colored distinctly (${c}Blue${r}${a}/${c}Yellow${r}${a}).${r}
-
-   ${y}Tip: AI features require a global ${c}GEMINI_API_KEY${r}${y} environment variable.${r}
-   ${y}     Set it on ${c}$HOME/.bash_custom${r}${y} with ${c}export GEMINI_API_KEY=\"AIzaSyAw...\"
-   ${y}     To disable all AI features, use ${c}BASHRC_DISABLE_AI=1${r}${y}, and to change the model ${c}BASHRC_GEMINI_MODEL${r}${y}.${r}
+   ${y}Tip: Store local configuration and API keys in ${c}$HOME/.bash_custom${r}${y} (git-ignored).${r}
+   ${y}     For troubleshooting, use ${c}BASHRC_DISABLE_AI=1${r}${y} to disable all AI features.${r}
   "
 }
 
