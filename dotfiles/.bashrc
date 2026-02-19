@@ -75,7 +75,7 @@ ${y}Changelog 38 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$
      ${a}Ahead ${c}↑${r}${a} and Behind ${c}↓${r}${a} arrows are now colored distinctly (${c}Blue${r}${a}/${c}Yellow${r}${a}).${r}
 
    ${y}Tip: AI features require a global ${c}GEMINI_API_KEY${r}${y} environment variable.${r}
-   ${y}     Set it on ${c}$HOME/.bash_globals${r}${y} with ${c}export GEMINI_API_KEY=\"AIzaSyAw...\"
+   ${y}     Set it on ${c}$HOME/.bash_custom${r}${y} with ${c}export GEMINI_API_KEY=\"AIzaSyAw...\"
    ${y}     To disable all AI features, use ${c}BASHRC_DISABLE_AI=1${r}${y}, and to change the model ${c}BASHRC_GEMINI_MODEL${r}${y}.${r}
   "
 }
