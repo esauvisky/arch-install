@@ -1689,520 +1689,407 @@ fi
 #   / __|_ _|_   _|
 #  | (_ || |  | |
 #   \___|___| |_|
-if _e "git"; then
-    export GIT_MERGE_AUTOEDIT=no # does not open editor when merging
+if _e git; then
+    export GIT_MERGE_AUTOEDIT=no
     export GIT_COMPLETION_SHOW_ALL_COMMANDS=1
-    # export GIT_COMPLETION_CHECKOUT_NO_GUESS=1
 
-    # Visualize the entire commit tree history in a compact and informative way, displaying commits, branches, merges, and tags.
+    # gitl remains an alias as it's a specific log view
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
 
-    # Display a concise log, highlighting merges and providing patches for individual commits.
-    alias gitd="git diff --color --patch-with-stat --ignore-blank-lines --minimal --abbrev --ignore-all-space --color-moved=dimmed-zebra --color-moved-ws=ignore-all-space"
+    # Removed gitd alias (logic moved to git function)
 
-    # Alias for switching branches.
-    alias s="git switch"
-
-    # Display the current status, including stash and omitting renames.
-    # alias gits='git status --show-stash --no-renames'
-
-    # Commit all staged changes with a given message.
-    function gitcam() {
-        git commit -a -m "$*"
-    }
-
-    # Amend the most recent commit message.
     function gitm() {
         git commit --amend -m "$*"
     }
 
-    function gitr() {
-        # Get the remote URL
-        remote_url="$(git config --get remote.origin.url)"
-
-        if [ -z "$remote_url" ]; then
-            echo "No remote URL found in the current Git repository."
-            return 1
-        fi
-
-        # Convert SSH URL to HTTPS if needed
-        if [[ "$remote_url" == git@* ]]; then
-            remote_url=${remote_url/git@/}
-            remote_url=${remote_url/:/\/}
-            remote_url="https://${remote_url%%.git}"
-        else
-            remote_url="${remote_url%%.git}"
-        fi
-
-        # Get the current branch or commit hash if in detached HEAD
-        branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
-
-        # Get the relative path from the root
-        relative_path=$(git rev-parse --show-prefix)
-
-        # Default to repo root on the current branch
-        target_url="$remote_url/tree/$branch/$relative_path"
-
-        # If a file argument is provided, include it
-        if [ -n "$1" ]; then
-            file_path="$relative_path/$1"
-
-            # Check if file argument includes a line number (format: file:line)
-            if [[ "$1" =~ ^(.+):([0-9]+)$ ]]; then
-                file_path="$relative_path/${BASH_REMATCH[1]}"
-                line_number="${BASH_REMATCH[2]}"
-                target_url="$remote_url/blob/$branch/$file_path#L$line_number"
-            else
-                target_url="$remote_url/blob/$branch/$file_path"
-            fi
-        fi
-
-        # Open in browser
-        echo "Opening: $target_url"
-        xdg-open "$target_url"
-    }
-
-
-
     function gits() {
-        # Fetching the git status and color-coding changes.
-        readarray -t lines < <(git status --show-stash --long | sed '/.*use "git.*$/d')
+        local current_block="" line status path emoji
+        # Define specific colors for echo output
+        local c_orange_light='\033[38;5;214m'
+        local c_orange_bold='\033[1;38;5;208m'
+        local c_reset='\033[0m'
 
-        current_block=""
-        for line in "${lines[@]}"; do
-            if [[ $line =~ 'On branch' ]] || [[ $line =~ 'HEAD detached at' ]]; then
-                echo -en "\e[01;94m$line.\e[00m\n"
+        local -A emoji_map=(
+            [modified]="🟠"
+            [deleted]="🔴"
+            [added]="🟢"
+            ["new file"]="🟢"
+            [renamed]="🔵"
+        )
+
+        while IFS= read -r line; do
+            # --- 1. Filter Noise ---
+
+            # A. Rebase/Merge History & Hints
+            [[ $line =~ ^[[:space:]]*(pick|drop|edit|squash|fixup|exec|label|reset|merge)[[:space:]] ]] && continue
+            [[ $line =~ ^(Last|Next)[[:space:]]commands ]] && continue
+            [[ $line =~ ^interactive[[:space:]]rebase[[:space:]]in[[:space:]]progress ]] && continue
+
+            # B. Parenthetical Hints (The heavy lifter)
+            # Removes (use "git add"...) (fix conflicts...) (use "git push"...)
+            [[ $line =~ ^[[:space:]]*\(.*\)$ ]] && continue
+
+            # C. Specific Messages to Hide
+            [[ $line =~ ^nothing\ to\ commit,\ working\ tree\ clean ]] && continue
+            [[ $line =~ ^no\ changes\ added\ to\ commit ]] && continue
+            [[ $line =~ ^You\ have\ unmerged\ paths\. ]] && continue
+
+            # [NEW] Hide "Up to date" (Prompt already shows this via lack of arrows)
+            [[ $line =~ ^Your\ branch\ is\ up\ to\ date\ with ]] && continue
+
+            # [NEW] Hide Ignored files header
+            [[ $line =~ ^Ignored\ files: ]] && continue
+
+            # [NEW] Hide simple "On branch" if strictly boring (Prompt shows branch)
+            # We keep it if it's "HEAD detached" or complex states, but "On branch main" is noise
+            # unless we want to confirm the name explicitly.
+            # Commented out by default, uncomment if you trust your prompt 100%
+            # [[ $line =~ ^On\ branch\  ]] && continue
+
+
+            # --- 2. Headers & Coloring ---
+
+            if [[ $line =~ ^(On branch|HEAD detached at) ]]; then
+                echo -e "\e[01;94m$line.\e[00m"
                 continue
-            elif [[ $line =~ 'Your branch is ' ]]; then
-                echo -en "\e[94m${line}\e[00m\n"
+            elif [[ $line =~ ^Your\ branch\ is ]]; then
+                echo -e "\e[94m$line\e[00m"
                 continue
-            elif [[ $line =~ 'Please commit or stash' ]]; then
-                echo -en "\e[96m$line\e[00m\n"
+            elif [[ $line =~ ^You\ are\ currently\ rebasing ]]; then
+                echo -e "\e[01;96m$line\e[00m"
                 continue
             fi
 
-            if [[ $line =~ 'Changes to be committed:' ]]; then
-                current_block="staged"
-                echo -en "\e[01;32m$line\e[00m\n"
+            # --- DIVERGENCE MESSAGE REPLACEMENT ---
+            if [[ $line =~ ^Your\ branch\ and\ .*have\ diverged ]]; then
+                echo -e "${c_orange_light}${line}${c_reset}"
                 continue
-            elif [[ $line =~ 'Changes not staged for commit:' ]]; then
-                current_block="changes"
-                echo -en "\e[01;33m$line\e[00m\n"
-                continue
-            elif [[ $line =~ 'Untracked files:' ]]; then
-                current_block="untracked"
-                echo -en "\e[01;96m$line\e[00m\n"
-                continue
-            elif [[ $line =~ 'Unmerged paths:' ]]; then
-                current_block="unmerged"
-                echo -en "\e[07m$line\e[00m\n"
+            elif [[ $line =~ ^and\ have\ .*different\ commits ]]; then
+                echo -e "${c_orange_light}${line}${c_reset}"
+                echo ""
+                echo -e "${c_orange_bold}You will need rewrite the history if you want to push to"
+                echo -e "the remote repository using \"git push --force\".${c_reset}"
                 continue
             fi
 
-            if [[ $current_block == "staged" ]]; then
-                extra="\e[00m"
-            elif [[ $current_block == "changes" ]]; then
-                extra="\e[00m"
-            elif [[ $current_block == "unmerged" ]]; then
-                extra="\e[07;01m"
-            elif [[ $current_block == "untracked" ]]; then
-                extra="\e[96m"
-            else
-                extra="\e[00m"
+            # Add spacing before sections
+            if [[ $line =~ ^(Changes|Untracked|Unmerged) ]]; then
+                echo ""
             fi
 
-            if [[ $line =~ ^[[:space:]]+[^:]+:[[:space:]].* ]]; then
-                status="${line%%:*}"
-                path="${line#*:}"
-                # strip all spaces from the beginning of path
-                path="${path##*( )}"
+            case "$line" in
+                *"Changes to be committed:"*)
+                    current_block="staged"
+                    echo -e "\e[01;32m$line\e[00m"
+                    continue
+                    ;;
+                *"Changes not staged for commit:"*)
+                    current_block="changes"
+                    echo -e "\e[01;33m$line\e[00m"
+                    continue
+                    ;;
+                *"Untracked files:"*)
+                    current_block="untracked"
+                    echo -e "\e[01;96m$line\e[00m"
+                    continue
+                    ;;
+                *"Unmerged paths:"*)
+                    current_block="unmerged"
+                    echo -e "\e[01;31m$line\e[00m"
+                    continue
+                    ;;
+            esac
 
-                if [[ $current_block == "staged" ]]; then
-                    emojies=(   "🟣" )
-                    case $status in
-                      *"modified"*)
-                       emoji="🟠"
-                       ;;
-                      *"deleted"*)
-                       emoji="🔴"
-                       ;;
-                      *"added"*)
-                       emoji="🟢"
-                       ;;
-                      *"new file"*)
-                        emoji="🟢"
-                       ;;
-                      *"renamed"*)
-                        emoji="🔵"
-                       ;;
-                      *)
-                        emoji="⚪️"
-                       ;;
-                    esac
-                    # get right emoji for each status
-                    echo -e "$extra\e[01;32m     $emoji$line\e[00m"
-                elif [[ $status == *"modified"* ]]; then
-                    echo -e "$extra\e[33m\tmodified:\t${path}\e[00m"
-                elif [[ $status == *"deleted"* ]]; then
-                    echo -e "$extra\e[91m\tdeleted: \t${path}\e[00m"
-                elif [[ $status == *"added"* ]]; then
-                    echo -e "$extra\e[92m\tadded:   \t${path}\e[00m"
-                elif [[ $status == *"new file"* ]]; then
-                    echo -e "$extra\e[92m\tnew file:\t${path}\e[00m"
-                elif [[ $status == *"renamed"* ]]; then
-                    echo -e "$extra\e[95m\trenamed: \t${path}\e[00m"
-                elif [[ $status == *"typechange"* ]]; then
-                    echo -e "$extra\e[93m\ttypechange:\t\e[00m${path}"
-                else
-                    echo -e "$extra$line"
-                fi
-            elif [[ $line =~ ^[[:space:]]+.+ && $current_block == "untracked" ]]; then
-                echo -e "$extra\e[96m\tuntracked:  \t${line/[[:space:]]/}\e[00m"
-            else
-                echo -e "$extra$line"
+            # --- 3. File List Processing ---
+            if [[ $line =~ ^[[:space:]]+([^:]+):[[:space:]]+(.+)$ ]]; then
+                status="${BASH_REMATCH[1]}"
+                path="${BASH_REMATCH[2]}"
+
+                case "$current_block" in
+                    staged)
+                        for key in "${!emoji_map[@]}"; do
+                            if [[ $status == *"$key"* ]]; then
+                                emoji="${emoji_map[$key]}"
+                                break
+                            fi
+                        done
+                        echo -e "\e[01;32m     ${emoji:-⚪️}$line\e[00m"
+                        ;;
+                    changes)
+                        if [[ $status == *modified* ]]; then
+                            echo -e "\e[33m\tmodified:\t$path\e[00m"
+                        elif [[ $status == *deleted* ]]; then
+                            echo -e "\e[91m\tdeleted: \t$path\e[00m"
+                        elif [[ $status == *added* || $status == *"new file"* ]]; then
+                            echo -e "\e[92m\tnew file:\t$path\e[00m"
+                        elif [[ $status == *renamed* ]]; then
+                            echo -e "\e[95m\trenamed: \t$path\e[00m"
+                        elif [[ $status == *typechange* ]]; then
+                            echo -e "\e[93m\ttypechange:\t$path\e[00m"
+                        else
+                            echo -e "$line"
+                        fi
+                        ;;
+                    unmerged)
+                        echo -e "\e[31m\t$status:\t$path\e[00m"
+                        ;;
+                esac
+            elif [[ $line =~ ^[[:space:]]+(.+)$ && $current_block == "untracked" ]]; then
+                echo -e "\e[96m\tuntracked:  \t${BASH_REMATCH[1]}\e[00m"
+            elif [[ -n $line ]]; then
+                 if [[ $line =~ ^Your\ stash\ currently ]]; then
+                    echo ""
+                    echo -e "\e[37m$line\e[00m"
+                 else
+                    echo -e "$line"
+                 fi
             fi
-        done
+        done < <(git status --show-stash --long 2>/dev/null)
     }
 
-    # # Display modified, deleted, and new files in a colorful manner. Shows git status with added emphasis on changes.
-    # function gitd() {
-    #     local -A files
-
-    #     # Fetching diffs and storing them in an associative array.
-    #     readarray diffs < <(git diff --color --stat=80 HEAD | sed '$d; s/^ //')
-    #     for line in "${diffs[@]}"; do
-    #         key=${line// |*/}
-    #         files[${key// /}]=$line
-    #     done
-
-    #     # Fetching the git status and color-coding changes.
-    #     readarray status < <(git status --show-stash --no-renames | sed '/  (use..*)$/d')
-    #     for line in "${status[@]}"; do
-    #         key=${line//* /}
-    #         if [[ $line =~ modified: ]]; then
-    #             echo -en "\e[93m\tmodified: \e[01m${files[${key%?}]}\e[00m"
-    #         elif [[ $line =~ deleted: ]]; then
-    #             echo -en "\e[91m\tdeleted:  \e[01m${files[${key%?}]}\e[00m"
-    #         elif [[ $line =~ new\ file: ]]; then
-    #             echo -en "\e[92m\tnew file: \e[01m${files[${key%?}]}\e[00m"
-    #         elif [[ $line =~ On\ branch ]]; then
-    #             echo -en "${line//On branch/On branch\\e[01;94m}\e[00m"
-    #         elif [[ $line =~ 'have diverged' ]]; then
-    #             echo -en "\e[91m$line\e[00m"
-    #         elif [[ $line =~ 'Your branch is ahead' ]]; then
-    #             echo -en "\e[92m$line\e[00m"
-    #         elif [[ $line =~ 'Your branch is behind' ]]; then
-    #             echo -en "\e[93m$line\e[00m"
-    #         elif [[ $line =~ 'Changes not staged for commit' ]]; then
-    #             echo -en "\e[95m$line\e[00m"
-    #         elif [[ $line =~ 'Changes to be committed' ]]; then
-    #             echo -en "\e[96m$line\e[00m"
-    #         elif [[ $line =~ 'Untracked files' ]]; then
-    #             echo -en "\e[97m$line\e[00m"
-    #         elif [[ $line =~ 'Stashed changes' ]]; then
-    #             echo -en "\e[90m$line\e[00m"
-    #         else
-    #             echo -en "$line"
-    #         fi
-    #     done
-    # }
-
-    # Clean up stale local branches that are already merged to the main branch. If the main branch name differs from "master", specify it as an argument.
     function gitcleanbranches() {
-        git fetch --prune
-
-        # Determine the master branch name.
-        if [[ $# == 1 ]]; then
-            master="$1"
-        else
-            master="master"
-        fi
-
-        # Checkout the master branch.
-        if ! git checkout $master 2>/dev/null; then
-            echo "Pass the master branch name as argv[1]!"
-            return
-        fi
-
-        # Delete branches already merged to master.
-        for r in $(git for-each-ref refs/heads --format='%(refname:short)'); do
-            if [[ "$(git merge-base $master "$r")" == "$(git rev-parse --verify "$r")" ]]; then
-                if [ "$r" != "$master" ]; then
-                    git branch --delete "$r"
-                fi
-            fi
-        done
+        local master="${1:-master}"
+        local merge_base commit_hash
+        git fetch --prune || return 1
+        git checkout "$master" 2>/dev/null || { echo "Pass the master branch name as argv[1]!"; return 1; }
+        while IFS= read -r branch; do
+            [[ "$branch" == "$master" ]] && continue
+            merge_base=$(git merge-base "$master" "$branch" 2>/dev/null) || continue
+            commit_hash=$(git rev-parse --verify "$branch" 2>/dev/null) || continue
+            [[ "$merge_base" == "$commit_hash" ]] && git branch --delete "$branch"
+        done < <(git for-each-ref refs/heads --format='%(refname:short)')
     }
 
-    ## Super awesome automatic git pull
-    # - Deletes all local branches that were merged and deleted from the remote.
-    # - Makes local branches without remote counterparts track them in case it's possible.
-    # - Updates/syncs all local branches with their remote counterpart, not only the current checked-out one (if possible, of course).
-    # - Warns about local branches that are both ahead and behind the remote counterparts and require manual intervention, something that will hopefully happen much less often by using this.
-    # - If you have unstaged or uncommited local changes, git won't make you commit or stash them before pulling and will update the branch properly if the changes don't conflict. If they do, it'll warn you.
     function _git_sync() {
-        local bold="$(printf '\033')[1m"
-        local fgre="$(printf '\033')[32m"
-        local fblu="$(printf '\033')[34m"
-        local fred="$(printf '\033')[31m"
-        local fyel="$(printf '\033')[33m"
-        local fvio="$(printf '\033')[35m"
-        local end="$(printf '\033')[0m"
+        local -r bold=$'\033[1m' fgre=$'\033[32m' fblu=$'\033[34m'
+        local -r fred=$'\033[31m' fyel=$'\033[33m' fvio=$'\033[35m' end=$'\033[0m'
+        local current_branch remote branch
+        current_branch=$(git rev-parse --abbrev-ref HEAD)
 
-        REMOTES=$(git remote | xargs -n1 echo)
-        CLB=$(git rev-parse --abbrev-ref HEAD)
-        echo "$REMOTES" | while read REMOTE; do
-            # for i in $(git for-each-ref --format='%(refname:short)' --no-merged=$REMOTE/HEAD refs/remotes/$REMOTE); do
-            #     git switch --track $i
-            # done
-            git remote update $REMOTE --prune 2>&1 | \sed "s/ - \[deleted\]..*-> *$REMOTE\/\(..*\)/   ${fyel}Branch ${bold}\1${end}${fyel} was deleted from $REMOTE and will be pruned locally.${end}/"
-            while read branch; do
-                upstream=$(git rev-parse --abbrev-ref $branch@{upstream} 2>/dev/null)
-                if [[ $? != 0 ]]; then
-                    git branch --set-upstream-to=$REMOTE/$branch $branch >/dev/null 2>/dev/null
-                    if [[ $? == 0 ]]; then
-                        echo -e "   ${fvio}Branch ${bold}$branch${end}${fvio} was not tracking any remote branch! It was set to track ${bold}$REMOTE/$branch.${end}"
+        while IFS= read -r remote; do
+            [[ -z "$remote" ]] && continue
+            git remote update "$remote" --prune 2>&1 | \
+                sed "s/ - \[deleted\]..*-> *$remote\/\(.*\)/   ${fyel}Branch ${bold}\1${end}${fyel} was deleted from $remote and will be pruned locally.${end}/"
+
+            while IFS= read -r branch; do
+                if ! git rev-parse --abbrev-ref "$branch@{upstream}" &>/dev/null; then
+                    if git branch --set-upstream-to="$remote/$branch" "$branch" &>/dev/null; then
+                        echo -e "   ${fvio}Branch ${bold}$branch${end}${fvio} was not tracking any remote branch! It was set to track ${bold}$remote/$branch.${end}"
                     fi
                 fi
             done < <(git for-each-ref --format='%(refname:short)' refs/heads/*)
 
-            git remote show $REMOTE -n |
-                awk '/merges with remote/{print $5" "$1}' |
-                while read RB LB; do
-                    ARB="refs/remotes/$REMOTE/$RB"
-                    ALB="refs/heads/$LB"
-                    NBEHIND=$(($(git rev-list --count $ALB..$ARB 2>/dev/null) + 0))
-                    NAHEAD=$(($(git rev-list --count $ARB..$ALB 2>/dev/null) + 0))
-                    if [ "$NBEHIND" -gt 0 ]; then
-                        if [ "$NAHEAD" -gt 0 ]; then
-                            echo -e "   ${fred}Branch ${bold}$LB${end}${fred} is ${bold}$NBEHIND${end}${fred} commit(s) behind and ${bold}$NAHEAD${end}${fred} commit(s) ahead of ${bold}$REMOTE/$RB${end}${fred}. Could not be fast-forwarded.${end}"
-                        elif [ "$LB" = "$CLB" ]; then
-                            git merge -q $ARB 2>/dev/null
-                            if [[ $? == 0 ]]; then
-                                echo -e "   ${fblu}Branch ${bold}$LB${end}${fblu} was ${bold}$NBEHIND${end}${fblu} commit(s) behind of ${bold}$REMOTE/$RB${end}${fblu}. Fast-forward merge.${end}"
-                            else
-                                if [[ $(git rev-parse --symbolic-full-name --abbrev-ref HEAD) == $LB ]]; then
-                                    CURRENT="(currently checked out)"
-                                fi
-                                echo -e "   ${bold}${fred}Warning! Branch $LB${end}${fred} $CURRENT will conflict with new commits incoming from ${bold}$REMOTE/$RB${end}${fred}!${end}"
-                                echo -e "   ${fred}You'll need to stash your changes before. Try \`${bold}git stash${end}${fred}\`, \`${bold}git merge${end}${fred}\`, then \`${bold}git stash pop${end}${fred}\`, and good luck!${end}"
-                            fi
-                        else
-                            echo -e "   ${fgre}Branch ${bold}$LB${end}${fgre} was ${bold}$NBEHIND${end}${fgre} commit(s) behind of ${bold}$REMOTE/$RB${end}${fgre}. Resetting local branch to remote.${end}"
-                            git branch -f $LB -t $ARB >/dev/null
-                        fi
+            while IFS=' ' read -r rb lb; do
+                [[ -z "$rb" || -z "$lb" ]] && continue
+                local arb="refs/remotes/$remote/$rb"
+                local alb="refs/heads/$lb"
+                local nbehind nahead
+                nbehind=$(git rev-list --count "$alb..$arb" 2>/dev/null || echo 0)
+                [[ $nbehind -eq 0 ]] && continue
+                nahead=$(git rev-list --count "$arb..$alb" 2>/dev/null || echo 0)
+
+                if [[ $nahead -gt 0 ]]; then
+                    echo -e "   ${fred}Branch ${bold}$lb${end}${fred} is ${bold}$nbehind${end}${fred} commit(s) behind and ${bold}$nahead${end}${fred} commit(s) ahead of ${bold}$remote/$rb${end}${fred}. Could not be fast-forwarded.${end}"
+                elif [[ "$lb" == "$current_branch" ]]; then
+                    if git merge -q "$arb" 2>/dev/null; then
+                        echo -e "   ${fblu}Branch ${bold}$lb${end}${fblu} was ${bold}$nbehind${end}${fblu} commit(s) behind of ${bold}$remote/$rb${end}${fblu}. Fast-forward merge.${end}"
+                    else
+                        echo -e "   ${fred}${bold}Warning! Branch $lb${end}${fred} (currently checked out) will conflict with new commits incoming from ${bold}$remote/$rb${end}${fred}!${end}"
+                        echo -e "   ${fred}You'll need to stash your changes before. Try \`${bold}git stash${end}${fred}\`, \`${bold}git merge${end}${fred}\`, then \`${bold}git stash pop${end}${fred}\`, and good luck!${end}"
                     fi
-                done
-        done
+                else
+                    echo -e "   ${fgre}Branch ${bold}$lb${end}${fgre} was ${bold}$nbehind${end}${fgre} commit(s) behind of ${bold}$remote/$rb${end}${fgre}. Resetting local branch to remote.${end}"
+                    git branch -f "$lb" -t "$arb" &>/dev/null
+                fi
+            done < <(git remote show "$remote" -n | awk '/merges with remote/{print $5" "$1}')
+        done < <(git remote)
     }
 
     function _git_ai_stash_message() {
-        # Limit diff to ~12kb to prevent token overflow
         local diff_content
         diff_content=$(git diff HEAD --no-color 2>/dev/null | head -c 12000)
-
-        if [ -z "$diff_content" ]; then
-            return 1
-        fi
-
-        # Print to Stderr so it shows up but isn't captured by the caller
+        [[ -z "$diff_content" ]] && return 1
         echo -ne "\e[35m🤖 Analyzing changes with Gemini...\e[0m\n" >&2
-
         local sys_prompt="You are a git assistant. Write a git stash message (max 10 words, imperative mood) based on the diff provided. Output ONLY the message text. No quotes, no markdown."
-
-        local ai_msg
-        if ai_msg=$(_gemini_query "$sys_prompt" "$diff_content"); then
-            echo "$ai_msg"
-            return 0
-        else
-            echo -e "\n\e[31mFailed to generate message.\e[0m" >&2
-            return 1
-        fi
+        _gemini_query "$sys_prompt" "$diff_content"
     }
 
-    # --- UPDATED GIT WRAPPER ---
     function git() {
-        # Intercept "git stash" (bare) or "git stash push" (without arguments)
-        if [[ ($1 == "stash" && $# == 1) || ($1 == "stash" && $2 == "push" && $# == 2) ]]; then
-
-            local ai_message
-            # Capture stdout from function. Stderr will pass through to console.
-            if ai_message=$(_git_ai_stash_message); then
-                # We add the robot icon HERE, not in the function
-                command git stash push -m "🤖 $ai_message"
-            else
-                # Fallback to standard stash on error/empty diff
-                command git "$@"
-            fi
-
-        elif [[ $1 == "pull" && $# == 1 ]]; then
-            shift
-            _git_sync
-        elif [[ $1 == "commit" && $2 == "--amend" && $# == 2 ]]; then
-            command git commit --amend --no-edit
-        else
-            command git "$@"
-        fi
+        case "$1" in
+            stash)
+                if [[ $# -eq 1 || ($# -eq 2 && "$2" == "push") ]]; then
+                    local ai_message
+                    if ai_message=$(_git_ai_stash_message); then
+                        command git stash push -m "🤖 $ai_message"
+                    else
+                        command git "$@"
+                    fi
+                    return
+                fi
+                ;;
+            pull)
+                [[ $# -eq 1 ]] && { _git_sync; return; }
+                ;;
+            commit)
+                [[ $# -eq 2 && "$2" == "--amend" ]] && { command git commit --amend --no-edit; return; }
+                ;;
+            # [NEW] Intercept 'status' to use custom gits function
+            status)
+                if [[ $# -eq 1 ]]; then
+                    gits
+                    return
+                fi
+                ;;
+            # [NEW] Intercept 'diff' to use custom flags (replacing gitd alias)
+            diff)
+                shift
+                command git diff --color --patch-with-stat --ignore-blank-lines \
+                    --minimal --abbrev --ignore-all-space \
+                    --color-moved=dimmed-zebra --color-moved-ws=ignore-all-space "$@"
+                return
+                ;;
+        esac
+        command git "$@"
     }
 
-    # Autocomplete custom commands
-    function _git_local_branches() {
-        __gitcomp_direct "$(__git_heads)"
-    }
-
-    function _git_conventional_commits_prefixes() {
-        __gitcomp "feat: fix: style: refactor: build: perf: ci: docs: test: chore: revert:"
-    }
-    __git_complete s git_switch
-    __git_complete gitdelbranch _git_local_branches
-    __git_complete gitcam _git_conventional_commits_prefixes
-
-    # Overwrite git commit autocompletion
     _git_commit() {
         case "$prev" in
-        -c | -C)
-            __git_complete_refs
-            return
-            ;;
-        -m)
-            __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert: "
-            return
-            ;;
+            -c|-C) __git_complete_refs; return ;;
+            -m) __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert: "; return ;;
         esac
-
         case "$cur" in
-        --cleanup=*)
-            __gitcomp "default scissors strip verbatim whitespace
-                " "" "${cur##--cleanup=}"
-            return
-            ;;
-        --message=*)
-            __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert:
-                " "" "${cur##--message=}"
-            return
-            ;;
-        --reuse-message=* | --reedit-message=* | \
-            --fixup=* | --squash=*)
-            __git_complete_refs --cur="${cur#*=}"
-            return
-            ;;
-        --untracked-files=*)
-            __gitcomp "$__git_untracked_file_modes" "" "${cur##--untracked-files=}"
-            return
-            ;;
-        --*)
-            __gitcomp_builtin commit
-            return
-            ;;
+            --cleanup=*) __gitcomp "default scissors strip verbatim whitespace" "" "${cur##--cleanup=}"; return ;;
+            --message=*) __gitcomp "\"feat: \"fix: \"style: \"refactor: \"build: \"perf: \"ci: \"docs: \"test: \"chore: \"revert:" "" "${cur##--message=}"; return ;;
+            --reuse-message=*|--reedit-message=*|--fixup=*|--squash=*) __git_complete_refs --cur="${cur#*=}"; return ;;
+            --untracked-files=*) __gitcomp "$__git_untracked_file_modes" "" "${cur##--untracked-files=}"; return ;;
+            --*) __gitcomp_builtin commit; return ;;
         esac
-
         if __git rev-parse --verify --quiet HEAD >/dev/null; then
             __git_complete_index_file "--committable"
         else
-            # This is the first commit
             __git_complete_index_file "--cached"
         fi
     }
 
-    # Load the official git-prompt script if it exists
-    if [[ -f "$HOME/.git_prompt.sh" ]]; then
-        source "$HOME/.git_prompt.sh"
-    elif [[ -f /usr/share/git/git-prompt.sh ]]; then
-        source /usr/share/git/git-prompt.sh
-    fi
+    # =========================================================================
+    #  CUSTOM GIT PROMPT
+    # =========================================================================
+    function _git_prompt() {
+        local git_dir
+        git_dir=$(git rev-parse --git-dir 2>/dev/null) || return
 
-    if [[ -f /usr/share/git/git-prompt.sh || -f "$HOME/.git_prompt.sh" ]]; then
-        # export GIT_PS1_SHOWCOLORHINTS=1      # Enable colors (matches `git status --short` colors)
-        export GIT_PS1_SHOWDIRTYSTATE=1     # Show unstaged (*) and staged (+) changes
-        # export GIT_PS1_SHOWSTASHSTATE=1      # Show if there's a stash ($)
-        # export GIT_PS1_SHOWUNTRACKEDFILES=1  # Show if there are untracked files (%)
-        export GIT_PS1_SHOWUPSTREAM="auto"   # Show if behind (<), ahead (>), or diverged (<>)
-        export GIT_PS1_STATESEPARATOR=" "    # Clean separator
+        local bname=""
+        local detached="no"
+        local op_text=""     # The text (REBASE, MERGING)
+        local op_state="normal"
+        local dirty=""
+        local staged=""
+        local conflict=""
+        local upstream_status=""
 
-        function _git_prompt() {
-            # 1. Fetch Git status
-            local git_info
-            if [[ -n "$(command -v __git_ps1)" ]]; then
-                git_info=$(__git_ps1 "%s")
-            fi
-            [[ -z "$git_info" ]] && return
+        # 1. Detect Operation State
+        if [ -d "$git_dir/rebase-merge" ]; then
+            bname=$(cat "$git_dir/rebase-merge/head-name" 2>/dev/null)
+            bname=${bname##refs/heads/}
+            op_text="REBASE"
+            op_state="rebase"
+        elif [ -d "$git_dir/rebase-apply" ]; then
+             if [ -f "$git_dir/rebase-apply/rebasing" ]; then
+                bname=$(cat "$git_dir/rebase-apply/head-name" 2>/dev/null)
+                bname=${bname##refs/heads/}
+                op_text="REBASE"
+                op_state="rebase"
+             elif [ -f "$git_dir/rebase-apply/applying" ]; then
+                op_text="AM"
+                op_state="rebase"
+             else
+                op_text="AM/REBASE"
+                op_state="rebase"
+             fi
+        elif [ -f "$git_dir/MERGE_HEAD" ]; then
+            op_text="MERGING"
+            op_state="merge"
+        elif [ -f "$git_dir/CHERRY_PICK_HEAD" ]; then
+            op_text="CHERRY-PICKING"
+            op_state="merge"
+        elif [ -f "$git_dir/REVERT_HEAD" ]; then
+            op_text="REVERTING"
+            op_state="merge"
+        elif [ -f "$git_dir/BISECT_LOG" ]; then
+            op_text="BISECTING"
+            op_state="bisect"
+        fi
 
-            # 2. Prepare Upstream Indicators (Arrows)
-            # We process these separately so we can append them later without breaking the name splitting logic
-            local upstream=""
-            if [[ "$git_info" == *"<>"* ]]; then
-                upstream="$__RedLightBold<>$__Reset"
+        # 2. Get Branch Name
+        if [ -z "$bname" ]; then
+            if bname=$(git symbolic-ref HEAD 2>/dev/null); then
+                bname=${bname##refs/heads/}
             else
-                [[ "$git_info" == *"<"* ]] && upstream+="$__YellowLightBold↓$__Reset"
-                [[ "$git_info" == *">"* ]] && upstream+="$__BlueLightBold↑$__Reset"
+                detached="yes"
+                bname=$(git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+                bname="($bname)"
             fi
+        fi
 
-            # 3. Clean the name to get pure text for length calculation
-            # Remove symbols (*, +, <, >, =, %) and spaces
-            local clean_name="${git_info//[\*+%<>= $]/}"
+        # 3. Status Flags
+        if ! git diff --no-ext-diff --quiet 2>/dev/null; then dirty="*"; fi
+        if ! git diff --no-ext-diff --cached --quiet 2>/dev/null; then staged="+"; fi
+        if [ "$(git ls-files --unmerged 2>/dev/null)" ]; then conflict="|CONFLICT"; fi
 
-            # 4. Define Color Variables for the output parts
-            local bracket_open=""
-            local bracket_close=""
-            local branch_text=""
+        # 4. Determine Colors
+        local frame_color=""
+        local branch_color_str=""
+        local conflict_color="$__RedBold"
+        local op_color="$__RedBold"
 
-            # 5. Determine Colors based on State
-            if [[ "$git_info" == *"*"* && "$git_info" == *"+"* ]]; then
-                # --- MIXED STATE (Staged + Unstaged) ---
-                # Logic: [ (Green) ... NameStart (Green) ... NameEnd (Yellow) ... ] (Yellow)
+        # Set Frame Color based on context
+        case "$op_state" in
+            rebase) frame_color="$__VioletBold" ;;
+            merge)  frame_color="$__VioletBold" ;;
+            bisect) frame_color="$__CyanLightBold" ;;
+            *)      frame_color="$__Bold$__Gray" ;;
+        esac
 
-                local len=${#clean_name}
-                local half=$((len / 2))
-                local part1="${clean_name:0:half}"
-                local part2="${clean_name:half}"
+        # Set Branch Name Color (File State)
+        if [[ -n "$dirty" && -n "$staged" ]]; then
+            local len=${#bname}
+            local half=$((len / 2))
+            branch_color_str="$__GreenBold${bname:0:half}$__YellowBold${bname:half}"
+        elif [[ -n "$staged" ]]; then
+            branch_color_str="$__GreenBold$bname"
+        elif [[ -n "$dirty" ]]; then
+            branch_color_str="$__YellowLightBold$bname"
+        elif [[ "$detached" == "yes" ]]; then
+            branch_color_str="$__VioletLightBold$bname"
+        else
+            branch_color_str="$__Bold$__Gray$bname"
+        fi
 
-                bracket_open="$__GreenBold"
-                # The text itself: Green Part + Yellow Part
-                branch_text="$__GreenBold$part1$__YellowBold$part2"
-                bracket_close="$__YellowBold"
-
-            elif [[ "$git_info" =~ /([0-9a-f\.]+)/ ]]; then
-                # --- DETACHED HEAD ---
-                bracket_open="$__VioletLightBold"
-                bracket_close="$__VioletLightBold"
-                branch_text="$__VioletLightBold$clean_name"
-
-            elif [[ "$git_info" == *"|"* ]]; then
-                # --- CONFLICT ---
-                bracket_open="$__RedLightBold"
-                bracket_close="$__RedLightBold"
-                branch_text="$__RedLightBold$clean_name"
-
-            elif [[ "$git_info" == *"+"* ]]; then
-                # --- STAGED ONLY ---
-                bracket_open="$__GreenBold"
-                bracket_close="$__GreenBold"
-                branch_text="$__GreenBold$clean_name"
-
-            elif [[ "$git_info" == *"*"* ]]; then
-                # --- UNSTAGED ONLY ---
-                bracket_open="$__YellowBold"
-                bracket_close="$__YellowBold"
-                branch_text="$__YellowBold$clean_name"
-
-            else
-                # --- CLEAN ---
-                bracket_open="$__WhiteLightBold"
-                bracket_close="$__WhiteLightBold"
-                branch_text="$__WhiteLightBold$clean_name"
+        # 5. Upstream Arrows & Divergence Override
+        local count
+        if count=$(git rev-list --count --left-right "@{upstream}"...HEAD 2>/dev/null); then
+            local behind=${count%	*}
+            local ahead=${count#*	}
+            if [[ "$ahead" -gt 0 && "$behind" -gt 0 ]]; then
+                upstream_status="$__Bold$__OrangeLight<>$__Reset"
+                branch_color_str="$__OrangeBold$bname"
+            elif [[ "$ahead" -gt 0 ]]; then
+                upstream_status="$__BlueLightBold↑$__Reset"
+            elif [[ "$behind" -gt 0 ]]; then
+                upstream_status="$__YellowLightBold↓$__Reset"
             fi
+        fi
 
-            # 6. Construct the final prompt
-            # Structure: [OPEN_BRACKET] [ [BRANCH_NAME] [UPSTREAM_ICONS] ] [CLOSE_BRACKET]
-            echo -ne " ${bracket_open}[${branch_text}${upstream}${bracket_close}]$__Reset"
-        }
-    else
-        function _git_prompt() {
-            true
-        }
-    fi
+        # 6. Build the String
+        local pipe_str=""
+        if [[ -n "$op_text" ]]; then
+            pipe_str="${frame_color}|"
+            op_text="${op_color}${op_text}"
+        fi
+
+        echo -ne " ${frame_color}[${branch_color_str}${pipe_str}${op_text}${conflict_color}${conflict}${upstream_status}${frame_color}]$__Reset"
+    }
 fi
-
 ###                                                                                                                      .         .
 ###  8888888 8888888888 8 8888        8 8 8888888888             8 888888888o   8 888888888o.      ,o888888o.           ,8.       ,8.          8 888888888o 8888888 8888888888
 ###        8 8888       8 8888        8 8 8888                   8 8888    `88. 8 8888    `88.  . 8888     `88.        ,888.     ,888.         8 8888    `88.     8 8888
