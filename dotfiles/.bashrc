@@ -2058,6 +2058,16 @@ if _e python || _e python3; then
     ## Disables the native embedded venv prompt so we can make our own
     export VIRTUAL_ENV_DISABLE_PROMPT=0
     _python_info() {
+        # Create cache key based on environment state
+        local cache_key="${PWD}:${VIRTUAL_ENV}:${PYENV_VERSION}:_python_info"
+        local cache_trigger="${VIRTUAL_ENV}:${PYENV_VERSION}"
+
+        # Try to get cached result
+        if cached=$(_cache_get "$cache_key" "$_PROMPT_CACHE_TTL_PYTHON" "$cache_trigger" 2>/dev/null); then
+            echo "$cached"
+            return
+        fi
+
         local pyenv_version pyenv_origin venv_origin
         local git_root_dir pyenv_info venv_info
         local py_version venv_version
@@ -2068,19 +2078,17 @@ if _e python || _e python3; then
         # Build output
         local out_info="$__BlueLight($__Reset"
 
-        # Cache git root lookup (expensive operation)
-        if _e git && [[ -z "$_CACHED_GIT_ROOT" || "$PWD" != "$_CACHED_PWD" ]]; then
+        # Get git root directory (for path simplification) - reuse git root cache
+        git_root_dir=""
+        if _e git; then
+            # Try to get from git prompt cache if available
+            git_root_dir=$(git rev-parse --show-toplevel 2>/dev/null)
             if _e cygpath; then
-                _CACHED_GIT_ROOT="$(cygpath "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null)"
-            else
-                _CACHED_GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+                git_root_dir=$(cygpath "$git_root_dir" 2>/dev/null)
             fi
-            _CACHED_PWD="$PWD"
         fi
-        git_root_dir="$_CACHED_GIT_ROOT"
 
-        # Get current python version (cache this if python doesn't change often)
-        # Use a faster approach: parse directly without invoking python
+        # Get current python version (parse from pyvenv.cfg if in venv, else python binary)
         if [[ -n "$VIRTUAL_ENV" ]] && [[ -f "$VIRTUAL_ENV/pyvenv.cfg" ]]; then
             # Read python version from venv config (faster than invoking python)
             while IFS= read -r line; do
@@ -2097,60 +2105,53 @@ if _e python || _e python3; then
 
         # Get pyenv information (only if PYENV_SHELL is set)
         if [[ -n "$PYENV_SHELL" ]]; then
-            # Cache pyenv version-name (expensive operation)
-            if [[ -z "$_CACHED_PYENV_VERSION" ]] || ! pyenv version-name &>/dev/null; then
-                _CACHED_PYENV_VERSION="$(command pyenv version-name 2>/dev/null)"
-                if _e cygpath; then
-                    _CACHED_PYENV_ORIGIN="$(cygpath "$(command pyenv version-origin 2>/dev/null)" 2>/dev/null)"
-                else
-                    _CACHED_PYENV_ORIGIN="$(command pyenv version-origin 2>/dev/null)"
-                fi
-            fi
+            # Get pyenv version and origin
+            pyenv_version=$(command pyenv version-name 2>/dev/null)
+            pyenv_origin=$(command pyenv version-origin 2>/dev/null)
 
-            pyenv_version="$_CACHED_PYENV_VERSION"
-            pyenv_origin="$_CACHED_PYENV_ORIGIN"
+            if _e cygpath; then
+                pyenv_origin=$(cygpath "$pyenv_origin" 2>/dev/null)
+            fi
 
             # Simplify path replacements
-            if [[ -n "$git_root_dir" ]]; then
+            if [[ -n "$git_root_dir" && -n "$pyenv_origin" ]]; then
                 pyenv_origin="${pyenv_origin#"$git_root_dir"/}"
             fi
-            pyenv_origin="${pyenv_origin/#"$HOME"/\~}"
+            if [[ -n "$pyenv_origin" ]]; then
+                pyenv_origin="${pyenv_origin/#"$HOME"/\~}"
+            fi
 
-            # Extract major.minor from pyenv version (faster string manipulation)
-            IFS='.' read -r pyenv_major pyenv_minor pyenv_patch _ <<< "$pyenv_version"
+            # Extract major.minor from pyenv version
+            if [[ -n "$pyenv_version" ]]; then
+                IFS='.' read -r pyenv_major pyenv_minor pyenv_patch _ <<< "$pyenv_version"
 
-            if [[ "$py_major.$py_minor.$py_patch" == "$pyenv_major.$pyenv_minor.$pyenv_patch" ]]; then
-                pyenv_info="${__Reset}${__Blue}${pyenv_origin}:${__Bold}${pyenv_major}.${pyenv_minor}"
-            else
-                out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
-                pyenv_info="${__Reset}${__Red}${pyenv_origin}:${__Bold}${pyenv_version}"
+                if [[ "$py_major.$py_minor.$py_patch" == "$pyenv_major.$pyenv_minor.$pyenv_patch" ]]; then
+                    pyenv_info="${__Reset}${__Blue}${pyenv_origin}:${__Bold}${pyenv_major}.${pyenv_minor}"
+                else
+                    out_info="$__BlueLight(${__Bold}$py_major.$py_minor.$py_patch$__ResetBold|"
+                    pyenv_info="${__Reset}${__Red}${pyenv_origin}:${__Bold}${pyenv_version}"
+                fi
             fi
         fi
 
         # Get virtualenv information (only if VIRTUAL_ENV is set)
         if [[ -n "$VIRTUAL_ENV" ]]; then
+            venv_origin="$VIRTUAL_ENV"
+
             if _e "cygpath"; then
-                venv_origin=$(cygpath "$VIRTUAL_ENV")
-            else
-                venv_origin="$VIRTUAL_ENV"
+                venv_origin=$(cygpath "$venv_origin" 2>/dev/null)
             fi
 
-            if [[ -n "$git_root_dir" ]]; then
+            if [[ -n "$git_root_dir" && -n "$venv_origin" ]]; then
                 venv_origin="${venv_origin#"$git_root_dir"/}"
             fi
-            venv_origin="${venv_origin/#"$HOME"/\~}"
+            if [[ -n "$venv_origin" ]]; then
+                venv_origin="${venv_origin/#"$HOME"/\~}"
+            fi
 
-            # We already read this earlier for py_version, reuse it
+            # Extract version from py_version (already read from pyvenv.cfg above)
             if [[ -n "$py_version" ]]; then
                 IFS='.' read -r venv_major venv_minor venv_patch _ <<< "$py_version"
-            elif [[ -f "$VIRTUAL_ENV/pyvenv.cfg" ]]; then
-                while IFS= read -r line; do
-                    if [[ $line == version* ]]; then
-                        venv_version="${line#*= }"
-                        IFS='.' read -r venv_major venv_minor venv_patch _ <<< "$venv_version"
-                        break
-                    fi
-                done < "$VIRTUAL_ENV/pyvenv.cfg"
             fi
 
             if [[ "$py_major.$py_minor.$py_patch" == "$venv_major.$venv_minor.$venv_patch" ]]; then
@@ -2169,9 +2170,13 @@ if _e python || _e python3; then
         elif [[ -n "$venv_info" ]]; then
             out_info="$out_info${venv_info}$__BlueLight)$__Reset"
         else
-            return  # Don't print anything if no python env
+            # No python env to display - cache this result too (prevents repeated expensive checks)
+            _cache_set "$cache_key" "" "$cache_trigger"
+            return
         fi
 
+        # Cache the result
+        _cache_set "$cache_key" "$out_info" "$cache_trigger"
         echo "$out_info"
     }
 
