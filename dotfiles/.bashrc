@@ -205,7 +205,7 @@ export IGNOREEOF=1
 
 # Check if the directories exist and add them to the PATH if they do
 for dir in "$HOME/.local/bin" "$HOME/.yarn/bin" "$HOME/.bin" "$HOME/.cargo/bin"; do
-    if [[ -d $dir ]]; then
+    if [[ -d $dir && ! "$PATH" =~ (^|:)"$dir"(:|$) ]]; then
         export PATH="$PATH:$dir"
     fi
 done
