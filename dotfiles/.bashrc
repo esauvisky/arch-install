@@ -118,8 +118,8 @@ function is_ssh() {
 
 ## Checks if a binary or built-in command exists on PATH with failovers
 function _e() {
-    # type -P "$1" >/dev/null 2>&1 && return 0
-    hash "$@" >/dev/null 2>&1 && return 0
+    type -P "$1" >/dev/null 2>&1 && return 0 # better for windows
+    # hash "$@" >/dev/null 2>&1 && return 0
     return 1
 }
 
@@ -1944,7 +1944,11 @@ if _e python || _e python3; then
 
         # Cache git root lookup (expensive operation)
         if _e git && [[ -z "$_CACHED_GIT_ROOT" || "$PWD" != "$_CACHED_PWD" ]]; then
-            _CACHED_GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+            if _e cygpath; then
+                _CACHED_GIT_ROOT="$(cygpath "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null)"
+            else
+                _CACHED_GIT_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+            fi
             _CACHED_PWD="$PWD"
         fi
         git_root_dir="$_CACHED_GIT_ROOT"
@@ -1970,7 +1974,11 @@ if _e python || _e python3; then
             # Cache pyenv version-name (expensive operation)
             if [[ -z "$_CACHED_PYENV_VERSION" ]] || ! pyenv version-name &>/dev/null; then
                 _CACHED_PYENV_VERSION="$(command pyenv version-name 2>/dev/null)"
-                _CACHED_PYENV_ORIGIN="$(command pyenv version-origin 2>/dev/null)"
+                if _e cygpath; then
+                    _CACHED_PYENV_ORIGIN="$(cygpath "$(command pyenv version-origin 2>/dev/null)" 2>/dev/null)"
+                else
+                    _CACHED_PYENV_ORIGIN="$(command pyenv version-origin 2>/dev/null)"
+                fi
             fi
 
             pyenv_version="$_CACHED_PYENV_VERSION"
@@ -1995,7 +2003,12 @@ if _e python || _e python3; then
 
         # Get virtualenv information (only if VIRTUAL_ENV is set)
         if [[ -n "$VIRTUAL_ENV" ]]; then
-            venv_origin="$VIRTUAL_ENV"
+            if _e "cygpath"; then
+                venv_origin=$(cygpath "$VIRTUAL_ENV")
+            else
+                venv_origin="$VIRTUAL_ENV"
+            fi
+
             if [[ -n "$git_root_dir" ]]; then
                 venv_origin="${VIRTUAL_ENV#"$git_root_dir"/}"
             fi
