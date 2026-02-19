@@ -490,43 +490,81 @@ function _get_truncated_pwd() {
 # | |    / _ \| |/ _ \| '__/ __|
 # | \__/\ (_) | | (_) | |  \__ \
 #  \____/\___/|_|\___/|_|  |___/
+# --- Standard ANSI Colors ---
 __Bold='\[\e[01m\]'
 __ResetBold='\[\e[22m\]'
+__Reset='\[\e[00m\]'
+
 __Blue='\[\e[00;34m\]'
 __BlueLight='\[\e[22;94m\]'
 __BlueBold='\[\e[01;34m\]'
 __BlueLightBold='\[\e[01;94m\]'
+
 __White='\[\e[00;37m\]'
 __WhiteBold='\[\e[01;37m\]'
 __WhiteLight='\[\e[22;97m\]'
 __WhiteLightBold='\[\e[01;97m\]'
 __WhiteBackground='\[\e[01;40m\]'
+
 __Violet='\[\e[00;35m\]'
 __VioletBold='\[\e[01;35m\]'
 __VioletLight='\[\e[22;95m\]'
 __VioletLightBold='\[\e[01;95m\]'
+
 __Cyan='\[\e[00;36m\]'
 __CyanBold='\[\e[01;36m\]'
 __CyanLight='\[\e[22;96m\]'
 __CyanLightBold='\[\e[01;96m\]'
+
 __Red='\[\e[00;31m\]'
 __RedBold='\[\e[01;31m\]'
 __RedLight='\[\e[22;91m\]'
 __RedLightBold='\[\e[01;91m\]'
+
 __Green='\[\e[00;32m\]'
 __GreenBold='\[\e[01;32m\]'
 __GreenLight='\[\e[22;92m\]'
 __GreenLightBold='\[\e[01;92m\]'
+
 __Yellow='\[\e[00;33m\]'
 __YellowBold='\[\e[01;33m\]'
 __YellowLight='\[\e[22;93m\]'
 __YellowLightBold='\[\e[01;93m\]'
-__Reset='\[\e[00m\]'
-# __FancyX='\342\234\227'
-# __Checkmark='\342\234\223'
+
+# --- Extended 256-Colors ---
+
+# Orange (Good for warnings/dirty state)
+__Orange='\[\e[38;5;208m\]'
+__OrangeBold='\[\e[1;38;5;208m\]'
+__OrangeLight='\[\e[38;5;214m\]'
+
+# Gray (Good for timestamps/brackets)
+__GrayDark='\[\e[38;5;240m\]'
+__Gray='\[\e[38;5;246m\]'
+__GrayLight='\[\e[38;5;252m\]'
+
+# Pink (Distinct from Violet/Magenta)
+__Pink='\[\e[38;5;198m\]'
+__PinkBold='\[\e[1;38;5;198m\]'
+
+# Lime (Brighter than Green)
+__Lime='\[\e[38;5;118m\]'
+__LimeBold='\[\e[1;38;5;118m\]'
+
+# Teal (Distinct from Cyan)
+__Teal='\[\e[38;5;37m\]'
+__TealBold='\[\e[1;38;5;37m\]'
+
+# Purple (Darker/Richer than Violet)
+__Purple='\[\e[38;5;141m\]'
+__PurpleBold='\[\e[1;38;5;141m\]'
+
+# Brown
+__Brown='\[\e[38;5;94m\]'
+
+# Symbols
 __FancyX='✘'
 __Checkmark='✔'
-
 ## Magic with `less` (like colors and other cool stuff)
 export LESS="R-P ?c<- .?f%f:Standard input.  ?n:?eEND:?p%pj\%.. .?c%ccol . ?mFile %i of %m  .?xNext\ %x.%t   Press h for help"
 
@@ -540,12 +578,8 @@ export LESS_TERMCAP_ue=$'\E[0m'
 export LESS_TERMCAP_us=$'\E[01;32m'
 
 ## Colors at file types when autocompleting and more
-if [[ -x /usr/bin/dircolors ]]; then
-    if [[ -f $HOME/.dircolors ]]; then
-        . <(dircolors -b "$HOME/.dircolors")
-    else
-        . <(dircolors -b "$HOME/.dircolors")
-    fi
+if _e dircolors && [[ -f $HOME/.dircolors ]]; then
+    . <(dircolors -b "$HOME/.dircolors")
     _COLOR_ALWAYS_ARG='--color=always' # FIXME: makes no sense for this to be inside this block
 fi
 
