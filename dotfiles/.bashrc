@@ -1777,8 +1777,8 @@ fi
 
 if [[ ! -s "$HOME/.emishrc_last_check" ]]; then
     [[ "$PS1" ]] && _changelog && date +%s >"$HOME/.emishrc_last_check"
-else
-    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && [[ -s "$HOME/.emishrc_last_check" ]] && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
+elif [[ $RANDOM -lt 10000 ]]; then
+    [[ "$PS1" ]] && _e "fortune" "cowthink" "lolcat" && fortune -s -n 200 | PERL_BADLANG=0 cowthink | lolcat -F 0.1 -p 30 -S 1
 fi
 
 function _pre_command() {
@@ -1834,7 +1834,7 @@ function _set_prompt() {
 
     # Sets the prompt color according to
     # user (if logged in as root gets red)
-    if [[ $(id -u) -eq 0 ]]; then
+    if [[ $(command id -u) -eq 0 ]]; then
         PS1+="\\n${__RedBold}\\\$ ${__RedLight}"
     else
         PS1+="\\n${__YellowBold}\\\$ ${__Yellow}"
@@ -1846,7 +1846,7 @@ function _set_prompt() {
     # Debug (PS4)
     # ** Does not work if set -x is used outside an script :( **
     # It works wonderfully if you copy this to the script and apply set -x there though.
-    #PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
+    # PS4=$'+ $(tput sgr0)$(tput setaf 4)DEBUG ${FUNCNAME[0]:+${FUNCNAME[0]}}$(tput bold)[$(tput setaf 6)${LINENO}$(tput setaf 4)]: $(tput sgr0)'
 
     ## Time right aligned
     # @see: https://superuser.com/questions/187455/right-align-part-of-prompt
