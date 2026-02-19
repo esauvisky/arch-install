@@ -334,7 +334,9 @@ if [ -f /usr/share/bash-completion/completions/git ]; then
 fi
 ## Node autocompletions
 if _e node; then
-    alias node='node --experimental-modules --experimental-repl-await --experimental-vm-modules --experimental-worker --experimental-import-meta-resolve'
+
+    unalias myalias 2>/dev/null || true # for windows users because git bash already aliases node to something else
+    # alias node='node --experimental-modules --experimental-repl-await --experimental-vm-modules --experimental-worker --experimental-import-meta-resolve'
     source <(node --completion-bash)
 fi
 
