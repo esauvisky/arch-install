@@ -1706,19 +1706,36 @@ if _e git; then
     #  CUSTOM GIT PROMPT
     # =========================================================================
     function _git_prompt() {
-        local git_dir
-        git_dir=$(git rev-parse --git-dir 2>/dev/null) || return
+        # Quick check: git must be available and we must be in a git repo
+        git rev-parse --git-dir &>/dev/null || return
 
+        # Check cache using git HEAD file as trigger
+        local git_dir
+        git_dir=$(git rev-parse --git-dir 2>/dev/null)
+        local head_file="$git_dir/HEAD"
+        local cache_key="${PWD}:_git_prompt"
+
+        # Use HEAD file content as cache trigger (changes on branch switch)
+        local head_trigger=""
+        [[ -f "$head_file" ]] && head_trigger=$(cat "$head_file" 2>/dev/null)
+
+        # Try to get cached result
+        if cached=$(_cache_get "$cache_key" "$_PROMPT_CACHE_TTL_GIT" "$head_trigger" 2>/dev/null); then
+            echo -ne "$cached"
+            return
+        fi
+
+        # Not cached, compute fresh result
         local bname=""
         local detached="no"
-        local op_text=""     # The text (REBASE, MERGING)
+        local op_text=""
         local op_state="normal"
         local dirty=""
         local staged=""
         local conflict=""
         local upstream_status=""
 
-        # 1. Detect Operation State
+        # 1. Detect Operation State (from git dir structure)
         if [ -d "$git_dir/rebase-merge" ]; then
             bname=$(cat "$git_dir/rebase-merge/head-name" 2>/dev/null)
             bname=${bname##refs/heads/}
@@ -1751,21 +1768,66 @@ if _e git; then
             op_state="bisect"
         fi
 
-        # 2. Get Branch Name
+        # 2. Get Status using single git call (much faster than multiple calls)
+        # git status --porcelain=v2 gives us all info in one call
+        local status_output
+        status_output=$(git status --porcelain=v2 --branch 2>/dev/null)
+
+        # Parse branch info from status output
         if [ -z "$bname" ]; then
-            if bname=$(git symbolic-ref HEAD 2>/dev/null); then
-                bname=${bname##refs/heads/}
+            # Extract branch name from status output
+            local branch_line=$(echo "$status_output" | grep "^# branch.head")
+            if [[ "$branch_line" =~ "branch.head "([^[:space:]]+) ]]; then
+                bname="${BASH_REMATCH[1]}"
+                detached="no"
             else
+                # Detached HEAD
                 detached="yes"
                 bname=$(git describe --tags --exact-match HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
                 bname="($bname)"
             fi
         fi
 
-        # 3. Status Flags
-        if ! git diff --no-ext-diff --quiet 2>/dev/null; then dirty="*"; fi
-        if ! git diff --no-ext-diff --cached --quiet 2>/dev/null; then staged="+"; fi
-        if [ "$(git ls-files --unmerged 2>/dev/null)" ]; then conflict="|CONFLICT"; fi
+        # Parse status flags from porcelain output
+        # Look for any changes: staged (index) or unstaged (worktree)
+        while IFS= read -r line; do
+            # Skip comment lines and branch info
+            [[ "$line" =~ ^# ]] && continue
+
+            # Status line format: <status><tabs><fields>...
+            # Check index (staged) status - anything other than "." means staged
+            if [[ "$line" =~ ^[0-9][[:space:]].([^[:space:]])[^[:space:]] ]] && [[ "${BASH_REMATCH[1]}" != "." ]]; then
+                staged="+"
+            fi
+
+            # Check worktree (unstaged) status
+            if [[ "$line" =~ ^[0-9][[:space:]]..[^[:space:]] ]] && [[ "${line:3:1}" != "." ]]; then
+                dirty="*"
+            fi
+
+            # Check for conflicts (unmerged)
+            if [[ "$line" =~ ^u[[:space:]] ]]; then
+                conflict="|CONFLICT"
+                break  # Stop processing once we find conflict
+            fi
+        done <<< "$status_output"
+
+        # 3. Parse upstream info from status output
+        local ab_line=$(echo "$status_output" | grep "^# branch.ab")
+        if [[ "$ab_line" =~ branch.ab[[:space:]]([+-][0-9]+)[[:space:]]([+-][0-9]+) ]]; then
+            local ahead="${BASH_REMATCH[1]#*+}"
+            local behind="${BASH_REMATCH[2]#*+}"
+
+            # If both present, we're diverged
+            if [[ $ahead -gt 0 && $behind -gt 0 ]]; then
+                upstream_status="$__Bold$__OrangeLight<>$__Reset"
+                # Will override color below
+            elif [[ $ahead -gt 0 ]]; then
+                upstream_status="$__BlueLightBold↑$__Reset"
+            elif [[ $behind -gt 0 ]]; then
+                upstream_status="$__YellowLightBold↓$__Reset"
+            fi
+        fi
 
         # 4. Determine Colors
         local frame_color=""
@@ -1773,7 +1835,7 @@ if _e git; then
         local conflict_color="$__RedBold"
         local op_color="$__RedBold"
 
-        # Set Frame Color based on context
+        # Set Frame Color based on operation state
         case "$op_state" in
             rebase) frame_color="$__VioletBold" ;;
             merge)  frame_color="$__VioletBold" ;;
@@ -1781,8 +1843,9 @@ if _e git; then
             *)      frame_color="$__Bold$__Gray" ;;
         esac
 
-        # Set Branch Name Color (File State)
+        # Set Branch Name Color (based on file state)
         if [[ -n "$dirty" && -n "$staged" ]]; then
+            # Split-color for mixed state
             local len=${#bname}
             local half=$((len / 2))
             branch_color_str="$__GreenBold${bname:0:half}$__YellowBold${bname:half}"
@@ -1792,33 +1855,26 @@ if _e git; then
             branch_color_str="$__YellowLightBold$bname"
         elif [[ "$detached" == "yes" ]]; then
             branch_color_str="$__VioletLightBold$bname"
+        elif [[ -n "$upstream_status" && "$upstream_status" == *"<>"* ]]; then
+            # Diverged from upstream
+            branch_color_str="$__OrangeBold$bname"
         else
             branch_color_str="$__Bold$__Gray$bname"
         fi
 
-        # 5. Upstream Arrows & Divergence Override
-        local count
-        if count=$(git rev-list --count --left-right "@{upstream}"...HEAD 2>/dev/null); then
-            local behind=${count%	*}
-            local ahead=${count#*	}
-            if [[ "$ahead" -gt 0 && "$behind" -gt 0 ]]; then
-                upstream_status="$__Bold$__OrangeLight<>$__Reset"
-                branch_color_str="$__OrangeBold$bname"
-            elif [[ "$ahead" -gt 0 ]]; then
-                upstream_status="$__BlueLightBold↑$__Reset"
-            elif [[ "$behind" -gt 0 ]]; then
-                upstream_status="$__YellowLightBold↓$__Reset"
-            fi
-        fi
-
-        # 6. Build the String
+        # 5. Build the output string
         local pipe_str=""
         if [[ -n "$op_text" ]]; then
             pipe_str="${frame_color}|"
             op_text="${op_color}${op_text}"
         fi
 
-        echo -ne " ${frame_color}[${branch_color_str}${pipe_str}${op_text}${conflict_color}${conflict}${upstream_status}${frame_color}]$__Reset"
+        local result=" ${frame_color}[${branch_color_str}${pipe_str}${op_text}${conflict_color}${conflict}${upstream_status}${frame_color}]$__Reset"
+
+        # Cache the result
+        _cache_set "$cache_key" "$result" "$head_trigger"
+
+        echo -ne "$result"
     }
 fi
 ###                                                                                                                      .         .
