@@ -1902,8 +1902,6 @@ alias sudo='sudo '
 
 _e "blkid" && alias blkid="${GRC}blkid"
 _e "docker" && alias docker="${GRC}docker"
-_e "docker-compose" && alias "ocker-compose='${GRC}docker-compose"
-_e "docker-machine" && alias "ocker-machine='${GRC}docker-machine"
 _e "efibootmgr" && alias efibootmgr="${GRC}efibootmgr"
 _e "du" && alias du="${GRC}du -h"
 _e "free" && alias free="${GRC}free"
