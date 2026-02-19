@@ -323,7 +323,7 @@ fi
 ## Node autocompletions
 if _e node; then
 
-    unalias myalias 2>/dev/null || true # for windows users because git bash already aliases node to something else
+    unalias node 2>/dev/null || true # for windows users because git bash already aliases node to something else
     # alias node='node --experimental-modules --experimental-repl-await --experimental-vm-modules --experimental-worker --experimental-import-meta-resolve'
     source <(node --completion-bash)
 fi
@@ -2010,7 +2010,7 @@ if _e python || _e python3; then
             fi
 
             if [[ -n "$git_root_dir" ]]; then
-                venv_origin="${VIRTUAL_ENV#"$git_root_dir"/}"
+                venv_origin="${venv_origin#"$git_root_dir"/}"
             fi
             venv_origin="${venv_origin/#"$HOME"/\~}"
 
