@@ -97,9 +97,6 @@ function check_updates() {
 
 ## Returns if the current shell is a SSH shell.
 # @see https://unix.stackexchange.com/a/12761
-
-declare -A IS_SSH_CACHE
-
 function is_ssh() {
     local p=${1:-$PPID}
 
@@ -133,24 +130,9 @@ function is_ssh() {
 
 ## Checks if a binary or built-in command exists on PATH with failovers
 function _e() {
-    type -P "$1" >/dev/null 2>&1 && return 0
+    # type -P "$1" >/dev/null 2>&1 && return 0
+    hash "$@" >/dev/null 2>&1 && return 0
     return 1
-}
-
-## Checks if a binary or built-in command exists and has color support
-function _c() {
-    if (
-        (hash "$1" >&/dev/null) ||
-            [[ $(command -v "$1" >&/dev/null) == "$1" ]] ||
-            (which --skip-alias --skip-functions "$1" >&/dev/null)
-    ) && (
-        ($1 --help 2>&1 | grep -qm1 -- '--color') ||
-            ($1 -h 2>&1 | grep -qm1 -- '--color')
-    ); then
-        return 0
-    else
-        return 1
-    fi
 }
 
 export BASHRC_DISABLE_AI=0
