@@ -1734,9 +1734,12 @@ if _e git; then
 
         # Use HEAD file content as cache trigger (changes on branch switch)
         # Also include index modification time to detect staging/unstaging
+        # And stash count for stash changes
         local head_trigger=""
         [[ -f "$head_file" ]] && head_trigger=$(cat "$head_file" 2>/dev/null)
         [[ -f "$git_dir/index" ]] && head_trigger+=":$(stat -c %Y "$git_dir/index" 2>/dev/null)"
+        local stash_count_for_cache=$(git stash list 2>/dev/null | wc -l)
+        head_trigger+=":stash:${stash_count_for_cache}"
 
         # Try to get cached result
         if cached=$(_cache_get "$cache_key" "$_PROMPT_CACHE_TTL_GIT" "$head_trigger" 2>/dev/null); then
@@ -1836,19 +1839,27 @@ if _e git; then
 
         # 3. Parse upstream info from status output
         local ab_line=$(echo "$status_output" | grep "^# branch.ab")
+        local stash_count=0
         if [[ "$ab_line" =~ branch.ab[[:space:]]([+-][0-9]+)[[:space:]]([+-][0-9]+) ]]; then
             local ahead="${BASH_REMATCH[1]#*+}"
             local behind="${BASH_REMATCH[2]#*+}"
 
             # If both present, we're diverged
             if [[ $ahead -gt 0 && $behind -gt 0 ]]; then
-                upstream_status="$__Bold$__OrangeLight<>$__Reset"
+                upstream_status="$__Bold$__OrangeLight↑${ahead}↓${behind}$__Reset"
                 # Will override color below
             elif [[ $ahead -gt 0 ]]; then
-                upstream_status="$__BlueLightBold↑$__Reset"
+                upstream_status="$__BlueLightBold↑${ahead}$__Reset"
             elif [[ $behind -gt 0 ]]; then
-                upstream_status="$__YellowLightBold↓$__Reset"
+                upstream_status="$__YellowLightBold↓${behind}$__Reset"
             fi
+        fi
+
+        # Check for stashed changes
+        stash_count=$(git stash list 2>/dev/null | wc -l)
+        local stash_status=""
+        if [[ $stash_count -gt 0 ]]; then
+            stash_status="${__CyanBold}⊕${stash_count}${__Reset}"
         fi
 
         # 4. Determine Colors
@@ -1891,7 +1902,7 @@ if _e git; then
             op_text="${op_color}${op_text}"
         fi
 
-        local result=" ${frame_color}[${branch_color_str}${pipe_str}${op_text}${conflict_color}${conflict}${upstream_status}${frame_color}]$__Reset"
+        local result=" ${frame_color}[${branch_color_str}${pipe_str}${op_text}${conflict_color}${conflict}${upstream_status}${stash_status}${frame_color}]$__Reset"
 
         # Cache the result
         _cache_set "$cache_key" "$result" "$head_trigger"
