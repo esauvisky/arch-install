@@ -1813,14 +1813,17 @@ if _e git; then
             # Skip comment lines and branch info
             [[ "$line" =~ ^# ]] && continue
 
-            # Status line format: <status><tabs><fields>...
-            # Check index (staged) status - anything other than "." means staged
-            if [[ "$line" =~ ^[0-9][[:space:]].([^[:space:]])[^[:space:]] ]] && [[ "${BASH_REMATCH[1]}" != "." ]]; then
+            # Status line format: 1 XY <fields>... where X=index status, Y=worktree status
+            # Only process actual status lines (start with digit+space)
+            [[ "$line" =~ ^[0-9][[:space:]] ]] || continue
+
+            # Check index (staged) status - X character (position 2) must not be "."
+            if [[ "${line:2:1}" != "." ]]; then
                 staged="+"
             fi
 
-            # Check worktree (unstaged) status
-            if [[ "$line" =~ ^[0-9][[:space:]]..[^[:space:]] ]] && [[ "${line:3:1}" != "." ]]; then
+            # Check worktree (unstaged) status - Y character (position 3) must not be "."
+            if [[ "${line:3:1}" != "." ]]; then
                 dirty="*"
             fi
 
