@@ -1733,8 +1733,10 @@ if _e git; then
         local cache_key="${PWD}:_git_prompt"
 
         # Use HEAD file content as cache trigger (changes on branch switch)
+        # Also include index modification time to detect staging/unstaging
         local head_trigger=""
         [[ -f "$head_file" ]] && head_trigger=$(cat "$head_file" 2>/dev/null)
+        [[ -f "$git_dir/index" ]] && head_trigger+=":$(stat -c %Y "$git_dir/index" 2>/dev/null)"
 
         # Try to get cached result
         if cached=$(_cache_get "$cache_key" "$_PROMPT_CACHE_TTL_GIT" "$head_trigger" 2>/dev/null); then
@@ -2089,7 +2091,7 @@ _e "ifconfig" && alias ifconfig="${GRC}ifconfig"
 _e "sockstat" && alias sockstat="${GRC}sockstat"
 
 ## Navigation
-alias ls="${GRC}ls -ltr --classify --human-readable -rt $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
+alias ls="${GRC}ls -ltr --file-type --human-readable $_COLOR_ALWAYS_ARG --group-directories-first --literal --time-style=long-iso"
 alias g="xdg-open"
 
 
