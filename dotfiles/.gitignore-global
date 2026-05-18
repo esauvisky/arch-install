@@ -28,3 +28,11 @@ __pycache__/
 # Frontend Build
 frontend/build
 .history/
+
+
+.claude
+CLAUDE.md
+AGENTS.md
+.codex
+.superpowers/
+.agents/

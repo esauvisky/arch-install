@@ -114,10 +114,17 @@ fi
 # #exec gnome-session --session=gnome-flashback --builtin
 # exec gnome-session --session=gnome-classic --systemd --debug
 
-export XDG_CURRENT_DESKTOP=GNOME
+# 1. Force X11 session types
 export XDG_SESSION_TYPE=x11
+export XDG_CURRENT_DESKTOP=GNOME
 export GDK_BACKEND=x11
-gnome-session #--systemd-service
+
+# 2. Tell systemd and DBus about your X11 display (REQUIRED for GNOME 47+)
+systemctl --user import-environment DISPLAY XAUTHORITY XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
+dbus-update-activation-environment --systemd DISPLAY XAUTHORITY XDG_SESSION_TYPE XDG_CURRENT_DESKTOP
+
+# 3. Start GNOME using the Xorg session file you injected into the PKGBUILD
+exec gnome-session #--session=gnome-xorg
 # exec gnome-shell -r --x11 -d 0 -r --sm-disable --sync --mode user
 
 #exec twm
