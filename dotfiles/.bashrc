@@ -25,9 +25,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-## Used for version checking
-export _RCVERSION=41
-export _DATE="Feb 19th, 2026"
+export _RCVERSION=43
+export _DATE="May 18th, 2026"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -41,32 +40,22 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 41 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 43 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
- ${a}Updated AI defaults and added new configuration options.${r}
+ ${a}History search got a real upgrade and the prompt now exposes more git state.${r}
 
-  ${r}- ${b}AI Assistant (Gemini) Updates.${r}
-    ${a}Default model changed to ${c}gemini-3-flash-preview${r}${a} for improved reasoning.${r}
-    ${a}Added ${c}BASHRC_ASK_PROMPT{r}${a} env variable to override the system prompt.${r}
+  ${r}- ${b}Swift History Search.${r}
+    ${a}${c}hh${r}${a} now provides the fast regex/context lookup flow with built-in help.${r}
+    ${a}${c}h${r}${a} now provides session-based grouped search around matching commands.${r}
+    ${a}Removed the unsafe ${c}eval${r}${a}-based grep invocation and fixed the embedded Python session renderer.${r}
 
- ${a}Additional performance optimization for frequently-called prompt functions.${r}
+  ${r}- ${b}Git Prompt Improvements.${r}
+    ${a}Upstream status now shows actual ahead/behind counts like ${c}↑5${r}${a}, ${c}↓3${r}${a}, or ${c}↑69↓66${r}${a}.${r}
+    ${a}Added stash visibility with a ${c}⊕N${r}${a} indicator and improved staged/dirty detection.${r}
 
-  ${r}- ${b}_pre_command Optimization.${r}
-    ${a}Replaced slow regex patterns (=~) with fast case glob patterns (70% faster).${r}
-    ${a}Early return on ${c}BASH_COMMAND${r}${a} check before history lookup.${r}
-
-  ${r}- ${b}VTE Prompt Command Caching.${r}
-    ${a}Added caching layer for ${c}__vte_prompt_command${r}${a} with PWD-based invalidation (60-80% faster).${r}
-    ${a}Only updates terminal title and OSC7 when directory changes or cache expires.${r}
-
-  ${r}- ${b}Performance Improvements.${r}
-    ${a}Reduced per-prompt overhead from ~15-20ms to ~6-8ms with all optimizations.${r}
-    ${a}Command execution latency reduced by ~5ms per command (DEBUG trap optimization).${r}
-
-   ${y}Configuration: Customize cache TTLs in ${c}$HOME/.bash_custom${r}${y}:${r}
-   ${y}     _VTE_CACHE_TTL=5            ${a}(VTE cache, default: 5 seconds)${r}
-   ${y}     _PROMPT_CACHE_TTL_GIT=2      ${a}(git cache, default: 2 seconds)${r}
-   ${y}     _PROMPT_CACHE_TTL_PYTHON=5   ${a}(python cache, default: 5 seconds)${r}
+  ${r}- ${b}Shell Quality-of-Life.${r}
+    ${a}Updated ${c}ls${r}${a} defaults to use ${c}--file-type${r}${a} and cleaned up prompt cache invalidation.${r}
+    ${a}Added ${c}$HOME/.npm-global/bin${r}${a} to ${c}PATH${r}${a} alongside the other guarded user bin directories.${r}
   "
 }
 
@@ -148,7 +137,7 @@ export BASHRC_GEMINI_MODEL="gemini-3-flash-preview"
 export IGNOREEOF=1
 
 # Check if the directories exist and add them to the PATH if they do
-for dir in "$HOME/.local/bin" "$HOME/.yarn/bin" "$HOME/.bin" "$HOME/.cargo/bin"; do
+for dir in "$HOME/.local/bin" "$HOME/.yarn/bin" "$HOME/.bin" "$HOME/.cargo/bin" "$HOME/.npm-global/bin"; do
     if [[ -d $dir && ! "$PATH" =~ (^|:)"$dir"(:|$) ]]; then
         export PATH="$PATH:$dir"
     fi
@@ -615,39 +604,33 @@ _e "grc" && GRC="grc -es --colour=on "
 ## An alternative to Ctrl+R that supports regex.
 ##
 ## Usage:
-##   h                        Show help
-##   h -h / h --help          Show help
-##   h 'clone.*gitlab'        Search history (regex supported)
-##   h 42                     Show context around history line 42
-##   h 30 500                 Show 30 lines of context around line 500
-##   h 30 'clone.*gitlab'     Search with 30 lines of context per match
+##   hh                       Show help
+##   hh -h / hh --help        Show help
+##   hh 'clone.*gitlab'       Search history (regex supported)
+##   hh 42                    Show context around history line 42
+##   hh 500 30                Show 30 lines of context around line 500
+##   hh 'clone.*gitlab' 30    Search with 30 lines of context per match
 ##
 ## Replay entry #4513:  !!4513
 ##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
 ##  |S|w|i|f|t| |H|i|s|t|o|r|y| |S|e|a|r|c|h|
 ##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
-##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
-##  |S|w|i|f|t| |H|i|s|t|o|r|y| |S|e|a|r|c|h|
-##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
-##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
-##  |S|w|i|f|t| |H|i|s|t|o|r|y| |S|e|a|r|c|h|
-##  +-+-+-+-+-+ +-+-+-+-+-+-+-+ +-+-+-+-+-+-+
-function h() {
+function hh() {
     if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
         echo -e "\e[01;95mSwift History Search\e[00m"
         echo "Fancy way of quickly grepping the command history."
         echo "An alternative to Ctrl+R that supports regex."
         echo ""
         echo -e "\e[01;96mUsage:\e[00m"
-        echo "  h  <query> [context]   : Search history for regex <query> with [context] lines around it (default 0)."
-        echo "  h  <number> [context]  : Show [context] lines around history entry <number> (default 30)."
-        echo "  hh <query> [gap_mins]  : Search history for regex <query> and group into time-based work sessions."
+        echo "  hh <query> [context]   : Search history for regex <query> with [context] lines around it (default 0)."
+        echo "  hh <number> [context]  : Show [context] lines around history entry <number> (default 30)."
+        echo "  h  <query> [gap_mins]  : Search history for regex <query> and group into time-based work sessions."
         echo ""
         echo -e "\e[01;96mExamples:\e[00m"
-        echo "  h 'clone.*gitlab' 5    : Find gitlab clone commands with 5 lines of context around matches."
-        echo "  h 'something\b'        : Search using regex word boundaries."
-        echo "  h 500 10               : Show 10 lines of context around history line 500."
-        echo "  hh 'pkgctl' 15         : Find 'pkgctl' and show the surrounding work session (splits if inactive for 15+ mins)."
+        echo "  hh 'clone.*gitlab' 5   : Find gitlab clone commands with 5 lines of context around matches."
+        echo "  hh 'something\b'       : Search using regex word boundaries."
+        echo "  hh 500 10              : Show 10 lines of context around history line 500."
+        echo "  h 'pkgctl' 15          : Find 'pkgctl' and show the surrounding work session (splits if inactive for 15+ mins)."
         return 0
     fi
 
@@ -708,9 +691,9 @@ function h() {
             fi
         done
     else
-        local grep_cmd="grep -E -i"
+        local grep_args=(-E -i -- "$query")
         if [[ $context -gt 0 ]]; then
-            grep_cmd+=" -C $context"
+            grep_args=(-E -i -C "$context" -- "$query")
         fi
 
         while IFS=$'\n' read -r entry; do
@@ -742,14 +725,22 @@ function h() {
             fi
 
             printf "\e[2m%-*s \e[00m%s\n" "$max_number_length" "$number" "$highlighted_cmd"
-        done < <(history | eval "$grep_cmd" -- "\"$query\"")
+        done < <(history | grep "${grep_args[@]}")
     fi
     printf "\e[01;95m======================\e[00m\n"
 }
 
-function hh() {
+function h() {
     if [[ $# -eq 0 || "$1" == "-h" || "$1" == "--help" ]]; then
-        h --help
+        echo -e "\e[01;95mSession History Search\e[00m"
+        echo "Search history for regex matches and expand them into time-based work sessions."
+        echo ""
+        echo -e "\e[01;96mUsage:\e[00m"
+        echo "  h  <query> [gap_mins]  : Show the surrounding work session for regex matches."
+        echo ""
+        echo -e "\e[01;96mExamples:\e[00m"
+        echo "  h 'pkgctl'             : Show the nearby commands around pkgctl matches."
+        echo "  h 'pkgctl' 15          : Split sessions if inactive for 15+ minutes."
         return 0
     fi
 
@@ -835,7 +826,7 @@ for s_i, (start, end) in enumerate(sessions):
     end_dt = datetime.datetime.fromtimestamp(end_ts)
 
     date_str = start_dt.strftime("%Y-%m-%d")
-    time_span = f"{start_dt.strftime("%H:%M:%S")} -> {end_dt.strftime("%H:%M:%S")}"
+    time_span = "{} -> {}".format(start_dt.strftime("%H:%M:%S"), end_dt.strftime("%H:%M:%S"))
 
     # Beautifully formatted separator
     sep_inner = f" {date_str} ---- {time_span} "
@@ -2612,4 +2603,3 @@ fi
 if [[ -f "$HOME/.bash_custom" ]]; then
     source "$HOME/.bash_custom"
 fi
-export PATH="$HOME/.npm-global/bin:$PATH"
