@@ -1386,43 +1386,314 @@ fi
 ##  +-+-+-+-+-+-+-+-+-+-+
 ##  |j|o|u|r|n|a|l|c|t|l|
 ##  +-+-+-+-+-+-+-+-+-+-+
+_SYSTEMD_UNIT_TYPES=(service socket timer target path mount automount slice scope)
+_SYSTEMD_UNIT_FILE_TYPES=(service socket timer target path mount automount)
+
+function _journal_paint() {
+    if [[ ! -t 1 ]]; then
+        cat
+        return
+    fi
+
+    awk '
+        BEGIN {
+            red = "\033[1;31m"
+            yellow = "\033[1;33m"
+            green = "\033[1;32m"
+            cyan = "\033[1;36m"
+            reset = "\033[0m"
+        }
+        {
+            line = $0
+            lower = tolower(line)
+            if (lower ~ /(panic|segfault|fatal|critical|failed|failure|error|exception|traceback|denied)/) {
+                print red line reset
+            } else if (lower ~ /(warning|warn|timeout|timed out|refused|unreachable|degraded)/) {
+                print yellow line reset
+            } else if (lower ~ /(started|listening|mounted|reached|success|succeeded)/) {
+                print green line reset
+            } else if (lower ~ /(gnome-shell|kernel|systemd|sudo)/) {
+                print cyan line reset
+            } else {
+                print line
+            }
+        }
+    '
+}
+
+function _journal_pretty() {
+    journalctl --no-hostname --output short-precise --no-pager -l "$@" | _journal_paint
+}
+
+function _systemd_has_unit_suffix() {
+    local unit="$1"
+    local suffix
+    for suffix in "${_SYSTEMD_UNIT_TYPES[@]}"; do
+        [[ "$unit" == *."$suffix" ]] && return 0
+    done
+    return 1
+}
+
+function _systemd_completion_base() {
+    local unit="$1"
+    local suffix
+    for suffix in "${_SYSTEMD_UNIT_TYPES[@]}"; do
+        [[ "$unit" == *."$suffix" ]] && {
+            printf '%s\n' "${unit%.$suffix}"
+            return
+        }
+    done
+    printf '%s\n' "$unit"
+}
+
+function _systemd_completion_prefix() {
+    local unit="$1"
+    local suffix
+    local tail
+
+    if [[ "$unit" == *.* ]]; then
+        tail="${unit##*.}"
+        for suffix in "${_SYSTEMD_UNIT_TYPES[@]}"; do
+            [[ "$suffix" == "$tail"* ]] && {
+                printf '%s\n' "${unit%.*}"
+                return
+            }
+        done
+    fi
+
+    printf '%s\n' "$unit"
+}
+
+function _systemd_candidate_units() {
+    local unit="$1"
+    local suffix
+
+    [[ -z "$unit" ]] && return 1
+
+    if _systemd_has_unit_suffix "$unit"; then
+        printf '%s\n' "$unit"
+        return
+    fi
+
+    for suffix in "${_SYSTEMD_UNIT_TYPES[@]}"; do
+        printf '%s.%s\n' "$unit" "$suffix"
+    done
+}
+
+function _systemd_unit_exists() {
+    local scope="$1"
+    local unit="$2"
+    local load_state
+
+    if [[ "$scope" == "user" ]]; then
+        load_state=$(systemctl --user show --property=LoadState --value "$unit" 2>/dev/null)
+    else
+        load_state=$(systemctl show --property=LoadState --value "$unit" 2>/dev/null)
+    fi
+
+    [[ -n "$load_state" && "$load_state" != "not-found" ]]
+}
+
+function _systemd_resolve_units() {
+    local unit="$1"
+    local candidate
+    local found=1
+
+    while read -r candidate; do
+        if _systemd_unit_exists user "$candidate"; then
+            printf 'user %s\n' "$candidate"
+            found=0
+        fi
+        if _systemd_unit_exists system "$candidate"; then
+            printf 'system %s\n' "$candidate"
+            found=0
+        fi
+    done < <(_systemd_candidate_units "$unit")
+
+    return "$found"
+}
+
+function _systemd_resolve_control_unit() {
+    local unit="$1"
+    local scope
+    local resolved
+    local user_match=
+
+    while read -r scope resolved; do
+        if [[ "$scope" == "system" ]]; then
+            printf 'system %s\n' "$resolved"
+            return 0
+        fi
+        [[ -z "$user_match" ]] && user_match="$resolved"
+    done < <(_systemd_resolve_units "$unit")
+
+    if [[ -n "$user_match" ]]; then
+        printf 'user %s\n' "$user_match"
+        return 0
+    fi
+
+    return 1
+}
+
 function _systemctl_exists_user() {
-    service="${1//.service/}"
-    [ "$(systemctl --user list-unit-files "${service}.service" | wc -l)" -gt 3 ] &&
-        [ "$(systemctl list-unit-files "${service}.service" | wc -l)" -eq 3 ]
+    local scope
+    local unit
+
+    read -r scope unit < <(_systemd_resolve_control_unit "$1") || return 1
+    [[ "$scope" == "user" ]]
+}
+
+function _systemd_list_units() {
+    local scope="$1"
+    local state="${2:-}"
+    local unit_type_arg
+    local unit_file_type_arg
+
+    unit_type_arg=$(IFS=, ; echo "${_SYSTEMD_UNIT_TYPES[*]}")
+    unit_file_type_arg=$(IFS=, ; echo "${_SYSTEMD_UNIT_FILE_TYPES[*]}")
+
+    if [[ "$scope" == "user" ]]; then
+        if [[ "$state" == "enabled" || "$state" == "disabled" ]]; then
+            systemctl --user list-unit-files --all --no-legend --no-pager --type="$unit_file_type_arg" --state="$state" 2>/dev/null | awk '{print $1}'
+        elif [[ -n "$state" && "$state" != "loaded" ]]; then
+            systemctl --user list-units --all --no-legend --no-pager --type="$unit_type_arg" --state="$state" 2>/dev/null | awk '{print $1}'
+        else
+            systemctl --user list-units --all --no-legend --no-pager --type="$unit_type_arg" 2>/dev/null | awk '{print $1}'
+            systemctl --user list-unit-files --all --no-legend --no-pager --type="$unit_file_type_arg" 2>/dev/null | awk '{print $1}'
+        fi
+    else
+        if [[ "$state" == "enabled" || "$state" == "disabled" ]]; then
+            systemctl list-unit-files --all --no-legend --no-pager --type="$unit_file_type_arg" --state="$state" 2>/dev/null | awk '{print $1}'
+        elif [[ -n "$state" && "$state" != "loaded" ]]; then
+            systemctl list-units --all --no-legend --no-pager --type="$unit_type_arg" --state="$state" 2>/dev/null | awk '{print $1}'
+        else
+            systemctl list-units --all --no-legend --no-pager --type="$unit_type_arg" 2>/dev/null | awk '{print $1}'
+            systemctl list-unit-files --all --no-legend --no-pager --type="$unit_file_type_arg" 2>/dev/null | awk '{print $1}'
+        fi
+    fi
+}
+
+function _systemd_completion_units() {
+    local state="${1:-}"
+
+    {
+        _systemd_list_units system "$state"
+        _systemd_list_units user "$state"
+    } | while read -r unit; do
+        [[ -n "$unit" ]] && _systemd_completion_base "$unit"
+    done | sort -u
+}
+
+function _complete_systemd_units() {
+    local cur
+    local prefix
+    local units
+    local state="${1:-}"
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prefix=$(_systemd_completion_prefix "$cur")
+    units=$(_systemd_completion_units "$state")
+
+    COMPREPLY=($(compgen -W "${units}" -- "$prefix"))
 }
 
 if _e "journalctl"; then
-    alias je='journalctl -efn 100 --no-hostname'
-    alias jb='journalctl -eb --no-hostname'
+    alias je='_journal_pretty -efn 100'
+    alias jb='_journal_pretty -b'
     function st() {
-        if _systemctl_exists_user "${1}"; then
-            journalctl --output cat -lxe _SYSTEMD_USER_UNIT="${1}"
-        else
-            journalctl --output cat -lxe _SYSTEMD_UNIT="${1}"
+        local unit="$1"
+        local scope
+        local resolved
+        local matches=()
+        local match_count=0
+
+        if [[ -z "$unit" ]]; then
+            echo "Usage: st <systemd-unit>"
+            return 2
         fi
+
+        while read -r scope resolved; do
+            matches+=("$scope:$resolved")
+            ((match_count++))
+        done < <(_systemd_resolve_units "$unit")
+
+        if [[ "$match_count" -eq 0 ]]; then
+            echo "st: no systemd unit found for '$unit'" >&2
+            echo "Try tab completion with the base name, for example: st pulseaudio" >&2
+            return 1
+        fi
+
+        for match in "${matches[@]}"; do
+            scope="${match%%:*}"
+            resolved="${match#*:}"
+            if [[ "$match_count" -gt 1 ]]; then
+                printf '\e[1;36m==> %s %s\e[0m\n' "$scope" "$resolved"
+            fi
+            if [[ "$scope" == "user" ]]; then
+                _journal_pretty -b -n "${ST_LINES:-200}" _SYSTEMD_USER_UNIT="$resolved"
+            else
+                _journal_pretty -b -n "${ST_LINES:-200}" _SYSTEMD_UNIT="$resolved"
+            fi
+        done
     }
     function _complete_journalctl() {
-        local cur
-        local units
-        COMPREPLY=()
-        cur=${COMP_WORDS[COMP_CWORD]}
+        _complete_systemd_units
+    }
+    function syswhat() {
+        local section_color=$'\e[1;35m'
+        local reset=$'\e[0m'
+        local dmesg_output
 
-        # Get loaded system and user units of specific types using systemctl
-        # --all includes inactive units which might still have logs
-        # --no-legend removes the header line
-        # --no-pager prevents output from being piped to less
-        units=$( ( \
-                    systemctl list-units --all --no-legend --no-pager --type=service,target,socket ; \
-                    systemctl --user list-units --all --no-legend --no-pager --type=service,target,socket 2>/dev/null \
-                 ) | awk '{print $1}' | sort -u )
-                 # Added 2>/dev/null for the user command to suppress errors if the user manager isn't running
+        printf '%s==> System%s\n' "$section_color" "$reset"
+        uptime
+        free -h
 
-        # Generate completions based on the list of known units
-        COMPREPLY=( $(compgen -W "${units}" -- "$cur") )
+        printf '\n%s==> Pressure%s\n' "$section_color" "$reset"
+        if [[ -r /proc/pressure/cpu ]]; then
+            awk '{print FILENAME ": " $0}' /proc/pressure/cpu /proc/pressure/memory /proc/pressure/io 2>/dev/null
+        else
+            echo "No PSI data in /proc/pressure"
+        fi
+
+        printf '\n%s==> Failed system units%s\n' "$section_color" "$reset"
+        systemctl --failed --no-pager --plain 2>/dev/null || echo "systemctl --failed unavailable"
+
+        printf '\n%s==> Failed user units%s\n' "$section_color" "$reset"
+        systemctl --user --failed --no-pager --plain 2>/dev/null || echo "systemctl --user --failed unavailable"
+
+        printf '\n%s==> Recent warnings and errors%s\n' "$section_color" "$reset"
+        _journal_pretty -b -p warning..alert -n "${SYSWHAT_JOURNAL_LINES:-80}"
+
+        printf '\n%s==> Kernel ring buffer%s\n' "$section_color" "$reset"
+        if dmesg_output=$(dmesg --level=emerg,alert,crit,err,warn --ctime --color=always 2>/dev/null); then
+            printf '%s\n' "$dmesg_output" | tail -n "${SYSWHAT_DMESG_LINES:-80}"
+        elif dmesg_output=$(sudo -n dmesg --level=emerg,alert,crit,err,warn --ctime --color=always 2>/dev/null); then
+            printf '%s\n' "$dmesg_output" | tail -n "${SYSWHAT_DMESG_LINES:-80}"
+        else
+            echo "dmesg unavailable without sudo; run sudo dmesg for kernel logs"
+        fi
+
+        printf '\n%s==> Disks%s\n' "$section_color" "$reset"
+        df -hT -x tmpfs -x devtmpfs 2>/dev/null
+
+        if _e lsblk; then
+            printf '\n%s==> Block devices%s\n' "$section_color" "$reset"
+            lsblk -o NAME,TYPE,SIZE,FSTYPE,FSUSE%,MOUNTPOINTS 2>/dev/null
+        fi
+
+        printf '\n%s==> Established network connections%s\n' "$section_color" "$reset"
+        ss -tun state established 2>/dev/null | head -n 25
+
+        printf '\n%s==> Hot processes by CPU%s\n' "$section_color" "$reset"
+        ps -eo pid,ppid,stat,pcpu,pmem,comm,args --sort=-pcpu | head -n 15
+
+        printf '\n%s==> Hot processes by memory%s\n' "$section_color" "$reset"
+        ps -eo pid,ppid,stat,pcpu,pmem,comm,args --sort=-pmem | head -n 15
     }
     complete -F _complete_journalctl st
     complete -F _complete_alias je jb
+    alias lowlevel=syswhat
 fi
 
 ##  +-+-+-+-+-+-+-+-+-+
@@ -1430,21 +1701,33 @@ fi
 ##  +-+-+-+-+-+-+-+-+-+
 if _e "systemctl"; then
     function _scomps() {
-        local cur
-        COMPREPLY=()
-        cur=${COMP_WORDS[COMP_CWORD]}
-        if [[ $1 == "loaded" ]]; then
-            user_units=$(systemctl --user list-unit-files --type socket,service,timer --all | grep -E '(service|socket|timer)' | awk '{print $1}')
-            system_units=$(systemctl list-unit-files --type socket,service,timer --all | grep -E '(service|socket|timer)' | awk '{print $1}')
-        elif [[ $1 == "enabled" || $1 == "disabled" ]]; then
-            user_units=$(systemctl --user list-unit-files --type socket,service,timer --all --state=$1 | grep -E '(service|socket|timer)' | awk '{print $1}')
-            system_units=$(systemctl list-unit-files --type socket,service,timer --all --state=$1 | grep -E '(service|socket|timer)' | awk '{print $1}')
-        else
-            user_units=$(systemctl --user list-units --type socket,service,timer --state=$1 | grep -E '(service|socket|timer).*loaded' | awk '{print $1}')
-            system_units=$(systemctl list-units --type socket,service,timer --state=$1 | grep -E '(service|socket|timer).*loaded' | awk '{print $1}')
+        _complete_systemd_units "$1"
+    }
+    function _systemd_control() {
+        local action="$1"
+        local requested
+        local scope
+        local unit
+
+        shift
+        requested="${1:-}"
+        [[ $# -gt 0 ]] && shift
+
+        if [[ -z "$requested" ]]; then
+            systemctl "$action" "$@"
+            return
         fi
-        # user_units
-        COMPREPLY=($(compgen -W "$user_units $system_units" -- $cur))
+
+        read -r scope unit < <(_systemd_resolve_control_unit "$requested") || {
+            echo "${action}: no systemd unit found for '$requested'" >&2
+            return 1
+        }
+
+        if [[ "$scope" == "user" ]]; then
+            systemctl --user "$action" "$unit" "$@"
+        else
+            systemctl "$action" "$unit" "$@"
+        fi
     }
     function _sstart() {
         _scomps inactive
@@ -1466,51 +1749,27 @@ if _e "systemctl"; then
     }
 
     sstart() {
-        if _systemctl_exists_user "${1}"; then
-            systemctl --user start "${1}"
-        else
-            systemctl start "${1}"
-        fi
+        _systemd_control start "$@"
     }
     complete -F _sstart sstart
     sstop() {
-        if _systemctl_exists_user "${1}"; then
-            systemctl --user stop "${1}"
-        else
-            systemctl stop "${1}"
-        fi
+        _systemd_control stop "$@"
     }
     complete -F _sstop sstop
     srestart() {
-        if _systemctl_exists_user "${1}"; then
-            systemctl --user restart "${1}"
-        else
-            systemctl restart "${1}"
-        fi
+        _systemd_control restart "$@"
     }
     complete -F _srestart srestart
     sstatus() {
-        if _systemctl_exists_user "${1}"; then
-            systemctl --user status "${1}"
-        else
-            systemctl status "${1}"
-        fi
+        _systemd_control status "$@"
     }
     complete -F _sstatus sstatus
     senable() {
-        if _systemctl_exists_user "${1}"; then
-            systemctl --user enable "${1}"
-        else
-            systemctl enable "${1}"
-        fi
+        _systemd_control enable "$@"
     }
     complete -F _senable senable
     sdisable() {
-        if _systemctl_exists_user "${1}"; then
-            systemctl --user disable "${1}"
-        else
-            systemctl disable "${1}"
-        fi
+        _systemd_control disable "$@"
     }
     complete -F _sdisable sdisable
 fi
