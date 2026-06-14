@@ -25,8 +25,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=43
-export _DATE="May 18th, 2026"
+export _RCVERSION=44
+export _DATE="May 29th, 2026"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -40,22 +40,22 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 43 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 44 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
- ${a}History search got a real upgrade and the prompt now exposes more git state.${r}
+ ${a}System logs and low-level machine checks are easier to read and target.${r}
 
-  ${r}- ${b}Swift History Search.${r}
-    ${a}${c}hh${r}${a} now provides the fast regex/context lookup flow with built-in help.${r}
-    ${a}${c}h${r}${a} now provides session-based grouped search around matching commands.${r}
-    ${a}Removed the unsafe ${c}eval${r}${a}-based grep invocation and fixed the embedded Python session renderer.${r}
+  ${r}- ${b}Smarter systemd log helpers.${r}
+    ${a}${c}st${r}${a} now accepts bare unit names or explicit suffixes like ${c}.service${r}${a} and ${c}.socket${r}${a}.${r}
+    ${a}Completion now collapses unit variants to useful base names, so ${c}pulseaudio${r}${a} appears once.${r}
+    ${a}Unknown units fail with a clear message instead of opening an empty journal pager.${r}
 
-  ${r}- ${b}Git Prompt Improvements.${r}
-    ${a}Upstream status now shows actual ahead/behind counts like ${c}↑5${r}${a}, ${c}↓3${r}${a}, or ${c}↑69↓66${r}${a}.${r}
-    ${a}Added stash visibility with a ${c}⊕N${r}${a} indicator and improved staged/dirty detection.${r}
+  ${r}- ${b}Cleaner journal viewing.${r}
+    ${a}${c}je${r}${a}, ${c}jb${r}${a}, and ${c}st${r}${a} use concise timestamps, no hostname noise, no surprise pager, and severity coloring.${r}
+    ${a}Bare unit names expand to every matching system/user unit so service/socket pairs are shown together.${r}
 
-  ${r}- ${b}Shell Quality-of-Life.${r}
-    ${a}Updated ${c}ls${r}${a} defaults to use ${c}--file-type${r}${a} and cleaned up prompt cache invalidation.${r}
-    ${a}Added ${c}$HOME/.npm-global/bin${r}${a} to ${c}PATH${r}${a} alongside the other guarded user bin directories.${r}
+  ${r}- ${b}Low-level snapshot command.${r}
+    ${a}Added ${c}syswhat${r}${a} for a pretty overview of failed units, warnings, kernel logs, pressure, disks, network, and hot processes.${r}
+    ${a}${c}lowlevel${r}${a} is an alias for the same check.${r}
   "
 }
 
