@@ -1871,7 +1871,24 @@ if _e git; then
     # gitl remains an alias as it's a specific log view
     alias gitl="git log --graph --all --pretty=format:'%C(auto,yellow)%h%C(magenta)%C(auto,bold)% G? %C(reset)%>(12,trunc) %ad %C(auto,blue)%<(10,trunc)%aN%C(auto)%d %C(auto,reset)%s' --date=relative"
 
-    # Removed gitd alias (logic moved to git function)
+    function gitd() {
+        if [[ $# -eq 0 ]]; then
+            git diff
+            return
+        fi
+
+        local commit="$1" next
+        [[ $commit == "~" || $commit == "$HOME" ]] && commit="HEAD~"
+
+        if [[ $# -eq 1 ]]; then
+            next=$(git rev-list --ancestry-path --reverse "${commit}..HEAD" | head -n 1)
+            [[ -n $next ]] || { echo "gitd: no next commit from $commit to HEAD" >&2; return 1; }
+            git diff "$commit" "$next"
+            return
+        fi
+
+        git diff "$@"
+    }
 
     function gitm() {
         git commit --amend -m "$*"
