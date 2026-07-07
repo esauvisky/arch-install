@@ -2769,8 +2769,9 @@ function clear() {
 
 ## use bat instead of cat if available
 function cat() {
-    if [[ -t 0 ]] && [[ $# == 1 ]] && _e bat && bat -L | grep -qm1 "[,:]${1##*.}($|,)"; then
-        command bat -P "$@"
+    bat -L | grep -qm1 "[,:]${1##*.}($|,)"
+    if [[ -t 0 ]] && [[ $# == 1 ]] && _e bat && bat -L | grep -q "${1##*.}"; then
+        command bat --color always --decorations never -P "$@"
     else
         command cat "$@"
     fi
