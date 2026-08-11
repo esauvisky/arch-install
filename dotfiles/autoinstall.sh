@@ -137,7 +137,18 @@ if [[ $QUIET == "false" ]]; then
 
     if hash nano 2>/dev/null; then
         echo -e "\e[34;01mAdding syntax highlighting to nano..."
-        find /usr/share/nano* -iname "*.nanorc" -exec echo include {} \; >> ~/.nanorc
+        # Let nano expand these globs when it starts.  Writing one include per
+        # installed file leaves broken entries behind whenever a package
+        # removes or renames a syntax definition.
+        if compgen -G '/usr/share/nano/*.nanorc' >/dev/null; then
+            echo 'include "/usr/share/nano/*.nanorc"' >>~/.nanorc
+        fi
+        if compgen -G '/usr/share/nano/extra/*.nanorc' >/dev/null; then
+            echo 'include "/usr/share/nano/extra/*.nanorc"' >>~/.nanorc
+        fi
+        if compgen -G '/usr/share/nano-syntax-highlighting/*.nanorc' >/dev/null; then
+            echo 'include "/usr/share/nano-syntax-highlighting/*.nanorc"' >>~/.nanorc
+        fi
     fi
 
     if ! ([[ $(id -u) -eq 0 ]] || hash sudo 2>/dev/null); then
