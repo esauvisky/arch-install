@@ -25,8 +25,8 @@
 [[ $- != *i* ]] && return
 
 ## Used for version checking
-export _RCVERSION=44
-export _DATE="May 29th, 2026"
+export _RCVERSION=45
+export _DATE="August 12th, 2026"
 function _changelog() {
     local a=$'\e[36;03m'       # cyan
     local r=$'\e[00m'          # reset
@@ -40,22 +40,17 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog 44 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog 45 ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
- ${a}System logs and low-level machine checks are easier to read and target.${r}
+ ${a}Everyday file viewing and commit inspection got a little sharper.${r}
 
-  ${r}- ${b}Smarter systemd log helpers.${r}
-    ${a}${c}st${r}${a} now accepts bare unit names or explicit suffixes like ${c}.service${r}${a} and ${c}.socket${r}${a}.${r}
-    ${a}Completion now collapses unit variants to useful base names, so ${c}pulseaudio${r}${a} appears once.${r}
-    ${a}Unknown units fail with a clear message instead of opening an empty journal pager.${r}
+  ${r}- ${b}Restored ${c}gitd${r}${b} commit navigation.${r}
+    ${a}Run ${c}gitd${r}${a} with no arguments for the working-tree diff, or pass a commit to compare it with its next descendant toward ${c}HEAD${r}${a}.${r}
+    ${a}Multiple arguments still pass through to ${c}git diff${r}${a}, and ${c}gitd ~${r}${a} is a shortcut for the previous commit.${r}
 
-  ${r}- ${b}Cleaner journal viewing.${r}
-    ${a}${c}je${r}${a}, ${c}jb${r}${a}, and ${c}st${r}${a} use concise timestamps, no hostname noise, no surprise pager, and severity coloring.${r}
-    ${a}Bare unit names expand to every matching system/user unit so service/socket pairs are shown together.${r}
-
-  ${r}- ${b}Low-level snapshot command.${r}
-    ${a}Added ${c}syswhat${r}${a} for a pretty overview of failed units, warnings, kernel logs, pressure, disks, network, and hot processes.${r}
-    ${a}${c}lowlevel${r}${a} is an alias for the same check.${r}
+  ${r}- ${b}Cleaner syntax-highlighted file output.${r}
+    ${a}${c}cat${r}${a} now asks ${c}bat${r}${a} for always-colored, decoration-free output when it recognizes the file type.${r}
+    ${a}Unsupported files and non-interactive input continue through the regular ${c}cat${r}${a} path.${r}
   "
 }
 
