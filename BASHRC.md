@@ -202,6 +202,21 @@ Behavior:
 
 ## systemd / journalctl Behavior
 
+### `log <service-name>`
+
+`log` completion is limited to currently running system and user service
+units. It intentionally does not scan the journal while completing, so Tab
+stays fast and does not surface transient D-Bus or coredump units.
+
+Bare service names are matched against all related service-unit names, so
+`log pulseaudio` includes every currently running system or user service containing
+`pulseaudio` in its name. Unmatched words retain the message-text fallback.
+
+### `sys`
+
+Interactive `sys` output is opened in `less -R` so the overview can be paged;
+redirected and piped output remains non-interactive.
+
 ### `st <unit>`
 
 `st` does not just call journalctl blindly.
@@ -308,4 +323,3 @@ Several default readline bindings are intentionally removed so they can be repur
 
 - `Alt+0` through `Alt+9`
 - function keys `F1` through `F10`, plus `F12`
-
