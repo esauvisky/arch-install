@@ -206,6 +206,7 @@
         # pacman -Sy nano-syntax-highlighting
         # nano /etc/nanorc
                 include "/usr/share/nano/*.nanorc"
+                # Add this only when the directory exists:
                 include "/usr/share/nano-syntax-highlighting/*.nanorc"
 
 - Editar /etc/pacman.conf
