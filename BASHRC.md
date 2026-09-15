@@ -1,8 +1,70 @@
-# Hidden `.bashrc` / `.inputrc` Features
+# Hidden `emishrc` / `.inputrc` Features
 
-Only non-obvious behavior from [`dotfiles/.bashrc`](/home/emi/Coding/arch-install/dotfiles/.bashrc) and [`dotfiles/.inputrc`](/home/emi/Coding/arch-install/dotfiles/.inputrc).
+Only non-obvious behavior from [`dotfiles/.emishrc/`](/home/emi/Coding/arch-install/dotfiles/.emishrc) and [`dotfiles/.inputrc`](/home/emi/Coding/arch-install/dotfiles/.inputrc).
 
 This intentionally ignores obvious aliases and cosmetic wrappers that are self-explanatory once seen in use.
+
+## Layout
+
+Since release 48 the shell config is split in two.
+
+| Path | Owner | Updated? |
+| --- | --- | --- |
+| `~/.bashrc` | you | never, after the first install |
+| `~/.emishrc/` | the repo | replaced wholesale on every update |
+
+`~/.bashrc` carries a small managed block at the very top that sources
+`~/.emishrc/init.sh`, and nothing else of ours. Everything you (or an
+installer that appends to the bottom of `~/.bashrc`) put below that block runs
+*after* emishrc, so your own settings always win. This replaces the old
+`~/.bash_custom`, which the installer folds into `~/.bashrc` and renames to
+`~/.bash_custom.migrated`.
+
+`~/.emishrc/init.sh` sources `~/.emishrc/rc.d/*.sh` in filename order. The
+modules are a pure split of the old monolith, so load order is unchanged:
+
+```
+00-core            _e, is_ssh, PATH, hostname, EDITOR, Android SDK
+05-history-opts    eternal history settings
+10-prompt-cache    prompt caching primitives
+15-completion      bash completion loading
+20-utils           select_option, format_duration, profiler, truncated pwd, colors
+25-colors          less/man/dircolors/grc
+30-history-search  hh, h
+35-history-cleanup cleanup_bash_history
+40-ai              ask, Ctrl+O
+45-navigation      extract, _magicCD, findir, cdcool
+50-adb             adb multi-device wrappers
+55-journal         log, sys, st
+60-systemctl       sstart, sstop, srestart, ...
+65-pacman          pacman/yay wrappers
+70-git             git wrappers, gits, _git_sync, git prompt
+75-prompt          PS1, _pre_command, VTE
+80-aliases         grc-colored aliases
+85-python          venv, pip, python prompt info
+90-overrides       clear, cat, grep, diff, rm
+```
+
+### Escape hatches
+
+- `EMISHRC_DISABLE=1` — skip emishrc entirely.
+- `EMISHRC_SKIP="50-adb 85-python"` — skip individual modules.
+- `EMISHRC_NO_UPDATE=1` — never check for updates.
+
+Set them in the environment, or above the managed block in `~/.bashrc`.
+
+### Updating
+
+`check_updates` runs in the background at most once a day, compares
+`~/.emishrc/VERSION` with the one in the repo and, when behind, re-runs
+`autoinstall.sh --quiet`. The installer stages every file in `$HOME` first and
+only swaps anything in once all of them downloaded and parsed, so a flaky
+connection can't leave you with a half-installed shell. The previous
+`~/.emishrc/` is kept at `~/.emishrc.bak`.
+
+To cut a release: bump `dotfiles/.emishrc/VERSION`, edit `_changelog` in
+`dotfiles/.emishrc/update.sh`, then run `dotfiles/release.sh` to regenerate the
+manifest and stamp the legacy update marker that pre-48 clients look for.
 
 ## History Behavior
 

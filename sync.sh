@@ -44,12 +44,35 @@ copy_file() {
     fi
 }
 
+# Repo-only files that have no counterpart in $HOME, plus dotfiles/.bashrc,
+# which is the install-once template and must never be overwritten by the
+# personal ~/.bashrc of whoever runs this.
+SYNC_SKIP=(
+    "dotfiles/.bashrc"
+    "dotfiles/autoinstall.sh"
+    "dotfiles/release.sh"
+    "dotfiles/.emishrc/MANIFEST"
+)
+
+is_skipped() {
+    local candidate="$1" skip
+    for skip in "${SYNC_SKIP[@]}"; do
+        [[ $candidate == "$skip" ]] && return 0
+    done
+    return 1
+}
+
 # Function to sync files from a source directory to a target directory
 sync_files() {
     local source_dir="$1"
     local target_dir="$2"
 
     git ls-files "$target_dir" | while read -r target_file; do
+        if is_skipped "$target_file"; then
+            echo -e "${YELLOW}Skipping $target_file (not synced from \$HOME)${NC}"
+            continue
+        fi
+
         # Get the relative path of the target file
         relative_path="${target_file#$target_dir/}"
 
