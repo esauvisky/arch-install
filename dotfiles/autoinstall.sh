@@ -58,7 +58,7 @@ trap cleanup EXIT INT TERM HUP
 
 say "\e[34;01mFetching emishrc from esauvisky/arch-install\e[00m"
 
-manifest=$(fetch "$RAW/.emishrc/MANIFEST") || die "Could not download the file manifest. Aborting, nothing was changed."
+manifest=$(fetch "$RAW/.emishrc/FILES") || die "Could not download the file manifest. Aborting, nothing was changed."
 grep -q '^\.emishrc/init\.sh$' <<<"$manifest" || die "The downloaded manifest looks wrong. Aborting, nothing was changed."
 
 total=$(grep -c . <<<"$manifest")

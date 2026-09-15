@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Regenerates .emishrc/MANIFEST and stamps the legacy update marker in .bashrc
+# Regenerates .emishrc/FILES and stamps the legacy update marker in .bashrc
 # from .emishrc/VERSION. Run it from this directory after bumping VERSION.
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
@@ -14,11 +14,11 @@ version=$(tr -cd '0-9' < .emishrc/VERSION)
     find .emishrc/rc.d -name '*.sh' -type f | sort
     printf '%s\n' .bash_completion .dircolors .inputrc .toprc .nanorc .git_prompt.sh
     find .grc -type f | sort
-} > .emishrc/MANIFEST
+} > .emishrc/FILES
 
 ## Old (<= 47) clients grep the remote .bashrc for `export _RCVERSION=`, so the
 ## template carries an inert comment that their sed still parses into a number.
 sed -i -E "s|^(# emishrc legacy update marker, do not remove: export _RCVERSION=)[0-9]+$|\1${version}|" .bashrc
 grep -q "export _RCVERSION=${version}$" .bashrc || { echo "failed to stamp legacy marker in .bashrc" >&2; exit 1; }
 
-echo "release $version: $(wc -l < .emishrc/MANIFEST) files in MANIFEST, legacy marker stamped"
+echo "release $version: $(wc -l < .emishrc/FILES) files listed, legacy marker stamped"

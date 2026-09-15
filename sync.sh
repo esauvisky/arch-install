@@ -51,7 +51,7 @@ SYNC_SKIP=(
     "dotfiles/.bashrc"
     "dotfiles/autoinstall.sh"
     "dotfiles/release.sh"
-    "dotfiles/.emishrc/MANIFEST"
+    "dotfiles/.emishrc/FILES"
 )
 
 is_skipped() {
