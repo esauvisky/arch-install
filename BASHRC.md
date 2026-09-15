@@ -53,6 +53,25 @@ modules are a pure split of the old monolith, so load order is unchanged:
 
 Set them in the environment, or above the managed block in `~/.bashrc`.
 
+### Symlinked dotfiles (dev checkouts)
+
+If a path in `$HOME` is a symlink, something else already owns it -- a checkout
+of this repo, stow, chezmoi -- so the installer skips it instead of replacing it
+or writing through it. That keeps a development box, where `~/.inputrc` and
+friends point straight into `dotfiles/`, from being silently detached from its
+checkout or having the installer scribble into the git tree.
+
+`~/.bashrc` is the one exception, because it is per-machine state and must be a
+real file. A symlink pointing at *our own* file (the pre-48 monolith, or the
+template) is replaced by a real file; the target stays in git, so nothing is
+lost. A symlink to anything else is left alone and the block is prepended to its
+target.
+
+On a development box `~/.emishrc` is therefore best left as a symlink into
+`dotfiles/.emishrc/`: edits land straight in the repo, `sync.sh` notices source
+and target are the same inode, and `check_updates` never fires because the local
+`VERSION` is never behind the published one.
+
 ### Updating
 
 `check_updates` runs in the background at most once a day, compares

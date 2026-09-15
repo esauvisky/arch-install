@@ -33,6 +33,10 @@ copy_file() {
                 echo -e "${RED}$(date '+%Y-%m-%d %H:%M:%S') - Error copying $actual_file to $dest_file${NC}"
             fi
         fi
+    elif [ "$src_file" -ef "$dest_file" ]; then
+        # Reached through a symlinked parent directory (e.g. ~/.emishrc -> here),
+        # so source and target are literally the same inode. Nothing to copy.
+        echo -e "${GREEN}$(date '+%Y-%m-%d %H:%M:%S') - Success: $src_file is already the local target $dest_file${NC}"
     else
         # If it's not a symlink, copy the file directly
         mkdir -p "$(dirname "$dest_file")"

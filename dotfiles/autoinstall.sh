@@ -29,6 +29,11 @@ command -v curl >/dev/null 2>&1 || command -v wget >/dev/null 2>&1 || {
 say()  { [[ $QUIET == true ]] || echo -e "$*"; }
 die()  { echo -e "\e[31;01m$*\e[00m" >&2; exit 1; }
 
+## `[ -r /dev/tty ]` is true even with no controlling terminal (it only stats the
+## device node), so actually try to open it. Without this, a piped non-quiet run
+## would "ask" questions nobody can answer and then act on the default.
+has_tty() { (exec </dev/tty) 2>/dev/null; }
+
 fetch() {
     if command -v curl >/dev/null 2>&1; then
         curl -fsSL -H "cache-control: no-cache" "$1"
@@ -102,16 +107,30 @@ done
 #  |I|n|s|t|a|l|l|i|n|g|
 #  +-+-+-+-+-+-+-+-+-+
 
+## A symlink means something else already owns that path -- a checkout of this
+## repo, stow, chezmoi, whatever. Overwriting it (or writing through it) would
+## either detach the user's setup or scribble into their git tree, so leave it be.
+managed_elsewhere() {
+    [[ -L $1 ]] || return 1
+    say "\e[33;01mSkipping ~/${1#"$HOME/"}: it is a symlink to $(readlink "$1"), so something else manages it.\e[00m"
+    return 0
+}
+
 ## ~/.emishrc/ is fully managed: swap the whole directory. Updates run daily, so
 ## keep exactly one previous copy around instead of filling the trash with them.
-rm -rf "$HOME/.emishrc.bak"
-[[ -e "$HOME/.emishrc" ]] && mv -f "$HOME/.emishrc" "$HOME/.emishrc.bak"
-mv "$STAGE/.emishrc" "$HOME/.emishrc" || die "Could not install $HOME/.emishrc."
-chmod +x "$HOME/.emishrc"/*.sh "$HOME/.emishrc"/rc.d/*.sh 2>/dev/null
+if managed_elsewhere "$HOME/.emishrc"; then
+    :
+else
+    rm -rf "$HOME/.emishrc.bak"
+    [[ -e "$HOME/.emishrc" ]] && mv -f "$HOME/.emishrc" "$HOME/.emishrc.bak"
+    mv "$STAGE/.emishrc" "$HOME/.emishrc" || die "Could not install $HOME/.emishrc."
+    chmod +x "$HOME/.emishrc"/*.sh "$HOME/.emishrc"/rc.d/*.sh 2>/dev/null
+fi
 
 ## The standalone dotfiles keep the old behaviour: replaced on every update.
 while IFS= read -r path; do
     [[ -n $path && $path != .emishrc/* ]] || continue
+    managed_elsewhere "$HOME/$path" && continue
     mkdir -p "$HOME/$(dirname "$path")"
     retire "$HOME/$path"
     mv "$STAGE/$path" "$HOME/$path" || say "\e[31;01mCould not install ~/$path\e[00m"
@@ -123,7 +142,22 @@ done <<<"$manifest"
 # Written at most once. From then on it belongs to the user and updates skip it.
 
 BASHRC="$HOME/.bashrc"
-[[ -L $BASHRC ]] && BASHRC=$(readlink -f "$BASHRC")
+
+## ~/.bashrc is per-machine state now, so it has to be a real file. If it is a
+## symlink into a checkout of THIS repo (a dev box, or the old setup where
+## ~/.bashrc was the tracked monolith) the link gets replaced by a real file --
+## the target stays in git, nothing is lost. A symlink to anything else belongs
+## to someone else's dotfile manager, so we write through it and leave it alone.
+if [[ -L $BASHRC ]]; then
+    link_target=$(readlink -f "$BASHRC")
+    if [[ -e $link_target ]] && { grep -q '^export _RCVERSION=' "$link_target" ||
+                                  grep -qF "$BLOCK_START" "$link_target"; }; then
+        say "\e[33;01m~/.bashrc pointed at $link_target; replacing the symlink with a real file you own.\e[00m"
+        rm -f "$BASHRC"
+    else
+        BASHRC=$link_target
+    fi
+fi
 
 emishrc_block() {
     # The managed block only, pulled out of the template.
@@ -167,8 +201,15 @@ if [[ -s $CUSTOM ]] && ! grep -qF "$MIGRATION_MARK" "$BASHRC" 2>/dev/null; then
         sed '1{/^#!/d}' "$CUSTOM"
         echo "# --- end of migrated ~/.bash_custom ---"
     } >> "$BASHRC"
-    mv -f "$CUSTOM" "$CUSTOM.migrated"
-    say "\e[32;01m~/.bash_custom was appended to ~/.bashrc and renamed to ~/.bash_custom.migrated\e[00m"
+    if [[ -L $CUSTOM ]]; then
+        ## Renaming a symlink would just leave a dangling one behind; the content
+        ## is now in ~/.bashrc and still in whatever checkout it pointed at.
+        rm -f "$CUSTOM"
+        say "\e[32;01m~/.bash_custom was appended to ~/.bashrc and its symlink removed\e[00m"
+    else
+        mv -f "$CUSTOM" "$CUSTOM.migrated"
+        say "\e[32;01m~/.bash_custom was appended to ~/.bashrc and renamed to ~/.bash_custom.migrated\e[00m"
+    fi
 fi
 
 #  +-+-+-+-+-+-+-+-+-+-+-+-+
@@ -188,7 +229,7 @@ done
 if [[ -z $login_rc ]] || ! grep -q '\.bashrc' "$login_rc"; then
     answer=n
     target=${login_rc:-$HOME/.bash_profile}
-    if [[ $QUIET == false && -r /dev/tty ]]; then
+    if [[ $QUIET == false ]] && has_tty; then
         echo -e "\e[33;01m$(basename "$target") does not source .bashrc, so login shells (ssh, tty, Termux) would skip it. Add it? [Y/n]\e[00m"
         read -r answer < /dev/tty
         [[ -z $answer ]] && answer=y
@@ -220,6 +261,11 @@ fi
 #  |I|n|t|e|r|a|c|t|i|v|e| |e|x|t|r|a|s|
 #  +-+-+-+-+-+-+-+-+-+-+-+-+
 
+if ! has_tty; then
+    echo -e "\e[32;01mEverything went well! No terminal attached, so the optional extras were skipped.\e[00m"
+    exit 0
+fi
+
 if command -v gio >/dev/null 2>&1; then
     echo -e "\e[32;01mEverything went well! Previous files are in the trash bin.\e[00m"
 else
@@ -228,7 +274,7 @@ fi
 
 ask() { # ask <prompt> <default y|n>
     local answer
-    [[ -r /dev/tty ]] || return 1
+    has_tty || return 1
     echo -en "$1"
     read -r answer < /dev/tty
     [[ -z $answer ]] && answer=$2
