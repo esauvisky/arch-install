@@ -159,4 +159,4 @@ alias code="code-insiders"
 ##  +-+-+-+ +-+-+-+-+-+-+-+-+-+-+-+
 
 alias cyrillify="sed 'y/aceopxyABCEHKMOPTX/асеорхуАВСЕНКМОРТХ/'"
-alias cyrillify="sed 'y/aceopxyABCEHKMOPTX/асеорхуАВСЕНКМОРТХ/'"
+alias claude='claude --permission-mode bypassPermissions'

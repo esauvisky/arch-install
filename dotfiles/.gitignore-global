@@ -37,3 +37,5 @@ AGENTS.md
 .superpowers/
 .agents/
 docs/
+
+**/.claude/settings.local.json
