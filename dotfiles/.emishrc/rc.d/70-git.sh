@@ -305,13 +305,25 @@ if _e git; then
     # =========================================================================
     #  CUSTOM GIT PROMPT
     # =========================================================================
+    # Count stashes by reading the ref log directly; `git stash list` forks a
+    # process and walks the ref just to give us a number. Sets _GIT_STASH_COUNT.
+    function _git_stash_count() {
+        local git_dir="$1" common="$1" log line
+        _GIT_STASH_COUNT=0
+        # linked worktrees keep refs (and the stash) in the common dir
+        [[ -f "$git_dir/commondir" ]] && common="$git_dir/$(<"$git_dir/commondir")"
+        log="$common/logs/refs/stash"
+        [[ -f "$log" ]] || return
+        while IFS= read -r line; do ((_GIT_STASH_COUNT++)); done < "$log"
+    }
+
     function _git_prompt() {
         # Quick check: git must be available and we must be in a git repo
-        git rev-parse --git-dir &>/dev/null || return
+        local git_dir
+        git_dir=$(git rev-parse --git-dir 2>/dev/null) || return
+        [[ -n "$git_dir" ]] || return
 
         # Check cache using git HEAD file as trigger
-        local git_dir
-        git_dir=$(git rev-parse --git-dir 2>/dev/null)
         local head_file="$git_dir/HEAD"
         local cache_key="${PWD}:_git_prompt"
 
@@ -321,8 +333,8 @@ if _e git; then
         local head_trigger=""
         [[ -f "$head_file" ]] && head_trigger=$(cat "$head_file" 2>/dev/null)
         [[ -f "$git_dir/index" ]] && head_trigger+=":$(stat -c %Y "$git_dir/index" 2>/dev/null)"
-        local stash_count_for_cache=$(git stash list 2>/dev/null | wc -l)
-        head_trigger+=":stash:${stash_count_for_cache}"
+        _git_stash_count "$git_dir"
+        head_trigger+=":stash:${_GIT_STASH_COUNT}"
 
         # Try to get cached result
         if cached=$(_cache_get "$cache_key" "$_PROMPT_CACHE_TTL_GIT" "$head_trigger" 2>/dev/null); then
@@ -373,17 +385,17 @@ if _e git; then
             op_state="bisect"
         fi
 
-        # 2. Get Status using single git call (much faster than multiple calls)
-        # git status --porcelain=v2 gives us all info in one call
-        local status_output
-        status_output=$(git status --porcelain=v2 --branch 2>/dev/null)
+        # 2. Get Status without walking the whole worktree
+        # `git status` stats (and rehashes) every tracked file and scans for
+        # untracked ones before printing anything -- hundreds of ms in big or
+        # very dirty trees. We only need three booleans, and `git diff --quiet`
+        # bails out at the first difference it finds, so ask one at a time.
+        local _gitq=(timeout "${_PROMPT_GIT_TIMEOUT:-0.35}" git --no-optional-locks)
+        local slow=""
 
-        # Parse branch info from status output
+        # Branch name
         if [ -z "$bname" ]; then
-            # Extract branch name from status output
-            local branch_line=$(echo "$status_output" | grep "^# branch.head")
-            if [[ "$branch_line" =~ "branch.head "([^[:space:]]+) ]]; then
-                bname="${BASH_REMATCH[1]}"
+            if bname=$(git symbolic-ref --quiet --short HEAD 2>/dev/null); then
                 detached="no"
             else
                 # Detached HEAD
@@ -393,39 +405,38 @@ if _e git; then
             fi
         fi
 
-        # Parse status flags from porcelain output
-        # Look for any changes: staged (index) or unstaged (worktree)
-        while IFS= read -r line; do
-            # Skip comment lines and branch info
-            [[ "$line" =~ ^# ]] && continue
+        if [[ "${_PROMPT_GIT_NO_DIRTY:-0}" != 1 ]]; then
+            # Unstaged changes (untracked files never affected the prompt, so
+            # skip the untracked scan entirely)
+            "${_gitq[@]}" diff --no-ext-diff --quiet --ignore-submodules=dirty 2>/dev/null
+            case $? in
+                0)   ;;
+                1)   dirty="*" ;;
+                124) slow="yes" ;;
+            esac
 
-            # Status line format: 1 XY <fields>... where X=index status, Y=worktree status
-            # Only process actual status lines (start with digit+space)
-            [[ "$line" =~ ^[0-9][[:space:]] ]] || continue
+            # Staged changes
+            "${_gitq[@]}" diff --no-ext-diff --cached --quiet --ignore-submodules=dirty 2>/dev/null
+            case $? in
+                0)   ;;
+                1)   staged="+" ;;
+                124) slow="yes" ;;
+            esac
 
-            # Check index (staged) status - X character (position 2) must not be "."
-            if [[ "${line:2:1}" != "." ]]; then
-                staged="+"
-            fi
-
-            # Check worktree (unstaged) status - Y character (position 3) must not be "."
-            if [[ "${line:3:1}" != "." ]]; then
-                dirty="*"
-            fi
-
-            # Check for conflicts (unmerged)
-            if [[ "$line" =~ ^u[[:space:]] ]]; then
+            # Conflicts: index-only, so cheap no matter how big the worktree is
+            if [[ -n "$(git --no-optional-locks ls-files --unmerged 2>/dev/null)" ]]; then
                 conflict="|CONFLICT"
-                break  # Stop processing once we find conflict
             fi
-        done <<< "$status_output"
 
-        # 3. Parse upstream info from status output
-        local ab_line=$(echo "$status_output" | grep "^# branch.ab")
-        local stash_count=0
-        if [[ "$ab_line" =~ branch.ab[[:space:]]([+-][0-9]+)[[:space:]]([+-][0-9]+) ]]; then
-            local ahead="${BASH_REMATCH[1]#*+}"
-            local behind="${BASH_REMATCH[2]#*+}"
+            # Timed out: say so rather than claim the tree is clean
+            [[ -n "$slow" ]] && dirty=""
+        fi
+
+        # 3. Upstream divergence (left = upstream-only = behind, right = ahead)
+        local ab_counts
+        if ab_counts=$(git --no-optional-locks rev-list --count --left-right '@{upstream}...HEAD' 2>/dev/null); then
+            local behind="${ab_counts%%[[:space:]]*}"
+            local ahead="${ab_counts##*[[:space:]]}"
 
             # If both present, we're diverged
             if [[ $ahead -gt 0 && $behind -gt 0 ]]; then
@@ -438,12 +449,16 @@ if _e git; then
             fi
         fi
 
-        # Check for stashed changes
-        stash_count=$(git stash list 2>/dev/null | wc -l)
+        # Check for stashed changes (already counted for the cache trigger)
+        local stash_count=$_GIT_STASH_COUNT
         local stash_status=""
         if [[ $stash_count -gt 0 ]]; then
             stash_status="${__CyanBold}⊕${stash_count}${__Reset}"
         fi
+
+        # Status unknown: git took longer than _PROMPT_GIT_TIMEOUT
+        local slow_status=""
+        [[ -n "$slow" ]] && slow_status="${__Bold}${__Gray}?${__Reset}"
 
         # 4. Determine Colors
         local frame_color=""
@@ -485,7 +500,7 @@ if _e git; then
             op_text="${op_color}${op_text}"
         fi
 
-        local result=" ${frame_color}[${branch_color_str}${pipe_str}${op_text}${conflict_color}${conflict}${upstream_status}${stash_status}${frame_color}]$__Reset"
+        local result=" ${frame_color}[${branch_color_str}${pipe_str}${op_text}${conflict_color}${conflict}${upstream_status}${stash_status}${slow_status}${frame_color}]$__Reset"
 
         # Cache the result
         _cache_set "$cache_key" "$result" "$head_trigger"
