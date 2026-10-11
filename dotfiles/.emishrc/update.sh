@@ -7,11 +7,13 @@
 export _RCVERSION
 _RCVERSION=$(< "$EMISHRC_DIR/VERSION")
 _RCVERSION=${_RCVERSION//[^0-9]/}
-export _DATE="September 15th, 2026"
+export _DATE="October 11th, 2026"
 
-## State lives in $HOME, not in $EMISHRC_DIR: the latter is wiped on every update.
-_EMISHRC_STAMP="$HOME/.emishrc_last_check"
-_EMISHRC_SEEN="$HOME/.emishrc_last_seen"
+## State lives outside $EMISHRC_DIR (wiped on every update) and outside $HOME
+## proper (clutter, and a dev checkout symlinked at ~/.emishrc would get dirty).
+_EMISHRC_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/emishrc"
+_EMISHRC_STAMP="$_EMISHRC_STATE/last_check"
+_EMISHRC_SEEN="$_EMISHRC_STATE/last_seen"
 _EMISHRC_RAW="${EMISHRC_RAW:-https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles}"
 
 function _changelog() {
@@ -27,7 +29,8 @@ function _changelog() {
     local f=$'\e[5;91;01m'     # flashing red bold
 
     echo "${g}emi's .bashrc${r}
-${y}Changelog $_RCVERSION ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
+${y}Changelog $_RCVERSION ($_DATE)${r}
+${f}!!! READ THIS CHANGELOG, IT IS IMPORTANT !!!${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) + 10))\}$/ & /;ta"
     echo -e "
  ${a}Your ${c}~/.bashrc${r}${a} is yours now. Everything else lives in ${c}~/.emishrc/${r}${a}.${r}
 
@@ -43,6 +46,12 @@ ${y}Changelog $_RCVERSION ($_DATE)${r}" | sed -e :a -e "s/^.\{1,$(($(tput cols) 
   ${r}- ${b}The monolith was split into modules.${r}
     ${a}${c}~/.emishrc/rc.d/*.sh${r}${a} is sourced in filename order. Skip any of them with${r}
     ${a}${c}EMISHRC_SKIP=\"50-adb 85-python\"${r}${a}, or disable emishrc entirely with ${c}EMISHRC_DISABLE=1${r}${a}.${r}
+
+ ${a}Smaller things that came along for the ride.${r}
+
+  ${r}- ${b}Faster git prompt:${r}${a} no more ${c}git status${r}${a}; slow checks time out and show a gray ${c}?${r}${a}.${r}
+  ${r}- ${b}Symlink-aware installer:${r}${a} symlinked dotfiles (repo checkout, stow, chezmoi) are left alone.${r}
+  ${r}- ${b}Nano highlighting survives updates:${r}${a} includes are regenerated as globs on every run. Thanks @root!${r}
   "
 }
 
@@ -55,8 +64,10 @@ function check_updates() {
     if [[ -s "$_EMISHRC_STAMP" ]]; then
         local last
         last=$(< "$_EMISHRC_STAMP")
-        [[ $((now - ${last//[^0-9]/})) -gt 86400 ]] || return 0
+        last=${last//[^0-9]/}
+        [[ -n $last && $((now - last)) -le 86400 ]] && return 0
     fi
+    mkdir -p "$_EMISHRC_STATE" 2>/dev/null
     echo "$now" >"$_EMISHRC_STAMP" 2>/dev/null || return 0
 
     remote=$(_emishrc_fetch "$_EMISHRC_RAW/.emishrc/VERSION")

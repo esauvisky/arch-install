@@ -6,7 +6,7 @@ This intentionally ignores obvious aliases and cosmetic wrappers that are self-e
 
 ## Layout
 
-Since release 48 the shell config is split in two.
+Since release 50 the shell config is split in two.
 
 | Path | Owner | Updated? |
 | --- | --- | --- |
@@ -62,7 +62,7 @@ friends point straight into `dotfiles/`, from being silently detached from its
 checkout or having the installer scribble into the git tree.
 
 `~/.bashrc` is the one exception, because it is per-machine state and must be a
-real file. A symlink pointing at *our own* file (the pre-48 monolith, or the
+real file. A symlink pointing at *our own* file (the pre-50 monolith, or the
 template) is replaced by a real file; the target stays in git, so nothing is
 lost. A symlink to anything else is left alone and the block is prepended to its
 target.
@@ -83,7 +83,7 @@ connection can't leave you with a half-installed shell. The previous
 
 To cut a release: bump `dotfiles/.emishrc/VERSION`, edit `_changelog` in
 `dotfiles/.emishrc/update.sh`, then run `dotfiles/release.sh` to regenerate the
-manifest and stamp the legacy update marker that pre-48 clients look for.
+manifest and stamp the legacy update marker that pre-50 clients look for.
 
 ## History Behavior
 

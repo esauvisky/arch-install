@@ -5,12 +5,9 @@
 #
 #   MANAGED FILE. Everything under ~/.emishrc/ is replaced wholesale on update.
 #   Your own aliases, functions and exports belong in ~/.bashrc, which the
-#   updater never touches. This file is sourced from the top of it.
-#
-#   Escape hatches (set them in the environment or above the emishrc block):
-#     EMISHRC_DISABLE=1              skip emishrc entirely
-#     EMISHRC_SKIP="50-adb 85-python"   skip individual rc.d modules
-#     EMISHRC_NO_UPDATE=1            never phone home for updates
+#   updater never touches. This file is sourced from the emishrc block at the
+#   top of it; the knobs (EMISHRC_DISABLE, EMISHRC_SKIP, EMISHRC_NO_UPDATE) are
+#   documented there.
 #
 #   https://github.com/esauvisky/arch-install
 
@@ -63,6 +60,7 @@ _emishrc_greet() {
 
     if [[ ${seen//[^0-9]/} != "$_RCVERSION" ]]; then
         _changelog
+        mkdir -p "$_EMISHRC_STATE" 2>/dev/null
         echo "$_RCVERSION" >"$_EMISHRC_SEEN" 2>/dev/null
     elif [[ $RANDOM -lt 10000 ]]; then
         _e "fortune" "cowthink" "lolcat" &&

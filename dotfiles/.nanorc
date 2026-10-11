@@ -1,4 +1,4 @@
-## Colors for user's nano
+## Colors
 set titlecolor bold,white,blue
 set promptcolor lightwhite,grey
 set statuscolor bold,white,green
@@ -10,19 +10,6 @@ set scrollercolor cyan
 set numbercolor white,blue
 set keycolor cyan
 set functioncolor green
-
-#### Colors for root's nano
-###set titlecolor bold,black,magenta
-###set promptcolor black,yellow
-###set statuscolor bold,black,magenta
-###set errorcolor bold,white,red
-###set spotlightcolor black,orange
-###set selectedcolor lightwhite,cyan
-###set stripecolor ,yellow
-###set scrollercolor magenta
-###set numbercolor black,magenta
-###set keycolor lightmagenta
-###set functioncolor magenta
 
 ## Characters that are special in a shell should not be escaped here.
 ## Inside string parameters, quotes should not be escaped -- the last

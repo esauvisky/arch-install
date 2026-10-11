@@ -3,26 +3,32 @@
 # ~/.bashrc
 #
 
-# >>> emishrc >>>
-# Managed block -- keep it at the very top of this file.
-# Loads emi's bashrc from ~/.emishrc/ (https://github.com/esauvisky/arch-install).
-# Updates ONLY ever rewrite ~/.emishrc/. This file is yours: edit it freely,
-# it will never be overwritten again. Anything you (or an installer) put below
-# runs after emishrc, so your settings always win.
-# Set EMISHRC_DISABLE=1 above this line to turn it off.
-# emishrc legacy update marker, do not remove: export _RCVERSION=48
+# ================================== emishrc ===================================
+# Loads emi's shell config from ~/.emishrc/  (github.com/esauvisky/arch-install)
+# Updates rewrite ~/.emishrc/ only. This file was written once and is now yours.
+#
+# Knobs, set them above the source line or in the environment:
+#   EMISHRC_DISABLE=1                  skip emishrc entirely
+#   EMISHRC_SKIP="50-adb 85-python"    skip these ~/.emishrc/rc.d/ modules
+#   EMISHRC_NO_UPDATE=1                never check for updates
+#
+# emishrc legacy update marker, do not remove: export _RCVERSION=50
 [[ -r "$HOME/.emishrc/init.sh" ]] && source "$HOME/.emishrc/init.sh"
-# <<< emishrc <<<
+# =============================== end of emishrc ===============================
 
-# If not running interactively, don't do anything else.
-[[ $- != *i* ]] && return
+# ##############################################################################
+# ##                                                                          ##
+# ##      FROM HERE DOWN IT IS ALL YOURS.  emishrc stops at the line above.   ##
+# ##                                                                          ##
+# ##   Aliases, functions, exports: put them here. Updates never touch this   ##
+# ##   file again, and it runs after emishrc, so what you write here wins.    ##
+# ##                                                                          ##
+# ##############################################################################
 
-## Dangerous stuff that interferes with scripts.
-# Allows non case-sensitive wildcard globs (*, ?):
-shopt -s nocaseglob
-# Allows extended wildcard globs
-shopt -s extglob
-# Enables the ** glob
-shopt -s globstar
+[[ $- != *i* ]] && return    # non-interactive shells stop here
 
-# Your aliases, functions and exports go below.
+# Starter globbing options emishrc put here for you. Change or delete freely.
+shopt -s nocaseglob    # case-insensitive globs
+shopt -s extglob       # extended patterns: !(x) +(x) @(x)
+shopt -s globstar      # ** matches recursively
+

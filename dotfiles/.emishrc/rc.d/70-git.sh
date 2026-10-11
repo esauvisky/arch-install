@@ -427,14 +427,11 @@ if _e git; then
             if [[ -n "$(git --no-optional-locks ls-files --unmerged 2>/dev/null)" ]]; then
                 conflict="|CONFLICT"
             fi
-
-            # Timed out: say so rather than claim the tree is clean
-            [[ -n "$slow" ]] && dirty=""
         fi
 
         # 3. Upstream divergence (left = upstream-only = behind, right = ahead)
         local ab_counts
-        if ab_counts=$(git --no-optional-locks rev-list --count --left-right '@{upstream}...HEAD' 2>/dev/null); then
+        if ab_counts=$("${_gitq[@]}" rev-list --count --left-right '@{upstream}...HEAD' 2>/dev/null); then
             local behind="${ab_counts%%[[:space:]]*}"
             local ahead="${ab_counts##*[[:space:]]}"
 

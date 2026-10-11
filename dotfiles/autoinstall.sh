@@ -16,8 +16,8 @@ QUIET=false
 [[ ${1:-} == "--quiet" ]] && QUIET=true
 
 RAW="${EMISHRC_RAW:-https://raw.githubusercontent.com/esauvisky/arch-install/master/dotfiles}"
-BLOCK_START="# >>> emishrc >>>"
-BLOCK_END="# <<< emishrc <<<"
+BLOCK_START="# ================================== emishrc ==================================="
+BLOCK_END="# =============================== end of emishrc ==============================="
 MIGRATION_MARK="# --- migrated from ~/.bash_custom by emishrc ---"
 
 for dep in sed grep mktemp; do
@@ -112,6 +112,10 @@ done
 ## either detach the user's setup or scribble into their git tree, so leave it be.
 managed_elsewhere() {
     [[ -L $1 ]] || return 1
+    if [[ ! -e $1 ]]; then
+        say "\e[33;01m~/${1#"$HOME/"} is a dangling symlink to $(readlink "$1"); replacing it.\e[00m"
+        return 1
+    fi
     say "\e[33;01mSkipping ~/${1#"$HOME/"}: it is a symlink to $(readlink "$1"), so something else manages it.\e[00m"
     return 0
 }
@@ -122,7 +126,7 @@ if managed_elsewhere "$HOME/.emishrc"; then
     :
 else
     rm -rf "$HOME/.emishrc.bak"
-    [[ -e "$HOME/.emishrc" ]] && mv -f "$HOME/.emishrc" "$HOME/.emishrc.bak"
+    [[ -e "$HOME/.emishrc" || -L "$HOME/.emishrc" ]] && mv -f "$HOME/.emishrc" "$HOME/.emishrc.bak"
     mv "$STAGE/.emishrc" "$HOME/.emishrc" || die "Could not install $HOME/.emishrc."
     chmod +x "$HOME/.emishrc"/*.sh "$HOME/.emishrc"/rc.d/*.sh 2>/dev/null
 fi
@@ -135,6 +139,33 @@ while IFS= read -r path; do
     retire "$HOME/$path"
     mv "$STAGE/$path" "$HOME/$path" || say "\e[31;01mCould not install ~/$path\e[00m"
 done <<<"$manifest"
+
+## Nano syntax highlighting is generated here, on every run, rather than shipped
+## inside .nanorc: the syntax dirs differ per machine (Termux, Arch's extra
+## package), nano < 4.0 errors at startup on an include glob that matches
+## nothing, and nano < 2.9 cannot glob at all.
+if command -v nano >/dev/null 2>&1 && [[ -f $HOME/.nanorc && ! -L $HOME/.nanorc ]]; then
+    nano_ver=$(nano --version 2>/dev/null | sed -n '1s/.*version \([0-9][0-9.]*\).*/\1/p')
+    nano_globs=yes
+    [[ $(printf '%s\n' 2.9 "${nano_ver:-0}" | sort -V | head -1) == 2.9 ]] || nano_globs=no
+    nano_dirs=(/usr/share/nano /usr/share/nano/extra /usr/share/nano-syntax-highlighting)
+    [[ -n ${PREFIX:-} && $PREFIX != /usr ]] && nano_dirs+=("$PREFIX/share/nano" "$PREFIX/share/nano/extra")
+    {
+        echo ""
+        echo "## Syntax highlighting, generated for this machine by the emishrc installer."
+        for d in "${nano_dirs[@]}"; do
+            compgen -G "$d/*.nanorc" >/dev/null || continue
+            if [[ $nano_globs == yes ]]; then
+                echo "include \"$d/*.nanorc\""
+            else
+                for f in "$d"/*.nanorc; do echo "include \"$f\""; done
+            fi
+        done
+    } >> "$HOME/.nanorc"
+fi
+
+## Update-check state moved to ~/.local/state/emishrc/ in release 50.
+rm -f "$HOME/.emishrc_last_check" "$HOME/.emishrc_last_seen"
 
 #  +-+-+-+-+-+-+-+
 #  |.|b|a|s|h|r|c|
@@ -164,10 +195,11 @@ emishrc_block() {
     sed -n "/^${BLOCK_START}\$/,/^${BLOCK_END}\$/p"
 }
 
-if [[ -e $BASHRC ]] && grep -qF "$BLOCK_START" "$BASHRC"; then
+## The second pattern is the marker the unreleased 48/49 dev builds used.
+if [[ -e $BASHRC ]] && grep -qF -e "$BLOCK_START" -e '# >>> emishrc >>>' "$BASHRC"; then
     say "\e[32;01m~/.bashrc already loads emishrc, leaving it alone.\e[00m"
 elif [[ -e $BASHRC ]] && grep -q '^export _RCVERSION=' "$BASHRC" && grep -q '^function check_updates' "$BASHRC"; then
-    ## Pre-48 layout: the whole monolith lived in ~/.bashrc. Retire it.
+    ## Pre-50 layout: the whole monolith lived in ~/.bashrc. Retire it.
     backup="$BASHRC.pre-emishrc-$(date +%Y%m%d%H%M%S)"
     cp -p "$BASHRC" "$backup" 2>/dev/null
     cp "$STAGE/bashrc-template" "$BASHRC" || die "Could not write $BASHRC."
@@ -305,17 +337,6 @@ elif command -v apt >/dev/null 2>&1; then
     fi
 fi
 
-## Nano syntax highlighting, without piling up duplicate includes on every run.
-if command -v nano >/dev/null 2>&1 && ! grep -q '^include "\?/usr/share/nano' "$HOME/.nanorc" 2>/dev/null; then
-    echo -e "\e[34;01mAdding syntax highlighting to nano...\e[00m"
-    ## Let nano expand these globs when it starts. Writing one include per
-    ## installed file leaves broken entries behind whenever a package removes
-    ## or renames a syntax definition.
-    for d in /usr/share/nano /usr/share/nano/extra /usr/share/nano-syntax-highlighting; do
-        compgen -G "$d/*.nanorc" >/dev/null && echo "include \"$d/*.nanorc\"" >> "$HOME/.nanorc"
-    done
-fi
-
 if ! { [[ $(id -u) -eq 0 ]] || command -v sudo >/dev/null 2>&1; }; then
     echo -e "\e[34;01mYou need to be root or have sudo to be able to get additional options. Run this script again with sudo or as root.\e[00m"
     exit 0
@@ -323,21 +344,14 @@ fi
 
 as_root() { if [[ $(id -u) -eq 0 ]]; then "$@"; else sudo "$@"; fi; }
 
-if ask "\e[34;01m\nDo you want to have nanorc for the root user with different colors? [Y/n]\e[00m " y; then
-    echo -e "\e[34;01mCopying .nanorc to /etc/nanorc...\e[00m"
-    as_root cp "$HOME/.nanorc" /etc/nanorc
-    as_root sed -i '/^## Colors for user/,/^####/d' /etc/nanorc
-    as_root sed -i 's/^###//' /etc/nanorc
-fi
-
 if ask "\e[34;01m\nDo you want new users on this machine to automatically have emi's bashrc installed by default? [Y/n]\e[00m " y; then
     echo -e "\e[34;01mCopying files to /etc/skel...\e[00m"
     as_root rm -rf /etc/skel/.emishrc
-    as_root cp -r "$HOME/.emishrc" "$HOME/.bash_completion" "$HOME/.dircolors" \
-        "$HOME/.inputrc" "$HOME/.toprc" "$HOME/.grc" /etc/skel/
+    ## -L: on a dev box these are symlinks into a checkout; skel needs real copies.
+    as_root cp -rL "$HOME/.emishrc" "$HOME/.bash_completion" "$HOME/.dircolors" \
+        "$HOME/.inputrc" "$HOME/.toprc" "$HOME/.nanorc" "$HOME/.grc" /etc/skel/
     ## New users get the small stub, never a copy of your personal .bashrc.
     as_root cp "$STAGE/bashrc-template" /etc/skel/.bashrc
-    [[ -f /etc/nanorc ]] && as_root cp /etc/nanorc /etc/skel/.nanorc
     if [[ $ADD_TO_BASH_PROFILE -eq 1 ]]; then
         printf '\n# Source the .bashrc file\nif [ -f ~/.bashrc ]; then\n  source ~/.bashrc\nfi\n' |
             as_root tee -a /etc/skel/.bash_profile >/dev/null
